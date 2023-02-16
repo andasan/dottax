@@ -11,10 +11,12 @@ import {
   Title,
   Text,
   Anchor,
+  Notification,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { showNotification } from '@mantine/notifications';
 
 import { LoadingDots } from '@/components/common/loading-dots';
 
@@ -79,23 +81,31 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
           onSubmit={form.onSubmit((values) => {
             console.log(values);
 
-            signIn("credentials", {
-              redirect: false,
-              username: e.currentTarget.username.value,
-              password: e.currentTarget.password.value,
-              // @ts-ignore
-            }).then(({ ok, error }) => {
-              setLoading(false);
-              if (ok) {
-                router.push("/dashboard");
-              } else {
-                // toast.error(error);
-              }
+            // signIn('credentials', {
+            //   redirect: false,
+            //   username: values.email,
+            //   password: values.password,
+            //   // @ts-ignore
+            // }).then(({ ok, error }) => {
+            //   setLoading(false);
+            //   if (ok) {
+            //     router.push('/dashboard');
+            //   } else {
+            //     showNotification({
+            //       title: 'Default notification',
+            //       message: 'Hey there, your code is awesome! 🤥',
+            //     });
+            //   }
 
-              if(error) {
-                // toast.error(error);
-              }
-            });
+            //   if (error) {
+            //     // toast.error(error);
+            //   }
+            // });
+
+            showNotification({
+                title: 'Default notification',
+                message: `Hey there, ${values.email} `,
+              })
           })}
         >
           <Title order={2} className={classes.title} align="center" mt="md" mb={50}>
@@ -118,9 +128,10 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
           <Checkbox label="Keep me logged in" mt="xl" size="md" />
 
           <Button
-            type='submit'
+            type="submit"
             disabled={loading}
-            fullWidth mt="xl"
+            fullWidth
+            mt="xl"
             size="md"
             className={`${
               loading
