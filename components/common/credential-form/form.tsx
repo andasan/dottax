@@ -105,6 +105,8 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
             showNotification({
                 title: 'Default notification',
                 message: `Hey there, ${values.email} `,
+                color: 'red',
+
               })
           })}
         >
