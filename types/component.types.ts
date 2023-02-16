@@ -52,6 +52,11 @@ export type StudentRowType = {
   mailStatus: 'sent' | 'standby' | 'error';
 };
 
+export type LoginCredentialsType = {
+  email: string;
+  password: string;
+}
+
 /**
   * Transactional email status
  * Sent: the transactional email has been sent to the recipient

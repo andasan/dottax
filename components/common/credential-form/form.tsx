@@ -11,7 +11,6 @@ import {
   Title,
   Text,
   Anchor,
-  Notification,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { signIn } from 'next-auth/react';
@@ -19,6 +18,7 @@ import { useRouter } from 'next/navigation';
 import { showNotification } from '@mantine/notifications';
 
 import { LoadingDots } from '@/components/common/loading-dots';
+import { LoginCredentialsType } from '@/types/component.types';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -74,42 +74,38 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
     },
   });
 
+  const handleForm = (values: LoginCredentialsType) => {
+    signIn('credentials', {
+      redirect: false,
+      username: values.email,
+      password: values.password,
+      // @ts-ignore
+    }).then(({ ok, error }) => {
+      setLoading(false);
+      if (ok) {
+        router.push('/dashboard');
+      } else {
+        showNotification({
+          title: 'Opps!',
+          message: error,
+          color: 'red',
+        });
+      }
+
+      if (error) {
+        showNotification({
+          title: 'Opps!',
+          message: error,
+          color: 'red',
+        });
+      }
+    });
+  };
+
   return (
     <div className={classes.wrapper}>
       <Paper className={classes.form} radius={0} p={30}>
-        <form
-          onSubmit={form.onSubmit((values) => {
-            console.log(values);
-
-            // signIn('credentials', {
-            //   redirect: false,
-            //   username: values.email,
-            //   password: values.password,
-            //   // @ts-ignore
-            // }).then(({ ok, error }) => {
-            //   setLoading(false);
-            //   if (ok) {
-            //     router.push('/dashboard');
-            //   } else {
-            //     showNotification({
-            //       title: 'Default notification',
-            //       message: 'Hey there, your code is awesome! 🤥',
-            //     });
-            //   }
-
-            //   if (error) {
-            //     // toast.error(error);
-            //   }
-            // });
-
-            showNotification({
-                title: 'Default notification',
-                message: `Hey there, ${values.email} `,
-                color: 'red',
-
-              })
-          })}
-        >
+        <form onSubmit={form.onSubmit(handleForm)}>
           <Title order={2} className={classes.title} align="center" mt="md" mb={50}>
             Welcome back to Dottax!
           </Title>
