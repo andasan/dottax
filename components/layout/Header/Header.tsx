@@ -8,6 +8,7 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import React from 'react';
+import Image from 'next/image';
 
 import CICCCLogo from '@/assets/static/ciccc-logo-square.png';
 import { ColorSchemeToggle } from '@/components/common';
@@ -71,13 +72,15 @@ const HeaderBar: React.FC<HeaderBarType> = ({ opened, setOpened }) => {
     <Header height={60} p="xs" className={classes.header}>
       <div className={classes.inner}>
         <Group>
-          {/* <Burger opened={opened} onClick={() => setOpened((o) => !o)} size="sm" /> */}
-          <img
+          <Burger opened={opened} onClick={() => setOpened((o) => !o)} size="sm" />
+          <Image
             style={{
               mixBlendMode: colorScheme === 'light' ? 'darken' : 'exclusion',
             }}
             height={28}
+            width={28}
             src={CICCCLogo.src}
+            alt="CICCC Logo"
           />
         </Group>
 

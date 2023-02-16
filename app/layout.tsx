@@ -3,14 +3,17 @@ import RootStyleRegistry from './emotion';
 import QueryClientRegistry from './query';
 import Layout from '@/components/layout';
 
+import '@/styles/globals.css';
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const auth = true;
   return (
     <html lang="en-US">
       <head />
       <body>
         <RootStyleRegistry>
           <QueryClientRegistry>
-            <Layout>{children}</Layout>
+            {auth ? <>{children}</> : <Layout>{children}</Layout>}
           </QueryClientRegistry>
         </RootStyleRegistry>
       </body>

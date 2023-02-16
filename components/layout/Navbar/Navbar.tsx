@@ -46,7 +46,6 @@ export default function NavigationBar() {
   const { classes } = useStyles()
   const links = navData.map((item) => <LinksGroup {...item} key={item.label} />)
 
-  console.log("Main: ", links)
   return (
     <Navbar width={{ sm: 300 }} hidden={false} p="md" className={classes.navbar}>
       <Navbar.Section grow className={classes.links} component={ScrollArea}>

@@ -26,14 +26,7 @@ export default function Layout({ children }: LayoutType) {
       }}
       navbarOffsetBreakpoint="lg"
       navbar={
-        // <Navbar
-        //   p="md"
-        //   hiddenBreakpoint="lg"
-        //   hidden={!opened}
-        //   width={{ sm: 200, lg: 210 }}
-        // >
           <NavigationBar />
-        // </Navbar>
       }
       footer={<FooterBar />}
       header={<HeaderBar opened={opened} setOpened={setOpened} />}

@@ -75,9 +75,7 @@ export default function LinksGroup({
   const [opened, setOpened] = useState(initiallyOpened || false)
   const ChevronIcon = theme.dir === 'ltr' ? IconChevronRight : IconChevronLeft
   const nonNestedLinks = link && link
-  const items = (hasLinks ? links : []).map((elLink) => {
-    console.log('LABEL: ', elLink)
-    return(
+  const items = (hasLinks ? links : []).map((elLink) => (
     <UnstyledButton
       component={Link}
       className={classes.link}
@@ -86,7 +84,7 @@ export default function LinksGroup({
     >
       {elLink.label}
     </UnstyledButton>
-  )})
+  ))
 
   return (
     <>
