@@ -65,41 +65,96 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
     initialValues: {
       email: '',
       password: '',
+      confirmPassword: '',
+      username: '',
     },
 
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
-      password: (value) =>
-        value.length > 5 ? null : 'Password must be at least 6 characters long',
+      password: (value) => {
+        if (value.length < 6) {
+          return 'Password must be at least 6 characters long';
+        }
+
+        if (!/\d/.test(value)) {
+          return 'Password must contain at least one number';
+        }
+
+        if (!/[a-z]/.test(value)) {
+          return 'Password must contain at least one lowercase letter';
+        }
+
+        if (!/[A-Z]/.test(value)) {
+          return 'Password must contain at least one uppercase letter';
+        }
+
+        return null;
+      },
+      confirmPassword: (value, { password }) =>
+        value === password ? null : 'Passwords must match',
+      username: (value) =>
+        value.length > 5 ? null : 'Username must be at least 6 characters long',
     },
   });
 
   const handleForm = (values: LoginCredentialsType) => {
-    signIn('credentials', {
-      redirect: false,
-      username: values.email,
-      password: values.password,
-      // @ts-ignore
-    }).then(({ ok, error }) => {
-      setLoading(false);
-      if (ok) {
-        router.push('/dashboard');
-      } else {
-        showNotification({
-          title: 'Opps!',
-          message: error,
-          color: 'red',
-        });
-      }
+    if (type === 'login') {
+      signIn('credentials', {
+        redirect: false,
+        username: values.email,
+        password: values.password,
+        // @ts-ignore
+      }).then(({ ok, error }) => {
+        setLoading(false);
+        if (ok) {
+          router.push('/dashboard');
+        } else {
+          showNotification({
+            title: 'Opps!',
+            message: error,
+            color: 'red',
+          });
+        }
 
-      if (error) {
-        showNotification({
-          title: 'Opps!',
-          message: error,
-          color: 'red',
-        });
-      }
-    });
+        if (error) {
+          showNotification({
+            title: 'Opps!',
+            message: error,
+            color: 'red',
+          });
+        }
+      });
+    } else {
+      fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: values.email,
+          password: values.password,
+        }),
+      }).then(async (res) => {
+        setLoading(false);
+        if (res.status === 200) {
+          showNotification({
+            title: 'Account created!',
+            message: 'Redirecting to login...',
+            color: 'green',
+          });
+          setTimeout(() => {
+            router.push('/');
+          }, 2000);
+        } else {
+          const errorMessage = await res.text();
+          showNotification({
+            title: 'Opps!',
+            message: errorMessage,
+            color: 'red',
+          });
+        }
+      });
+    }
   };
 
   return (
@@ -109,7 +164,14 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
           <Title order={2} className={classes.title} align="center" mt="md" mb={50}>
             Welcome back to Dottax!
           </Title>
-
+          {type === 'register' && (
+            <TextInput
+              label="Username"
+              placeholder="hellouser"
+              size="md"
+              {...form.getInputProps('username')}
+            />
+          )}
           <TextInput
             label="Email address"
             placeholder="hello@gmail.com"
@@ -123,7 +185,17 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
             size="md"
             {...form.getInputProps('password')}
           />
-          <Checkbox label="Keep me logged in" mt="xl" size="md" />
+          {type === 'register' && (
+            <PasswordInput
+              label="Confirm Password"
+              placeholder="Your password"
+              mt="md"
+              size="md"
+              {...form.getInputProps('confirmPassword')}
+            />
+          )}
+
+          {/* {type === 'login' && <Checkbox label="Keep me logged in" mt="xl" size="md" />} */}
 
           <Button
             type="submit"
@@ -145,10 +217,35 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
           </Button>
 
           <Text align="center" mt="md">
-            Don&apos;t have an account?{' '}
-            <Anchor<'a'> href="#" weight={700} onClick={(event) => event.preventDefault()}>
-              Register
-            </Anchor>
+            {type === 'login' ? (
+              <>
+                Don&apos;t have an account?{' '}
+                <Anchor<'a'>
+                  href="/register"
+                  weight={700}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    router.push('/register');
+                  }}
+                >
+                  Register
+                </Anchor>
+              </>
+            ) : (
+              <>
+                Have an account?{' '}
+                <Anchor<'a'>
+                  href="/"
+                  weight={700}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    router.push('/');
+                  }}
+                >
+                  Login
+                </Anchor>
+              </>
+            )}
           </Text>
         </form>
       </Paper>

@@ -55,6 +55,8 @@ export type StudentRowType = {
 export type LoginCredentialsType = {
   email: string;
   password: string;
+  username?: string;
+  confirmPassword?: string;
 }
 
 /**
