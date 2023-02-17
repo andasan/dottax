@@ -1,12 +1,11 @@
-import type { UnstyledButtonProps } from '@mantine/core'
-import {
-  Avatar,
-  createStyles,
-  Group,
-  Text,
-  UnstyledButton
-} from '@mantine/core'
-import { IconChevronRight } from '@tabler/icons-react'
+
+
+import type { UnstyledButtonProps } from '@mantine/core';
+
+import { Avatar, createStyles, Group, Text, UnstyledButton, Menu, Button } from '@mantine/core';
+import { IconChevronRight, IconLogout } from '@tabler/icons-react';
+import { signOut } from "next-auth/react"
+import { useSession } from "next-auth/react"
 
 const useStyles = createStyles((theme) => ({
   user: {
@@ -16,47 +15,49 @@ const useStyles = createStyles((theme) => ({
     color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
 
     '&:hover': {
-      backgroundColor:
-        theme.colorScheme === 'dark'
-          ? theme.colors.dark[8]
-          : theme.colors.gray[0]
-    }
-  }
-}))
+      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
+    },
+  },
+}));
 
 interface UserButtonProps extends UnstyledButtonProps {
-  image: string
-  name: string
-  email: string
-  icon?: React.ReactNode
+  image: string;
+  name: string;
+  email: string;
+  icon?: React.ReactNode;
 }
 
-export function UserButton({
-  image,
-  name,
-  email,
-  icon,
-  ...others
-}: UserButtonProps) {
-  const { classes } = useStyles()
+export function UserButton({ image, name, email, icon, ...others }: UserButtonProps) {
+  const { data: session, status } = useSession()
+  const { classes } = useStyles();
 
   return (
-    <UnstyledButton className={classes.user} {...others}>
-      <Group>
-        <Avatar src={image} radius="xl" />
+    <Menu position="right-start" withArrow>
+      <Menu.Target>
+        <UnstyledButton className={classes.user} {...others}>
+          <Group>
+            <Avatar src={image} radius="xl" />
 
-        <div style={{ flex: 1 }}>
-          <Text size="sm" weight={500}>
-            {name}
-          </Text>
+            <div style={{ flex: 1 }}>
+              <Text size="sm" weight={500}>
+              {session?.user?.name}
+              </Text>
 
-          <Text color="dimmed" size="xs">
-            {email}
-          </Text>
-        </div>
+              <Text color="dimmed" size="xs">
+                {session?.user?.email}
+              </Text>
+            </div>
 
-        {icon || <IconChevronRight size={14} stroke={1.5} />}
-      </Group>
-    </UnstyledButton>
-  )
+            {icon || <IconChevronRight size={14} stroke={1.5} />}
+          </Group>
+        </UnstyledButton>
+      </Menu.Target>
+
+      <Menu.Dropdown>
+        <Menu.Item color="red" icon={<IconLogout size={14} />} onClick={() => signOut()}>
+          Logout
+        </Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
+  );
 }

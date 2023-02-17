@@ -1,13 +1,10 @@
 /* eslint-disable @next/next/no-head-element */
-import NotificationRegistry from './notification';
-import RootStyleRegistry from './emotion';
-import QueryClientRegistry from './query';
-import Layout from '@/components/layout';
+import { AuthSessionRegistry, NotificationRegistry, RootStyleRegistry, QueryClientRegistry } from '@/providers';
 
 import '@/styles/globals.css';
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const auth = true;
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+
   return (
     <html lang="en-US">
       <head />
@@ -15,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <RootStyleRegistry>
           <NotificationRegistry>
             <QueryClientRegistry>
-              {auth ? <>{children}</> : <Layout>{children}</Layout>}
+              <AuthSessionRegistry>{children}</AuthSessionRegistry>
             </QueryClientRegistry>
           </NotificationRegistry>
         </RootStyleRegistry>

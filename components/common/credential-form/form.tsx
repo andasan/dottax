@@ -66,7 +66,7 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
       email: '',
       password: '',
       confirmPassword: '',
-      username: '',
+      name: '',
     },
 
     validate: {
@@ -90,10 +90,13 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
 
         return null;
       },
-      confirmPassword: (value, { password }) =>
-        value === password ? null : 'Passwords must match',
-      username: (value) =>
-        value.length > 5 ? null : 'Username must be at least 6 characters long',
+      ...(type === 'register' && {
+        confirmPassword: (value, { password }) =>
+          value === password ? null : 'Passwords must match',
+          name: (value: string) =>
+          value.length > 4 ? null : 'Name must be at least 5 characters long',
+      }),
+      //   ...(type === "register" && { name: (value) => value.length > 5 ? null : 'Name must be at least 6 characters long'}),
     },
   });
 
@@ -101,10 +104,11 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
     if (type === 'login') {
       signIn('credentials', {
         redirect: false,
-        username: values.email,
+        email: values.email,
         password: values.password,
         // @ts-ignore
       }).then(({ ok, error }) => {
+        console.log('ok: ', ok);
         setLoading(false);
         if (ok) {
           router.push('/dashboard');
@@ -131,7 +135,8 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: values.email,
+          name: values.name,
+          email: values.email,
           password: values.password,
         }),
       }).then(async (res) => {
@@ -166,12 +171,13 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
           </Title>
           {type === 'register' && (
             <TextInput
-              label="Username"
+              label="Name"
               placeholder="hellouser"
               size="md"
-              {...form.getInputProps('username')}
+              {...form.getInputProps('name')}
             />
           )}
+          <br />
           <TextInput
             label="Email address"
             placeholder="hello@gmail.com"

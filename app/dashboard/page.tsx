@@ -27,7 +27,7 @@ function Home() {
               <Title ml="xl">Best Selling Brands</Title>
             </Paper>
             <div className="h-[400px] w-full">
-              <RevenueChart data={data} />
+              {/* <RevenueChart data={data} /> */}
             </div>
           </Stack>
         </div>
@@ -44,7 +44,7 @@ function Home() {
           </Stack>
         </div>
       </div>
-      <Grid>
+      {/* <Grid>
         <Grid.Col sm={12} md={5} lg={5}>
           <Box aria-label="transactions" title="Transactions">
             <Paper p="xs">
@@ -67,7 +67,7 @@ function Home() {
             <RecentOrdersTable />
           </Box>
         </Grid.Col>
-      </Grid>
+      </Grid> */}
     </div>
   )
 }
