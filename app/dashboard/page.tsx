@@ -1,22 +1,23 @@
-"use client"
+'use client';
 
-import { Box, Flex, Grid, Paper, Stack, Title } from '@mantine/core'
-import { IconBasket, IconCards } from '@tabler/icons-react'
+import { Box, Flex, Grid, Paper, Stack, Title } from '@mantine/core';
+import { IconBasket, IconCards } from '@tabler/icons-react';
 
-import {
-  RecentOrdersTable,
-  StatsGrid,
-  TransactionTable
-} from '@/components/common'
-import { RevenueStatCard, ViewStatBars } from '@/components/common/cards'
-import { RevenueChart } from '@/components/common/charts'
-import { viewStats, websiteViewsData } from '@/data/cards'
-import { data } from '@/data/revenue'
-import { statCards } from '@/utils/data'
+import { RecentOrdersTable, StatsGrid, TransactionTable } from '@/components/common';
+import { RevenueStatCard, ViewStatBars } from '@/components/common/cards';
+import { RevenueChart } from '@/components/common/charts';
+import { viewStats, websiteViewsData } from '@/data/cards';
+import { data } from '@/data/revenue';
+import { statCards } from '@/utils/data';
 
 function Home() {
   return (
     <div className="grid">
+        <div className="flex-[12]">
+          <Stack>
+            <RevenueStatCard data={websiteViewsData} diff={844} total={'12,434'} />
+          </Stack>
+        </div>
       <Stack ml="xl" mt="xl">
         <StatsGrid data={statCards} />
       </Stack>
@@ -26,9 +27,7 @@ function Home() {
             <Paper p="sm" ml="xl">
               <Title ml="xl">Best Selling Brands</Title>
             </Paper>
-            <div className="h-[400px] w-full">
-              {/* <RevenueChart data={data} /> */}
-            </div>
+            <div className="h-[400px] w-full">{/* <RevenueChart data={data} /> */}</div>
           </Stack>
         </div>
         <div className="flex-[4]">
@@ -36,11 +35,7 @@ function Home() {
             <ViewStatBars data={viewStats} />
           </Stack>
           <Stack>
-            <RevenueStatCard
-              data={websiteViewsData}
-              diff={844}
-              total={'12,434'}
-            />
+            <RevenueStatCard data={websiteViewsData} diff={844} total={'12,434'} />
           </Stack>
         </div>
       </div>
@@ -69,7 +64,7 @@ function Home() {
         </Grid.Col>
       </Grid> */}
     </div>
-  )
+  );
 }
 
-export default Home
+export default Home;

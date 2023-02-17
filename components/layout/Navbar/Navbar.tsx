@@ -42,12 +42,16 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-export default function NavigationBar() {
+interface NavigationBarProps {
+  opened: boolean
+}
+
+export default function NavigationBar({ opened } : NavigationBarProps) {
   const { classes } = useStyles()
   const links = navData.map((item) => <LinksGroup {...item} key={item.label} />)
 
   return (
-    <Navbar width={{ sm: 300 }} hidden={false} p="md" className={classes.navbar}>
+    <Navbar width={{ sm: 300 }} hidden={opened} p="md" className={classes.navbar}>
       <Navbar.Section grow className={classes.links} component={ScrollArea}>
         <div className={classes.linksInner}>{links}</div>
       </Navbar.Section>

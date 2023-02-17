@@ -2,10 +2,11 @@
 
 import type { UnstyledButtonProps } from '@mantine/core';
 
-import { Avatar, createStyles, Group, Text, UnstyledButton, Menu, Button } from '@mantine/core';
+import { createStyles, Group, Text, UnstyledButton, Menu, Button } from '@mantine/core';
 import { IconChevronRight, IconLogout } from '@tabler/icons-react';
 import { signOut } from "next-auth/react"
 import { useSession } from "next-auth/react"
+import Avatar from 'react-avatar';
 
 const useStyles = createStyles((theme) => ({
   user: {
@@ -36,7 +37,7 @@ export function UserButton({ image, name, email, icon, ...others }: UserButtonPr
       <Menu.Target>
         <UnstyledButton className={classes.user} {...others}>
           <Group>
-            <Avatar src={image} radius="xl" />
+            <Avatar name={session?.user?.name || "Guest"} size="40" textSizeRatio={1.75} round />
 
             <div style={{ flex: 1 }}>
               <Text size="sm" weight={500}>

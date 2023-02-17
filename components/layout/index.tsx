@@ -24,9 +24,9 @@ export default function Layout({ children }: LayoutType) {
               : theme.colors.gray[0]
         }
       }}
-      navbarOffsetBreakpoint="lg"
+      navbarOffsetBreakpoint="md"
       navbar={
-          <NavigationBar />
+          < NavigationBar opened={opened} />
       }
       footer={<FooterBar />}
       header={<HeaderBar opened={opened} setOpened={setOpened} />}
