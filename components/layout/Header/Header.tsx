@@ -72,7 +72,16 @@ const HeaderBar: React.FC<HeaderBarType> = ({ opened, setOpened }) => {
     <Header height={60} p="xs" className={classes.header}>
       <div className={classes.inner}>
         <Group>
-          <Burger opened={opened} onClick={() => setOpened((o) => !o)} size="sm" />
+          <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+            <Burger
+              opened={!opened}
+              onClick={() => setOpened((o) => !o)}
+              size="sm"
+              color={theme.colors.gray[7]}
+              mx="md"
+            />
+          </MediaQuery>
+          {/* <Burger opened={opened} onClick={() => setOpened((o) => !o)} size="sm" /> */}
           <Image
             style={{
               mixBlendMode: colorScheme === 'light' ? 'darken' : 'exclusion',

@@ -13,7 +13,7 @@ type LayoutType = {
 
 export default function Layout({ children }: LayoutType) {
   const theme = useMantineTheme()
-  const [opened, setOpened] = useState(true)
+  const [opened, setOpened] = useState(false)
   return (
     <AppShell
       styles={{
@@ -24,7 +24,7 @@ export default function Layout({ children }: LayoutType) {
               : theme.colors.gray[0]
         }
       }}
-      navbarOffsetBreakpoint="md"
+      navbarOffsetBreakpoint="sm"
       navbar={
           < NavigationBar opened={opened} />
       }
