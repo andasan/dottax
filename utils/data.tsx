@@ -17,30 +17,3 @@ export const icons = {
   sales: IconBasket,
   order: IconStars
 }
-
-export const statCards: StatCardType[] = [
-  {
-    diff: 10,
-    icon: 'user',
-    title: 'User',
-    value: 'user'
-  },
-  {
-    diff: 31,
-    icon: 'order',
-    title: 'Orders',
-    value: '1,312'
-  },
-  {
-    diff: 12,
-    icon: 'sales',
-    title: 'Sales',
-    value: '2,800'
-  },
-  {
-    diff: 7,
-    icon: 'sales',
-    title: 'Refunded',
-    value: '400'
-  }
-]

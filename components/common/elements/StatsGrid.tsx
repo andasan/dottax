@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react'
 import { createStyles, Group, Paper, SimpleGrid, Text } from '@mantine/core'
 import { IconArrowDownRight, IconArrowUpRight } from '@tabler/icons-react'
 
 import type { StatCardType } from '@/types/component.types'
 import { icons } from '@/utils/data'
+import { AggregatedReport } from '@/types/api.types'
 
 const useStyles = createStyles((theme) => ({
   root: {},
@@ -30,9 +32,52 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-export default function StatsGrid({ data }: { data: StatCardType[] }) {
+export default function StatsGrid() {
+  const [aggregate, setAggregate] = useState<AggregatedReport | null>(null)
   const { classes } = useStyles()
-  const stats = data.map((stat) => {
+
+  useEffect(() => {
+
+    if(!aggregate){
+      const fetchAggregate = async () => {
+        const response = await fetch("/api/email/aggregated-reports");
+        const { body } = await response.json();
+        setAggregate(body)
+      }
+
+      fetchAggregate()
+    }
+
+  }, [])
+
+  const statCards:StatCardType[] = [
+    {
+      diff: 'delivered',
+      icon: 'coin',
+      title: 'Delivered',
+      value: aggregate?.delivered
+    },
+    {
+      diff: 'clicks',
+      icon: 'coin',
+      title: 'Clicks',
+      value: aggregate?.clicks
+    },
+    {
+      diff: 'bounces',
+      icon: 'coin',
+      title: 'Bounces',
+      value: (aggregate?.softBounces || 0) + (aggregate?.hardBounces || 0)
+    },
+    {
+      diff: 7,
+      icon: 'sales',
+      title: 'Refunded',
+      value: 400
+    }
+  ]
+
+  const stats = statCards.map((stat) => {
     const Icon = icons[stat.icon]
     const DiffIcon = stat.diff > 0 ? IconArrowUpRight : IconArrowDownRight
 

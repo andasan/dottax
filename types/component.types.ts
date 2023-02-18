@@ -4,8 +4,8 @@ import type { icons } from '@/utils/data';
 export type StatCardType = {
   title: string;
   icon: keyof typeof icons;
-  value: string;
-  diff: number;
+  value: number | undefined;
+  diff: number | string;
 };
 
 export type StatItemType = {

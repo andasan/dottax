@@ -1,2 +1,2 @@
-export { default as RevenueStatCard } from './StatsSegament'
+export { default as SentMailStatsCard } from './SentMailStats'
 export { default as ViewStatBars } from './ViewStatBars'
