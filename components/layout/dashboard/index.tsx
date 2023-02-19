@@ -49,7 +49,7 @@ export default function Dashboard({ students }: StudentProps) {
         <div className="flex-[8]">
           <Stack>
             <Paper p="sm" ml="xl">
-              <Title ml="xl">Best Selling Brands</Title>
+              <Title ml="xl">Recent Activity</Title>
             </Paper>
             <div className="h-[400px] w-full">{/* <RevenueChart data={data} /> */}</div>
           </Stack>
