@@ -10,7 +10,6 @@ const FooterBar = () => {
       <Paper>
         <Text variant="gradient" size={12} weight={600} gradient={{ from: COLORS.primary, to: COLORS.secondary }} style={{ lineHeight: '2.55'}}>
           Copyright &copy; 2023,{' '}
-        <IconBrandGithub style={{ display: 'inline' }} size={13} />{' '}
         <UnstyledButton>
           <Text
             variant="gradient"

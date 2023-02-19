@@ -13,7 +13,7 @@ import Image from 'next/image';
 import CICCCLogo from '@/assets/static/ciccc-logo-square.png';
 import { ColorSchemeToggle } from '@/components/common';
 
-import NavAction from '../NavAction/NavAction';
+import NavAction from '../nav-action/nav-action';
 
 const useStyles = createStyles((theme) => ({
   header: {

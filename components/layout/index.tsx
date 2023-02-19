@@ -3,9 +3,9 @@
 import { AppShell, Navbar, useMantineTheme } from '@mantine/core'
 import { useState } from 'react'
 
-import FooterBar from './Footer/Footer'
-import HeaderBar from './Header/Header'
-import NavigationBar from './Navbar/Navbar'
+import FooterBar from './footer/footer'
+import HeaderBar from './header/header'
+import NavigationBar from './navbar/navbar'
 
 type LayoutType = {
   children: React.ReactNode
