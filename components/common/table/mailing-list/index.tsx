@@ -16,12 +16,13 @@ import {
   Chip,
   Drawer,
   Skeleton,
+  MediaQuery,
 } from '@mantine/core';
 import { keys } from '@mantine/utils';
 import { IconSelector, IconChevronDown, IconChevronUp, IconSearch } from '@tabler/icons-react';
 import { showNotification } from '@mantine/notifications';
 import { useModals } from '@mantine/modals';
-import { useClipboard } from '@mantine/hooks';
+import { useClipboard, useMediaQuery } from '@mantine/hooks';
 
 import { useStoreSelector, useStoreDispatch } from '@/lib/hooks';
 import { studentState, studentAction } from '@/store/index';
@@ -61,11 +62,17 @@ interface ThProps {
   reversed: boolean;
   sorted: boolean;
   onSort(): void;
+  hide?: boolean;
 }
 
-function Th({ children, reversed, sorted, onSort }: ThProps) {
+function Th({ children, reversed, sorted, onSort, hide }: ThProps) {
   const { classes } = useStyles();
   const Icon = sorted ? (reversed ? IconChevronUp : IconChevronDown) : IconSelector;
+
+  if (hide) {
+    return null;
+  }
+
   return (
     <th className={classes.th}>
       <UnstyledButton onClick={onSort} className={classes.control}>
@@ -119,15 +126,17 @@ export default function MailingListTable({ data, batchNumber }: TableSortProps) 
   const [sortedData, setSortedData] = useState([] as Student[]);
   const [sortBy, setSortBy] = useState<keyof Student | null>(null);
   const [reverseSortDirection, setReverseSortDirection] = useState(false);
-  const [emailMode, setEmailMode] = useState('all')
+  const [emailMode, setEmailMode] = useState('all');
   const [drawerOpened, toggleDrawer] = useState(false);
 
   const clipboard = useClipboard();
   const modals = useModals();
 
+  const mobileScreen = useMediaQuery('(max-width: 600px)');
+
   useEffect(() => {
-    dispatch(studentAction.loadStudents(data))
-  }, [data])
+    dispatch(studentAction.loadStudents(data));
+  }, [data]);
 
   useEffect(() => {
     setSortedData(populateStudents);
@@ -141,7 +150,6 @@ export default function MailingListTable({ data, batchNumber }: TableSortProps) 
   };
 
   const handleEmailMode = (value: string) => {
-
     switch (value) {
       case 'sent':
       case 'pending':
@@ -149,20 +157,22 @@ export default function MailingListTable({ data, batchNumber }: TableSortProps) 
           populateStudents.filter(
             (item: Student) => item.status.toLowerCase() === value.toLowerCase()
           )
-        )
+        );
         break;
       default:
-        setSortedData(populateStudents)
+        setSortedData(populateStudents);
         break;
     }
 
-    setEmailMode(value)
-  }
+    setEmailMode(value);
+  };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
     setSearch(value);
-    setSortedData(sortData(populateStudents, { sortBy, reversed: reverseSortDirection, search: value }));
+    setSortedData(
+      sortData(populateStudents, { sortBy, reversed: reverseSortDirection, search: value })
+    );
   };
 
   const onSubmitEditForm = async (student: any) => {
@@ -232,7 +242,7 @@ export default function MailingListTable({ data, batchNumber }: TableSortProps) 
       body: JSON.stringify({ id: student.id }),
     });
 
-    dispatch(studentAction.deleteStudent(student.id))
+    dispatch(studentAction.deleteStudent(student.id));
 
     if (!res.ok) {
       showNotification({
@@ -247,7 +257,6 @@ export default function MailingListTable({ data, batchNumber }: TableSortProps) 
         color: 'teal',
       });
     }
-
   };
 
   const rows = sortedData.map((row) => (
@@ -257,6 +266,7 @@ export default function MailingListTable({ data, batchNumber }: TableSortProps) 
       toggleDrawer={toggleDrawer}
       copyProfile={copyProfile}
       deleteProfile={deleteProfile}
+      mobileScreen={mobileScreen}
     />
   ));
 
@@ -277,36 +287,31 @@ export default function MailingListTable({ data, batchNumber }: TableSortProps) 
   return (
     <Paper p="sm">
       <ScrollArea>
-      <Drawer
-        opened={drawerOpened}
-        onClose={() => toggleDrawer(false)}
-        title="Modify Student Profile"
-        padding="xl"
-        size="xl"
-      >
-        <EditUserForm submitForm={onSubmitEditForm} />
-      </Drawer>
+        <Drawer
+          opened={drawerOpened}
+          onClose={() => toggleDrawer(false)}
+          title="Modify Student Profile"
+          padding="xl"
+          size="xl"
+        >
+          <EditUserForm submitForm={onSubmitEditForm} />
+        </Drawer>
 
-      <Grid align="baseline" justify={'center'}>
-        <Grid.Col sm={12} md={3} lg={3}>
-          <Title order={2}>Batch {batchNumber}</Title>
-        </Grid.Col>
-        <Grid.Col sm={12} md={6} lg={6}>
-          {/* Fill in */}
-        </Grid.Col>
-        <Grid.Col sm={12} md={3} lg={3}>
-          <Chip.Group
-            value={emailMode}
-            onChange={handleEmailMode}
-            spacing="sm"
-            mb="lg"
-          >
-            <Chip value="pending">Pending</Chip>
-            <Chip value="sent">Sent</Chip>
-            <Chip value="all">All</Chip>
-          </Chip.Group>
-        </Grid.Col>
-      </Grid>
+        <Grid align="baseline" justify={'center'}>
+          <Grid.Col sm={12} md={3} lg={3}>
+            <Title order={2}>Batch {batchNumber}</Title>
+          </Grid.Col>
+          <Grid.Col sm={12} md={6} lg={6}>
+            {/* Fill in */}
+          </Grid.Col>
+          <Grid.Col sm={12} md={3} lg={3}>
+            <Chip.Group value={emailMode} onChange={handleEmailMode} spacing="sm" mb="lg">
+              <Chip value="pending">Pending</Chip>
+              <Chip value="sent">Sent</Chip>
+              <Chip value="all">All</Chip>
+            </Chip.Group>
+          </Grid.Col>
+        </Grid>
 
         <TextInput
           placeholder="Search by any field"
@@ -334,6 +339,7 @@ export default function MailingListTable({ data, batchNumber }: TableSortProps) 
                 sorted={sortBy === 'lastName'}
                 reversed={reverseSortDirection}
                 onSort={() => setSorting('lastName')}
+                hide={mobileScreen}
               >
                 Last Name
               </Th>
@@ -341,6 +347,7 @@ export default function MailingListTable({ data, batchNumber }: TableSortProps) 
                 sorted={sortBy === 'email'}
                 reversed={reverseSortDirection}
                 onSort={() => setSorting('email')}
+                hide={mobileScreen}
               >
                 Email
               </Th>

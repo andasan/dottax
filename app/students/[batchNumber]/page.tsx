@@ -15,6 +15,7 @@ export default async function StudentBatch({ params }: { params: any}) {
       email: true,
       studentId: true,
       status: true,
+      batch: true,
     },
   });
 

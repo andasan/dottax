@@ -18,6 +18,7 @@ type TableRowType = {
   toggleDrawer: Dispatch<React.SetStateAction<boolean>>;
   copyProfile: (user: Student) => void;
   deleteProfile: (user: Student) => void;
+  mobileScreen: boolean;
 };
 
 const useStyles = createStyles((theme) => ({
@@ -32,15 +33,15 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const TableRow = ({ student, toggleDrawer, copyProfile, deleteProfile }: TableRowType) => {
+const TableRow = ({ student, toggleDrawer, copyProfile, deleteProfile, mobileScreen }: TableRowType) => {
   const { classes } = useStyles();
   const dispatch = useStoreDispatch();
 
   return (
     <tr key={student.id}>
       <td>{student.firstName}</td>
-      <td>{student.lastName}</td>
-      <td>{student.email}</td>
+      {!mobileScreen && <td>{student.lastName}</td>}
+      {!mobileScreen && <td>{student.email}</td>}
       <td>{student.studentId}</td>
       <td>
         <Badge color={student.status === 'pending' ? 'yellow' : 'blue'}>{student.status}</Badge>

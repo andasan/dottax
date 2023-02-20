@@ -1,6 +1,5 @@
 import Dashboard from '@/components/layout/dashboard';
 import prisma from '@/lib/prisma';
-import { notFound } from "next/navigation";
 
 export default async function Home() {
 
@@ -12,12 +11,9 @@ export default async function Home() {
       email: true,
       studentId: true,
       status: true,
+      batch: true,
     },
   });
-
-  if(!students){
-    notFound();
-  }
 
   return <Dashboard students={students} />;
 }

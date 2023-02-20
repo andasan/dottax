@@ -28,14 +28,14 @@ interface UserButtonProps extends UnstyledButtonProps {
   icon?: React.ReactNode;
 }
 
-export function UserButton({ image, name, email, icon, ...others }: UserButtonProps) {
+export function UserButton() {
   const { data: session, status } = useSession()
   const { classes } = useStyles();
 
   return (
     <Menu position="right-start" withArrow>
       <Menu.Target>
-        <UnstyledButton className={classes.user} {...others}>
+        <UnstyledButton className={classes.user}>
           <Group>
             <Avatar name={session?.user?.name || "Guest"} size="40" textSizeRatio={1.75} round />
 
@@ -49,7 +49,7 @@ export function UserButton({ image, name, email, icon, ...others }: UserButtonPr
               </Text>
             </div>
 
-            {icon || <IconChevronRight size={14} stroke={1.5} />}
+            <IconChevronRight size={14} stroke={1.5} />
           </Group>
         </UnstyledButton>
       </Menu.Target>

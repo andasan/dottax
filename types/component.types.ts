@@ -33,16 +33,6 @@ export type NavLinkType = {
   links?: NavLinkItemType[];
 };
 
-export type OrderRowType = {
-  orderId: string;
-  user: string;
-  paymentMode: 'cod' | 'online';
-  paymentId?: string;
-  orderAmount: number;
-  orderCurrency: 'INR';
-  orderStatus: 'pending' | 'processing' | 'dispached' | 'arrived' | 'failed';
-};
-
 export type StudentRowType = {
   id: string;
   firstName: string;

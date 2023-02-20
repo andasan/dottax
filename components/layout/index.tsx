@@ -1,6 +1,6 @@
 "use client";
 
-import { AppShell, Navbar, useMantineTheme } from '@mantine/core'
+import { AppShell, useMantineTheme } from '@mantine/core'
 import { useState } from 'react'
 
 import FooterBar from './footer/Footer'
@@ -26,7 +26,7 @@ export default function Layout({ children }: LayoutType) {
       }}
       navbarOffsetBreakpoint="sm"
       navbar={
-          < NavigationBar opened={opened} />
+          <NavigationBar opened={opened} />
       }
       footer={<FooterBar />}
       header={<HeaderBar opened={opened} setOpened={setOpened} />}

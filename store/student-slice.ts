@@ -20,6 +20,7 @@ const initialState: StudentState = {
     email: '',
     studentId: '',
     status: '',
+    batch: 0,
   },
   loading: true,
 };

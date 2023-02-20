@@ -8,6 +8,7 @@ export type Student = Prisma.StudentGetPayload<{
     email: true;
     studentId: true;
     status: true;
+    batch: true;
   };
 }>;
 
