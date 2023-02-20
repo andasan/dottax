@@ -23,7 +23,7 @@ export default function RecentActivityTable(/*props*/) {
   const onSubmitEditForm = async (student: any) => {
     toggleDrawer(false);
 
-    // edit data in db
+    // Edit data in db
     const res = await fetch("/api/update-student", {
       method: "POST",
       headers: {
@@ -32,11 +32,23 @@ export default function RecentActivityTable(/*props*/) {
       body: JSON.stringify({student})
     });
 
-    showNotification({
-      title: 'Edit profile',
-      message: `You have successfully edited ${student.firstName}'s profile`,
-      color: 'teal',
-    });
+    // In case we need to return data from the server
+    // const data = await res.json();
+
+    if(!res.ok) {
+      showNotification({
+        title: 'Something went wrong!',
+        message: `Unable to edit ${student.firstName}'s profile`,
+        color: 'red',
+      });
+    }else{
+      showNotification({
+        title: 'Edit profile',
+        message: `You have successfully edited ${student.firstName}'s profile`,
+        color: 'teal',
+      });
+    }
+
   };
 
   const copyProfile = (user: Student) => {
@@ -120,7 +132,6 @@ export default function RecentActivityTable(/*props*/) {
       </Drawer>
 
       {populateStudents.length > 0 ? (
-        // <ScrollArea >
           <Table highlightOnHover verticalSpacing="md" fontSize="xs">
             <thead>
               <tr>
@@ -141,7 +152,6 @@ export default function RecentActivityTable(/*props*/) {
               />
             </tbody>
           </Table>
-        // </ScrollArea>
       ) : (
         <Text align="center" weight="bold">
           No students found

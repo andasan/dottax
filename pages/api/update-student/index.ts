@@ -8,23 +8,21 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { student : { id, name, email, studentId, status }  } = req.body;
+  const { student : { id, firstName, lastName, email, studentId, status }  } = req.body;
 
-  console.log(id, name, email, studentId, status);
-  
-
-  await prisma.student.update({
+  const data = await prisma.student.update({
     where: {
       id
     },
     data: {
-      name,
+      firstName,
+      lastName,
       email,
       studentId,
       status
     }
   });
 
-  res.status(200).json("Student updated");
-  
+  res.status(200).json({ message: "Student updated", data });
+
 }
