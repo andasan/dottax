@@ -1,4 +1,4 @@
-import Form from "@/components/common/credential-form/form";
+import Form from "@/components/common/forms/credential-form";
 
 export default function RegisterPage() {
   return (

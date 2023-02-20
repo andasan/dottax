@@ -8,9 +8,10 @@ import {
 
 import type { NavLinkType } from '@/types/component.types'
 
+// const batchNav =
+
 export const navData: NavLinkType[] = [
   { label: 'Dashboard', icon: IconGauge, link: '/dashboard' },
-  { label: 'Users', icon: IconUser, link: '/users' },
   {
     label: 'Students',
     icon: IconNotes,
@@ -22,5 +23,13 @@ export const navData: NavLinkType[] = [
       { label: 'Batch 2023', link: '/students/2023' },
     ].reverse()
   },
-  { label: 'Settings', icon: IconAdjustments, link: '/settings' },
+  { label: 'Settings',
+    icon: IconAdjustments,
+    initiallyOpened: true,
+    links: [
+      { label: 'Add a Batch', link: '/students/add-batch' },
+      { label: 'Add Students', link: '/students/add' },
+      { label: 'File upload', link: '/files' },
+    ]
+  },
 ]

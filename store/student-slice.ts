@@ -73,5 +73,8 @@ export const studentSlice = createSlice({
         );
       });
     },
+    deleteStudent: (state, action) => {
+      state.populateStudents = state.students.filter((student) => student.id !== action.payload);
+    }
   },
 });

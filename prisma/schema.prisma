@@ -21,10 +21,11 @@ model Student {
   id        Int       @id @default(autoincrement())
   firstName String
   lastName  String
-  email     String
-  // email     String    @unique
-  studentId String
-  // studentId String    @unique
+  // email     String
+  email     String    @unique
+  // studentId String
+  studentId String    @unique
+  batch     Int
   status    String    @default("idle")
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
