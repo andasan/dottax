@@ -63,8 +63,6 @@ export default function NavigationBar({ opened }: NavigationBarProps) {
 
   const links = navData(batchLinks).map((item) => <LinksGroup {...item} key={item.label} />);
 
-  if (loading) return <div>Loading...</div>;
-
   return (
     <Navbar width={{ sm: 300 }} hidden={opened} p="md" className={classes.navbar}>
       <Navbar.Section grow className={classes.links} component={ScrollArea}>
