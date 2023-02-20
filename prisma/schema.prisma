@@ -19,7 +19,8 @@ model User {
 
 model Student {
   id        Int       @id @default(autoincrement())
-  name      String
+  firstName String
+  lastName  String
   email     String
   // email     String    @unique
   studentId String

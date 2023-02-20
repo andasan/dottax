@@ -1,15 +1,7 @@
-import { Prisma } from "@prisma/client";
-import { createSlice, isPending } from "@reduxjs/toolkit";
+import { Prisma } from '@prisma/client';
+import { createSlice, isPending } from '@reduxjs/toolkit';
 
-type Student = Prisma.StudentGetPayload<{
-  select: {
-    id: true;
-    name: true;
-    email: true;
-    studentId: true;
-    status: true;
-  };
-}>;
+import { Student } from '@/types/schema.types';
 
 type StudentState = {
   students: Student[];
@@ -23,16 +15,17 @@ const initialState: StudentState = {
   populateStudents: [],
   studentSelected: {
     id: 0,
-    name: "",
-    email: "",
-    studentId: "",
-    status: ""
+    firstName: '',
+    lastName: '',
+    email: '',
+    studentId: '',
+    status: '',
   },
-  loading: true
+  loading: true,
 };
 
 export const studentSlice = createSlice({
-  name: "students",
+  name: 'students',
   initialState,
   reducers: {
     loadStudents: (state, action) => {
@@ -40,13 +33,13 @@ export const studentSlice = createSlice({
       state.populateStudents = action.payload;
       state.loading = false;
     },
-    populateModal: (state, action) => {
+    selectedProfileData: (state, action) => {
       state.studentSelected = action.payload;
     },
-    updateStudent: (state) => {
+    updateStudent: (state, action) => {
       state.populateStudents = state.students.map((student) => {
-        if (student.id === state.studentSelected.id) {
-          return state.studentSelected;
+        if (student.id === action.payload.id) {
+          return action.payload;
         }
         return student;
       });
@@ -65,7 +58,7 @@ export const studentSlice = createSlice({
     updateStudentsStatuses: (state, action) => {
       state.populateStudents = state.students.map((student) => {
         if (action.payload.includes(student.id)) {
-          return { ...student, status: "sent" };
+          return { ...student, status: 'sent' };
         }
         return student;
       });
@@ -73,11 +66,12 @@ export const studentSlice = createSlice({
     filterStudents: (state, { payload }) => {
       state.populateStudents = state.students.filter((student) => {
         return (
-          student.name.toLowerCase().includes(payload.toLowerCase()) ||
+          student.firstName.toLowerCase().includes(payload.toLowerCase()) ||
+          student.lastName.toLowerCase().includes(payload.toLowerCase()) ||
           student.email.toLowerCase().includes(payload.toLowerCase()) ||
           student.studentId.toLowerCase().includes(payload.toLowerCase())
         );
       });
-    }
-  }
+    },
+  },
 });

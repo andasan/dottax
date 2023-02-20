@@ -2,33 +2,16 @@
 
 import { FormEvent, useState, useEffect } from 'react';
 import { Box, Flex, Grid, Paper, Stack, Title } from '@mantine/core';
-import { IconBasket, IconCards } from '@tabler/icons-react';
-import { useStoreDispatch, useStoreSelector } from '@/lib/hooks';
-import { Prisma } from '@prisma/client';
+import { useStoreDispatch } from '@/lib/hooks';
 
-import { RecentOrdersTable, StatsGrid, TransactionTable } from '@/components/common';
-import { SentMailStatsCard, ViewStatBars } from '@/components/common/cards';
-import { RevenueChart } from '@/components/common/charts';
-import { viewStats } from '@/data/cards';
-import { data } from '@/data/revenue';
-import { studentAction, studentState } from '@/store/index';
+import { StatsGrid } from '@/components/common';
+import { SentMailStatsCard } from '@/components/common/cards';
+import { studentAction } from '@/store/index';
+import RecentActivityTable from '@/components/common/table/recent-activity';
 
-type Student = Prisma.StudentGetPayload<{
-  select: {
-    id: true;
-    name: true;
-    email: true;
-    studentId: true;
-    status: true;
-  };
-}>;
-
-type StudentProps = {
-  students: Student[];
-};
+import { StudentProps } from '@/types/schema.types';
 
 export default function Dashboard({ students }: StudentProps) {
-  const { populateStudents, loading } = useStoreSelector(studentState);
   const dispatch = useStoreDispatch();
 
   useEffect(() => {
@@ -42,23 +25,21 @@ export default function Dashboard({ students }: StudentProps) {
           <SentMailStatsCard />
         </Stack>
       </div>
-      <Stack ml="xl" mt="xl">
-        <StatsGrid />
-      </Stack>
-      <div className="my-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <div className="flex-[8]">
-          <Stack>
-            <Paper p="sm" ml="xl">
-              <Title ml="xl">Recent Activity</Title>
-            </Paper>
-            <div className="h-[400px] w-full">{/* <RevenueChart data={data} /> */}</div>
-          </Stack>
-        </div>
-        <div className="flex-[4]">
-          <Stack mb="xl">
-            <ViewStatBars data={viewStats} />
-          </Stack>
-        </div>
+      <div className="flex-[12]">
+        <Stack ml="xl" mt="xl">
+          <StatsGrid />
+        </Stack>
+      </div>
+      <div className="flex-[12]">
+        <Stack mt="xl">
+          {/* <Paper p="sm" ml="xl">
+            <Title ml="xl">Recent Activity</Title>
+          </Paper> */}
+          <Flex gap="md" align="center">
+            <Title>Recent Activity</Title>
+          </Flex>
+          <RecentActivityTable />
+        </Stack>
       </div>
       {/* <Grid>
         <Grid.Col sm={12} md={5} lg={5}>

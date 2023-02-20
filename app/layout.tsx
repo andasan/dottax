@@ -5,6 +5,7 @@ import {
   RootStyleRegistry,
   QueryClientRegistry,
   ReduxRegistry,
+  ModalRegistry,
 } from '@/providers';
 
 import '@/styles/globals.css';
@@ -18,7 +19,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <NotificationRegistry>
             <ReduxRegistry>
               <QueryClientRegistry>
-                <AuthSessionRegistry>{children}</AuthSessionRegistry>
+                <ModalRegistry>
+                  <AuthSessionRegistry>{children}</AuthSessionRegistry>
+                </ModalRegistry>
               </QueryClientRegistry>
             </ReduxRegistry>
           </NotificationRegistry>

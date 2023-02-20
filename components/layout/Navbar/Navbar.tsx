@@ -2,8 +2,8 @@ import { createStyles, Navbar, ScrollArea } from '@mantine/core'
 
 import { navData } from '@/data/navData'
 
-import LinksGroup from './NavLinkGroup'
-import { UserButton } from './UserButton'
+import LinksGroup from './nav-link-group'
+import { UserButton } from './user-button'
 
 const useStyles = createStyles((theme) => ({
   navbar: {

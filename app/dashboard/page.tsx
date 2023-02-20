@@ -5,7 +5,8 @@ export default async function Home() {
   const students = await prisma.student.findMany({
     select: {
       id: true,
-      name: true,
+      firstName: true,
+      lastName: true,
       email: true,
       studentId: true,
       status: true,
