@@ -366,7 +366,7 @@ export default function MailingListTable({ data, batchNumber }: TableSortProps) 
               rows
             ) : (
               <tr>
-                <td colSpan={Object.keys(data[0]).length}>
+                <td colSpan={6}>
                   <Text weight={500} align="center">
                     Nothing found
                   </Text>

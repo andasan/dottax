@@ -5,6 +5,9 @@ export default async function StudentBatch({ params }: { params: any}) {
   const { batchNumber } = params
 
   const students = await prisma.student.findMany({
+    where: {
+      batch: Number(batchNumber)
+    },
     select: {
       id: true,
       firstName: true,
