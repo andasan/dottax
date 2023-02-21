@@ -24,7 +24,6 @@ import { useStoreDispatch } from '@/lib/hooks';
 import { studentAction } from '@/store/index';
 import { formatBytes } from '@/utils/formatBytes';
 
-
 interface AddBatchProps {
   data: any;
 }
@@ -38,19 +37,16 @@ export default function AddBatchPage({ data }: AddBatchProps) {
   }, [data]);
 
   const [active, setActive] = useState(0);
-//   const nextStep = () => setActive((current) => (current < 3 ? current + 1 : current));
+  const nextStep = () => setActive((current) => (current < 3 ? current + 1 : current));
   const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current));
 
   const form = useForm({
     initialValues: {
-      email: '',
-      termsOfService: false,
       batchNumber: 0,
       file: null,
     },
 
     validate: {
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
       batchNumber: (value) => (typeof value === 'number' ? 'Invalid number' : null),
       file: (value) => (value === null ? 'Please upload a file' : null),
     },
@@ -59,7 +55,6 @@ export default function AddBatchPage({ data }: AddBatchProps) {
   //step handler
   const handleStep = () => {
     setActive((current) => {
-      console.log(current);
       if (current === 0) {
         //validate bach number
         if (form.values.batchNumber === 0) {
@@ -73,23 +68,37 @@ export default function AddBatchPage({ data }: AddBatchProps) {
           return current;
         }
       }
-      return current < 2 ? current + 1 : current;
+      return current < 3 ? current + 1 : current;
     });
+  };
+
+  const handleSubmit = () => {
+    //submit form to server
+    console.log(form.values);
+
+    nextStep();
   };
 
   return (
     <Paper shadow="xs" p="xl">
       <Container size="md" px="xs" pt={20}>
-        <form onSubmit={form.onSubmit((values) => console.log(values))}>
-          <Stepper active={active}  breakpoint="sm">
+        <form onSubmit={form.onSubmit((values: any) => console.log(values))}>
+          <Stepper active={active} breakpoint="sm">
             <Stepper.Step label="First step" description="Input a batch">
               <StepOne form={form} />
             </Stepper.Step>
-            <Stepper.Step label="Second step" description="Verify email">
+            <Stepper.Step label="Second step" description="Upload a file">
               <StepTwo form={form} />
             </Stepper.Step>
+            <Stepper.Step label="Third step" description="Confirmation">
+              <StepThree form={form} />
+            </Stepper.Step>
             <Stepper.Completed>
-              Completed, click back button to get to previous step
+              <Container p="xl">
+                <Title order={3} weight={100} align="center" py={50}>
+                  New batch added successfully
+                </Title>
+              </Container>
             </Stepper.Completed>
           </Stepper>
 
@@ -97,9 +106,10 @@ export default function AddBatchPage({ data }: AddBatchProps) {
             <Button variant="default" onClick={prevStep}>
               Back
             </Button>
-            {/* redirect to dashboard */}
-            {active === 2 ? (
+            {active === 3 ? (
               <Button onClick={() => router.push('/dashboard')}>Dashboard</Button>
+            ) : active === 2 ? (
+              <Button onClick={handleSubmit}>Submit</Button>
             ) : (
               <Button onClick={handleStep}>Next step</Button>
             )}
@@ -210,10 +220,36 @@ const StepTwo = ({ form }: { form: any }) => {
             </div>
           </Group>
         </Dropzone>
+      </Box>
+    </Container>
+  );
+};
 
-        {/* <Group position="center" mt="md">
-        <Button onClick={() => openRef.current()}>Select files</Button>
-      </Group> */}
+const StepThree = ({ form }: { form: any }) => {
+  //check for form error
+  useEffect(() => {
+    if (Object.keys(form.errors).length > 0) {
+      console.log('form errors', form.errors);
+    } else {
+      console.log('form values', form.values);
+    }
+  }, [form]);
+
+  return (
+    <Container p="xl">
+      <Title order={3} weight={100} align="center" py={50}>
+        Confirm your details
+      </Title>
+      <Box sx={{ maxWidth: 300 }} mx="auto">
+        <Paper shadow="xs" p="md" withBorder>
+          <Text>
+            Batch Number: <b>{form.values?.batchNumber}</b>
+          </Text>
+          <Text>
+            File: <b>{form.values?.file?.name}</b>{' '}
+            <small>({formatBytes(form.values?.file.size)})</small>
+          </Text>
+        </Paper>
       </Box>
     </Container>
   );
