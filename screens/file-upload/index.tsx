@@ -56,9 +56,9 @@ export default function FileUploadPage({ data }: AddStudentProps) {
 
   const handleSubmit = async () => {
     const formData = new FormData();
-    fileState.forEach((file: any) => formData.append('files', file));
+    fileState.forEach((file: any) => formData.append('media', file));
 
-    const res = await fetch('/api/upload', {
+    const res = await fetch('/api/file-upload', {
       method: 'POST',
       body: formData,
     });
