@@ -1,16 +1,28 @@
-import { useState } from 'react';
 import { Table, Text, Skeleton, ScrollArea } from '@mantine/core';
 
 export default function BatchTable({ data }: { data: any }) {
-  console.log(data);
 
   const headerRow = data[0];
   const bodyRows = data.slice(1);
 
+  if(data.length === 0) {
+    return (
+      <>
+      <Skeleton height={28} mt={20} radius="sm" />
+      <Skeleton height={18} mt={8} radius="sm" />
+      <Skeleton height={18} mt={8} radius="sm" />
+      <Skeleton height={18} mt={8} radius="sm" />
+      <Skeleton height={18} mt={8} radius="sm" />
+      <Skeleton height={18} mt={8} radius="sm" />
+      <Skeleton height={18} mt={8} radius="sm" />
+    </>
+    );
+  }
+
   return (
     <>
       {data.length > 0 ? (
-        <ScrollArea style={{ height: 400 }}>
+        <ScrollArea style={{ height: 400, marginTop: 10 }}>
           <Table highlightOnHover verticalSpacing="md" fontSize="xs" sx={{ height: 500 }}>
             <thead>
               <tr style={{ position: 'sticky' }}>

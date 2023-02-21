@@ -297,15 +297,15 @@ export default function MailingListTable({ data, batchNumber }: TableSortProps) 
           <EditUserForm submitForm={onSubmitEditForm} />
         </Drawer>
 
-        <Grid align="baseline" justify={'center'}>
+        <Grid align="baseline" justify={'flex-start'}>
           <Grid.Col sm={12} md={3} lg={3}>
             <Title order={2}>Batch {batchNumber}</Title>
           </Grid.Col>
-          <Grid.Col sm={12} md={6} lg={6}>
+          <Grid.Col sm={12} md={5} lg={5}>
             {/* Fill in */}
           </Grid.Col>
-          <Grid.Col sm={12} md={3} lg={3}>
-            <Chip.Group value={emailMode} onChange={handleEmailMode} spacing="sm" mb="lg">
+          <Grid.Col sm={12} md={4} lg={4}>
+            <Chip.Group value={emailMode} onChange={handleEmailMode} spacing="sm" mb="lg" style={{justifyContent: "flex-end"}}>
               <Chip value="pending">Pending</Chip>
               <Chip value="sent">Sent</Chip>
               <Chip value="all">All</Chip>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   useMantineTheme,
@@ -9,13 +9,13 @@ import {
   Stepper,
   Button,
   Group,
-  Center,
   Title,
   TextInput,
   Text,
   Box,
+  Select,
 } from '@mantine/core';
-import { IconUpload, IconPhoto, IconFileSpreadsheet, IconX } from '@tabler/icons-react';
+import { IconUpload, IconFileSpreadsheet, IconX } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
 import { Dropzone, MS_EXCEL_MIME_TYPE } from '@mantine/dropzone';
 import { showNotification } from '@mantine/notifications';
@@ -24,6 +24,7 @@ import { useStoreDispatch } from '@/lib/hooks';
 import { studentAction } from '@/store/index';
 import { formatBytes } from '@/utils/formatBytes';
 import { readFile } from '@/utils/readFile';
+
 import BatchTable from '@/components/common/table/batch-table';
 
 interface AddBatchProps {
@@ -33,6 +34,8 @@ interface AddBatchProps {
 export default function AddBatchPage({ data }: AddBatchProps) {
   const dispatch = useStoreDispatch();
   const router = useRouter();
+
+  const [studentRecords, setStudentRecords] = useState<any>([]);
 
   useEffect(() => {
     dispatch(studentAction.loadStudents(data));
@@ -74,11 +77,55 @@ export default function AddBatchPage({ data }: AddBatchProps) {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     //submit form to server
-    console.log(form.values);
 
-    nextStep();
+    const remapRecords = studentRecords.slice(1).map((item: any) => {
+      return {
+        firstName: item[0],
+        lastName: item[1],
+        email: item[2],
+        studentId: String(item[3]),
+        batch: Number(form.values.batchNumber),
+      };
+    });
+
+    try {
+      //save  to database
+      const res = await fetch('/api/add-students', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ remapRecords }),
+      });
+
+      // In case we need to return data from the server
+      const data = await res.json();
+      console.log('>>>>>', data);
+
+      if (!res.ok) {
+        showNotification({
+          title: 'Something went wrong!',
+          message: `Unable to add students to database`,
+          color: 'red',
+        });
+      } else {
+        showNotification({
+          title: 'Upload successful!',
+          message: `You have successfully added new students to the database`,
+          color: 'teal',
+        });
+      }
+
+      nextStep();
+    } catch (err: any) {
+      showNotification({
+        title: 'Something went wrong!',
+        message: err.message,
+        color: 'red',
+      });
+    }
   };
 
   return (
@@ -93,7 +140,7 @@ export default function AddBatchPage({ data }: AddBatchProps) {
               <StepTwo form={form} />
             </Stepper.Step>
             <Stepper.Step label="Third step" description="Confirmation">
-              <StepThree form={form} />
+              <StepThree form={form} setStudentRecords={setStudentRecords} />
             </Stepper.Step>
             <Stepper.Completed>
               <Container p="xl">
@@ -140,6 +187,15 @@ const StepOne = ({ form }: { form: any }) => {
         Step 1: Input a batch number
       </Title>
       <Box sx={{ maxWidth: 300 }} mx="auto">
+        {/* existing */}
+        <Select
+          data={["data1", "data2", "data3"]}
+          label="Select with native scrollbars"
+          placeholder="Dropdown with native scrollbars"
+          dropdownComponent="div"
+        />
+
+        {/* new batch */}
         <TextInput label="Batch Number" type="number" {...form.getInputProps('batchNumber')} />
       </Box>
     </Container>
@@ -148,7 +204,6 @@ const StepOne = ({ form }: { form: any }) => {
 
 const StepTwo = ({ form }: { form: any }) => {
   const [fileState, setFileState] = useState<any>(null);
-  // const openRef = useRef<() => void>(null);
   const theme = useMantineTheme();
 
   useEffect(() => {
@@ -227,13 +282,19 @@ const StepTwo = ({ form }: { form: any }) => {
   );
 };
 
-const StepThree = ({ form }: { form: any }) => {
+interface IStepThreeProps {
+  form: any;
+  setStudentRecords: (records: any[]) => void;
+}
+
+const StepThree = ({ form, setStudentRecords }: IStepThreeProps) => {
   const [data, setData] = useState<any[]>([]);
 
   const handleReadFile = async (spreadSheetFile: any) => {
     // const file = spreadSheetFile.path;
     const jsonData = await readFile(spreadSheetFile);
     setData(jsonData);
+    setStudentRecords(jsonData);
   };
 
   useEffect(() => {
@@ -247,9 +308,9 @@ const StepThree = ({ form }: { form: any }) => {
   return (
     <Container p="xl">
       <Title order={3} weight={100} align="center" py={50}>
-        Confirm your details
+        Confirm the uploaded details
       </Title>
-      <Box  mx="auto">
+      <Box mx="auto">
         <Paper shadow="xs" p="md" withBorder>
           <Text py={10}>
             Batch Number: <b>{form.values?.batchNumber}</b>
@@ -258,13 +319,6 @@ const StepThree = ({ form }: { form: any }) => {
             File: <b>{form.values?.file?.name}</b>{' '}
             <small>({formatBytes(form.values?.file.size)})</small>
             <BatchTable data={data} />
-            {/* {data.map((row, index) => (
-              <div key={index}>
-                {row.map((cell: any, index: any) => (
-                  <span key={index}>{cell}</span>
-                ))}
-              </div>
-            ))} */}
           </Text>
         </Paper>
       </Box>
