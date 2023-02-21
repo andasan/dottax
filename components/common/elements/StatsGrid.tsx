@@ -71,10 +71,12 @@ export default function StatsGrid() {
     }
   ]
 
-  const stats = statCards.map((stat) => {
+  const stats = statCards.map((stat: StatCardType) => {
     const Icon = icons[stat.icon]
 
-    const colorCode = () => stat.diff === 'bounces' ? stat.value > 0 ? 'red' : 'teal' : (stat.value > 0) ? 'teal' : 'red';
+    const val = stat.value || 0
+
+    const colorCode = () => stat?.diff === 'bounces' ? val > 0 ? 'red' : 'teal' : (val > 0) ? 'teal' : 'red';
 
     return (
       <Paper withBorder p="md" radius="md" key={stat.title}>

@@ -4,9 +4,12 @@ import prisma from '@/lib/prisma';
 export default async function StudentBatch({ params }: { params: any}) {
   const { batchNumber } = params
 
+  //convert batchNumber to integer
+  const parseBatchNumber = parseInt(batchNumber)
+
   const students = await prisma.student.findMany({
     where: {
-      batch: Number(batchNumber)
+      batch: parseBatchNumber
     },
     select: {
       id: true,

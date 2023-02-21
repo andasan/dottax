@@ -190,7 +190,7 @@ const heading = {
   fontFamily,
   fontSize: '14px',
   lineHeight: '26px',
-  fontWeight: '700',
+  fontWeight: 700,
   color: '#004dcf',
 };
 

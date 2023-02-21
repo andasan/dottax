@@ -56,7 +56,7 @@ const useStyles = createStyles((theme) => ({
 
 interface TableSortProps {
   data: Student[];
-  batchNumber: string;
+  batchNumber: number;
   studentsBatchOnly: {batch: number}[]
 }
 

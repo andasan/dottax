@@ -52,12 +52,12 @@ export default async function handler(
   }
 }
 
-type StudentProps = { studentId: string; email: string, name: string };
+type StudentProps = { studentId: string; email: string, firstName: string };
 
 function sendEmail({
   studentId,
   email,
-  name,
+  firstName,
 }: StudentProps): Promise<{ message: string; status: number }> {
   return new Promise((resolve, reject) => {
 
@@ -78,7 +78,7 @@ function sendEmail({
 
       if (fs.existsSync(pdfPath)) {
         //file exists
-        const emailHtml = render(<EmailTemplate studentName={name} />, { pretty: true })
+        const emailHtml = render(<EmailTemplate studentName={firstName} />, { pretty: true })
 
         const mailOptions = {
           from: `CICCC <${process.env.EMAIL_FROM}>`,
