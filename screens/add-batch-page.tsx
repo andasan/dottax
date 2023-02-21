@@ -102,7 +102,6 @@ export default function AddBatchPage({ data }: AddBatchProps) {
 
       // In case we need to return data from the server
       const data = await res.json();
-      console.log('>>>>>', data);
 
       if (!res.ok) {
         showNotification({

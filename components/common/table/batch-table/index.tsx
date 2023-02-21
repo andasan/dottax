@@ -32,8 +32,8 @@ export default function BatchTable({ data }: { data: any }) {
               </tr>
             </thead>
             <tbody>
-              {bodyRows.map((row: string[]) => (
-                <tr>
+              {bodyRows.map((row: string[], index: number) => (
+                <tr key={index}>
                   {row.map((item: string, index: number) => (
                     <td key={index}>{item}</td>
                   ))}

@@ -35,7 +35,7 @@ export const navData = (batchLinks: number[]): NavLinkType[] => [
     initiallyOpened: true,
     links: [
       { label: 'Add a Batch', link: '/add-batch' },
-      { label: 'Add Students', link: '/students/add' },
+      { label: 'Add Students', link: '/add-student' },
       { label: 'File upload', link: '/files' },
     ]
   },
