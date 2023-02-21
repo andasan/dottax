@@ -23,6 +23,8 @@ import { showNotification } from '@mantine/notifications';
 import { useStoreDispatch } from '@/lib/hooks';
 import { studentAction } from '@/store/index';
 import { formatBytes } from '@/utils/formatBytes';
+import { readFile } from '@/utils/readFile';
+import BatchTable from '@/components/common/table/batch-table';
 
 interface AddBatchProps {
   data: any;
@@ -226,12 +228,19 @@ const StepTwo = ({ form }: { form: any }) => {
 };
 
 const StepThree = ({ form }: { form: any }) => {
-  //check for form error
+  const [data, setData] = useState<any[]>([]);
+
+  const handleReadFile = async (spreadSheetFile: any) => {
+    // const file = spreadSheetFile.path;
+    const jsonData = await readFile(spreadSheetFile);
+    setData(jsonData);
+  };
+
   useEffect(() => {
     if (Object.keys(form.errors).length > 0) {
       console.log('form errors', form.errors);
     } else {
-      console.log('form values', form.values);
+      handleReadFile(form.values.file);
     }
   }, [form]);
 
@@ -240,14 +249,22 @@ const StepThree = ({ form }: { form: any }) => {
       <Title order={3} weight={100} align="center" py={50}>
         Confirm your details
       </Title>
-      <Box sx={{ maxWidth: 300 }} mx="auto">
+      <Box  mx="auto">
         <Paper shadow="xs" p="md" withBorder>
-          <Text>
+          <Text py={10}>
             Batch Number: <b>{form.values?.batchNumber}</b>
           </Text>
-          <Text>
+          <Text py={10}>
             File: <b>{form.values?.file?.name}</b>{' '}
             <small>({formatBytes(form.values?.file.size)})</small>
+            <BatchTable data={data} />
+            {/* {data.map((row, index) => (
+              <div key={index}>
+                {row.map((cell: any, index: any) => (
+                  <span key={index}>{cell}</span>
+                ))}
+              </div>
+            ))} */}
           </Text>
         </Paper>
       </Box>
