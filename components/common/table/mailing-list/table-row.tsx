@@ -12,6 +12,7 @@ import {
 import { studentAction } from '@/store/index';
 
 import { Student } from '@/types/schema.types';
+import { showNotification, cleanNotifications } from '@mantine/notifications';
 
 type TableRowType = {
   student: Student;
@@ -37,6 +38,45 @@ const TableRow = ({ student, toggleDrawer, copyProfile, deleteProfile, mobileScr
   const { classes } = useStyles();
   const dispatch = useStoreDispatch();
 
+  const handleSendEmail = async () => {
+    showNotification({
+      title: 'Sending mail',
+      message: "Please wait...",
+      color: 'green',
+      loading: true,
+    });
+
+    const res = await fetch("/api/send-email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: student.email,
+        id: student.id
+      })
+    });
+
+    const { status, message } = await res.json();
+    cleanNotifications()
+
+    if(status === 250) {
+      showNotification({
+        title: 'Mail sent',
+        message: message,
+        color: 'teal',
+      });
+      dispatch(studentAction.updateStudentStatus({ id: student.id, status: "sent"}));
+    }else {
+      showNotification({
+        title: 'Error',
+        message: message,
+        color: 'red',
+        icon: '🚨',
+      });
+    }
+  }
+
   return (
     <tr key={student.id}>
       <td>{student.firstName}</td>
@@ -54,7 +94,12 @@ const TableRow = ({ student, toggleDrawer, copyProfile, deleteProfile, mobileScr
 
           <Menu.Dropdown>
             <Menu.Label>{`${student.firstName} ${student.lastName}`}</Menu.Label>
-            <Menu.Item icon={<IconMailForward size={14} />}>Send Email</Menu.Item>
+            <Menu.Item
+              icon={<IconMailForward size={14}/>}
+              onClick={handleSendEmail}
+            >
+              Send Email
+            </Menu.Item>
             <Menu.Item
               icon={<IconEdit size={14} />}
               onClick={() => {

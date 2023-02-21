@@ -51,12 +51,12 @@ export default async function handler(
   }
 }
 
-type StudentProps = { studentId: string; email: string, name: string };
+type StudentProps = { studentId: string; email: string, firstName: string };
 
 function sendEmail({
   studentId,
   email,
-  name,
+  firstName: name,
 }: StudentProps): Promise<{ message: string; status: number }> {
   return new Promise((resolve, reject) => {
     try {
@@ -69,7 +69,7 @@ function sendEmail({
         }
       });
 
-      const pdfDirectory = path.join(process.cwd(), "pdfs");
+      const pdfDirectory = path.join(process.cwd(), "uploads");
       const pdfPath = path.join(pdfDirectory, studentId + ".pdf");
 
       if (fs.existsSync(pdfPath)) {

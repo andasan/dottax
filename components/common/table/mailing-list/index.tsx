@@ -17,10 +17,11 @@ import {
   Drawer,
   Skeleton,
   MediaQuery,
+  Button,
 } from '@mantine/core';
 import { keys } from '@mantine/utils';
 import { IconSelector, IconChevronDown, IconChevronUp, IconSearch } from '@tabler/icons-react';
-import { showNotification } from '@mantine/notifications';
+import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useModals } from '@mantine/modals';
 import { useClipboard, useMediaQuery } from '@mantine/hooks';
 
@@ -261,6 +262,45 @@ export default function MailingListTable({ data, batchNumber, studentsBatchOnly 
     }
   };
 
+  const handleSendBulkEmail = async () => {
+    showNotification({
+      title: 'Sending mass mail in progress',
+      message: "Please wait...",
+      color: 'green',
+      loading: true,
+    });
+    // setIsEmailSending(true);
+    console.log(">>>>", batchNumber)
+    const res = await fetch("/api/send-email/bulk", {
+      method: "POST",
+      body: JSON.stringify({ batchNumber }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const { status, message } = await res.json();
+    cleanNotifications()
+    // setIsEmailSending(false);
+
+    if (status === 250) {
+      cleanNotifications()
+      showNotification({
+        title: 'Mail sent',
+        message: message,
+        color: 'teal',
+      });
+      // dispatch(studentAction.updateStudentStatus({ id: student.id, status: "sent"}));
+    } else {
+      showNotification({
+        title: 'Error',
+        message: message,
+        color: 'red',
+        icon: '🚨',
+      });
+    }
+  };
+
   const rows = sortedData.map((row) => (
     <TableRow
       key={row.id}
@@ -303,12 +343,13 @@ export default function MailingListTable({ data, batchNumber, studentsBatchOnly 
           <Grid.Col sm={12} md={3} lg={3}>
             <Title order={2}>Batch {batchNumber}</Title>
           </Grid.Col>
-          <Grid.Col sm={12} md={5} lg={5}>
+          <Grid.Col sm={12} md={5} lg={5} style={{justifyContent: "center"}}>
             {/* Fill in */}
+            <Button compact onClick={handleSendBulkEmail}>Send Email to all</Button>
           </Grid.Col>
           <Grid.Col sm={12} md={4} lg={4}>
             <Chip.Group value={emailMode} onChange={handleEmailMode} spacing="sm" mb="lg" style={{justifyContent: "flex-end"}}>
-              <Chip value="pending">Pending</Chip>
+              <Chip >Pending</Chip>
               <Chip value="sent">Sent</Chip>
               <Chip value="all">All</Chip>
             </Chip.Group>

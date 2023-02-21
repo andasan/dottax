@@ -19,18 +19,20 @@ export default async function handler(
 ) {
   const studentsEmailList = await prisma.student.findMany({
     where: {
-      status: "idle"
+      batch: Number(req.body.batchNumber)
     },
     select: {
       id: true,
       email: true,
-      name: true,
+      firstName: true,
       studentId: true
     }
   });
 
+
   if (studentsEmailList.length > 0) {
-    await sendBulkEmail(studentsEmailList);
+    const result = await sendBulkEmail(studentsEmailList);
+    console.log(">>> studentsEmailList: ", result)
     res.status(200).json({ message: "Email has been sent", status: 250 });
     // const { message, status }: SendBulkEmailReturnType = await sendBulkEmail(studentsEmailList);
     // res.status(status).json({ message, status });
@@ -42,7 +44,7 @@ export default async function handler(
 type StudentType = {
   id: number;
   email: string;
-  name: string;
+  firstName: string;
   studentId: string;
 };
 
@@ -105,7 +107,7 @@ function sendBulkEmail(studentsEmailList: StudentEmailProps) {
 
     // send the emails with unique attachments
     batchEmailWithAttachments.forEach((recipient, i) => {
-      const emailHtml = render(<EmailTemplate studentName={recipient.name} />, { pretty: true })
+      const emailHtml = render(<EmailTemplate studentName={recipient.firstName} />, { pretty: true })
       // create the email options
       emailQueue.push({
         id: recipient.id,
@@ -146,18 +148,21 @@ function sendBulkEmail(studentsEmailList: StudentEmailProps) {
 }
 
 // type AccType = { [key: string]: string };
-type AccType = { id: number; name: string, email: string; attachmentPath: string };
+type AccType = { id: number; firstName: string, email: string; attachmentPath: string };
 type Acc = AccType[];
 
 const studentReducer = (acc: Acc, student: StudentType) => {
-  const { id, email, studentId, name } = student;
-  const pdfDirectory = path.join(process.cwd(), "pdfs");
+  const { id, email, studentId, firstName } = student;
+  const pdfDirectory = path.join(process.cwd(), "uploads");
 
-  const pdfPath = path.join(pdfDirectory, studentId + "-t2202-fill-21e.pdf");
+  const pdfPath = path.join(pdfDirectory, studentId + ".pdf");
   // const pdfPath = path.join(pdfDirectory, studentId + '-t2202-fill-21e.pdf');
 
   if (fs.existsSync(pdfPath)) {
-    return [...acc, { id, name, email, attachmentPath: pdfPath }];
+    return [...acc, { id, firstName, email, attachmentPath: pdfPath }];
+  } else {
+    //file does not exist
+    throw new Error("Failed to send email. Student's T2202 form doesn't exists");
   }
 
   return acc;
