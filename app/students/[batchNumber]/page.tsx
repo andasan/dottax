@@ -19,7 +19,13 @@ export default async function StudentBatch({ params }: { params: any}) {
     },
   });
 
-  return <MailingListTable data={students} batchNumber={batchNumber} />
+  const studentsBatchOnly = await prisma.student.findMany({
+    select: {
+      batch: true,
+    },
+  });
+
+  return <MailingListTable data={students} batchNumber={batchNumber} studentsBatchOnly={studentsBatchOnly} />
 
 }
 

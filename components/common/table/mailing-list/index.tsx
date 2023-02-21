@@ -55,6 +55,7 @@ const useStyles = createStyles((theme) => ({
 interface TableSortProps {
   data: Student[];
   batchNumber: string;
+  studentsBatchOnly: {batch: number}[]
 }
 
 interface ThProps {
@@ -118,7 +119,7 @@ function sortData(
   );
 }
 
-export default function MailingListTable({ data, batchNumber }: TableSortProps) {
+export default function MailingListTable({ data, batchNumber, studentsBatchOnly }: TableSortProps) {
   const { populateStudents, loading } = useStoreSelector(studentState);
   const dispatch = useStoreDispatch();
 
@@ -136,6 +137,7 @@ export default function MailingListTable({ data, batchNumber }: TableSortProps) 
 
   useEffect(() => {
     dispatch(studentAction.loadStudents(data));
+    dispatch(studentAction.loadBatches(studentsBatchOnly));
   }, [data]);
 
   useEffect(() => {

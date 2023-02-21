@@ -28,7 +28,11 @@ export const navData = (batchLinks: number[]): NavLinkType[] => [
     label: 'Students',
     icon: IconNotes,
     initiallyOpened: true,
-    links: batchLinks.sort().reverse().map((batch) => ({ label: `Batch ${batch}`, link: `/students/${batch}` })),
+    links: batchLinks.map((batch) => ({ label: `Batch ${batch}`, link: `/students/${batch}` })),
+    // links: [
+    //   { label: 'Batch 1', link: '/students/1' },
+    //   { label: 'Batch 2', link: '/students/2' },
+    // ],
   },
   { label: 'Settings',
     icon: IconAdjustments,
@@ -36,7 +40,7 @@ export const navData = (batchLinks: number[]): NavLinkType[] => [
     links: [
       { label: 'Add a Batch', link: '/add-batch' },
       { label: 'Add Students', link: '/add-student' },
-      { label: 'File upload', link: '/files' },
+      { label: 'File upload', link: '/file-upload' },
     ]
   },
 ]

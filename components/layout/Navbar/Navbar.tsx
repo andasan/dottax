@@ -51,17 +51,10 @@ interface NavigationBarProps {
 }
 
 export default function NavigationBar({ opened }: NavigationBarProps) {
-  const { populateStudents, loading } = useStoreSelector(studentState);
+  const { populateStudents, loading, batches } = useStoreSelector(studentState);
   const { classes } = useStyles();
 
-  const [batchLinks, setBatchLinks] = useState<number[]>([]);
-
-  useEffect(() => {
-    const removeDup = [...new Set(populateStudents.map((item: Student) => item.batch))];
-    setBatchLinks(removeDup);
-  }, [populateStudents]);
-
-  const links = navData(batchLinks).map((item) => <LinksGroup {...item} key={item.label} />);
+  const links = navData(batches).map((item) => <LinksGroup {...item} key={item.label} />);
 
   return (
     <Navbar width={{ sm: 300 }} hidden={opened} p="md" className={classes.navbar}>

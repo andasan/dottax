@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 import FooterBar from './footer/Footer'
 import HeaderBar from './header/Header'
-import NavigationBar from './navbar/navbar';
+import NavigationBar from './navbar/Navbar';
 
 type LayoutType = {
   children: React.ReactNode

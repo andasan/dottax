@@ -36,6 +36,9 @@ export const studentSlice = createSlice({
       state.populateStudents = action.payload;
       state.loading = false;
     },
+    loadBatches: (state, action) => {
+      state.batches = [...new Set(action.payload.map((student: Student) => student.batch))].sort().reverse() as number[];
+    },
     selectedProfileData: (state, action) => {
       state.studentSelected = action.payload;
     },

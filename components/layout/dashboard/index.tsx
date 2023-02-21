@@ -16,6 +16,7 @@ export default function Dashboard({ students }: StudentProps) {
 
   useEffect(() => {
     dispatch(studentAction.loadStudents(students));
+    dispatch(studentAction.loadBatches(students));
   }, [students, dispatch]);
 
   return (
