@@ -4,7 +4,10 @@ import {
   IconDiscount2,
   IconReceipt2,
   IconStars,
-  IconUserPlus
+  IconUserPlus,
+  IconMailFast,
+  IconClick,
+  IconReceiptRefund
 } from '@tabler/icons-react'
 
 import type { StatCardType } from '@/types/component.types'
@@ -15,5 +18,8 @@ export const icons = {
   receipt: IconReceipt2,
   coin: IconCoin,
   sales: IconBasket,
-  order: IconStars
+  order: IconStars,
+  deliver: IconMailFast,
+  click: IconClick,
+  bounce: IconReceiptRefund
 }

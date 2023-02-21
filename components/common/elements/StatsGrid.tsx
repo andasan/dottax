@@ -53,33 +53,28 @@ export default function StatsGrid() {
   const statCards:StatCardType[] = [
     {
       diff: 'delivered',
-      icon: 'coin',
+      icon: 'deliver',
       title: 'Delivered',
       value: aggregate?.delivered
     },
     {
       diff: 'clicks',
-      icon: 'coin',
+      icon: 'click',
       title: 'Clicks',
       value: aggregate?.clicks
     },
     {
       diff: 'bounces',
-      icon: 'coin',
+      icon: 'bounce',
       title: 'Bounces',
       value: (aggregate?.softBounces || 0) + (aggregate?.hardBounces || 0)
-    },
-    {
-      diff: 7,
-      icon: 'sales',
-      title: 'Refunded',
-      value: 400
     }
   ]
 
   const stats = statCards.map((stat) => {
     const Icon = icons[stat.icon]
-    const DiffIcon = stat.diff > 0 ? IconArrowUpRight : IconArrowDownRight
+
+    const colorCode = () => stat.diff === 'bounces' ? stat.value > 0 ? 'red' : 'teal' : (stat.value > 0) ? 'teal' : 'red';
 
     return (
       <Paper withBorder p="md" radius="md" key={stat.title}>
@@ -93,13 +88,12 @@ export default function StatsGrid() {
         <Group align="flex-end" spacing="xs" mt={25}>
           <Text className={classes.value}>{stat.value}</Text>
           <Text
-            color={stat.diff > 0 ? 'teal' : 'red'}
+            color={colorCode()}
             size="sm"
             weight={500}
             className={classes.diff}
           >
-            <span>{stat.diff}%</span>
-            <DiffIcon size={16} stroke={1.5} />
+            <span>{stat.diff}</span>
           </Text>
         </Group>
 
@@ -112,7 +106,7 @@ export default function StatsGrid() {
   return (
     <div className={classes.root}>
       <SimpleGrid
-        cols={4}
+        cols={3}
         breakpoints={[
           { maxWidth: 'md', cols: 2 },
           { maxWidth: 'xs', cols: 1 }

@@ -24,6 +24,7 @@ import { IconSelector, IconChevronDown, IconChevronUp, IconSearch } from '@table
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useModals } from '@mantine/modals';
 import { useClipboard, useMediaQuery } from '@mantine/hooks';
+import { useRouter } from 'next/navigation';
 
 import { useStoreSelector, useStoreDispatch } from '@/lib/hooks';
 import { studentState, studentAction } from '@/store/index';
@@ -123,6 +124,7 @@ function sortData(
 export default function MailingListTable({ data, batchNumber, studentsBatchOnly }: TableSortProps) {
   const { populateStudents, loading } = useStoreSelector(studentState);
   const dispatch = useStoreDispatch();
+  const router = useRouter();
 
   const [search, setSearch] = useState('');
   const [sortedData, setSortedData] = useState([] as Student[]);
@@ -263,42 +265,44 @@ export default function MailingListTable({ data, batchNumber, studentsBatchOnly 
   };
 
   const handleSendBulkEmail = async () => {
-    showNotification({
-      title: 'Sending mass mail in progress',
-      message: "Please wait...",
-      color: 'green',
-      loading: true,
-    });
-    // setIsEmailSending(true);
-    console.log(">>>>", batchNumber)
-    const res = await fetch("/api/send-email/bulk", {
-      method: "POST",
-      body: JSON.stringify({ batchNumber }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    //reroute to send email page
+    router.push(`/batch-email/${batchNumber}`);
 
-    const { status, message } = await res.json();
-    cleanNotifications()
-    // setIsEmailSending(false);
+    // showNotification({
+    //   title: 'Sending mass mail in progress',
+    //   message: "Please wait...",
+    //   color: 'green',
+    //   loading: true,
+    // });
+    // // setIsEmailSending(true);
+    // const res = await fetch("/api/send-email/bulk", {
+    //   method: "POST",
+    //   body: JSON.stringify({ batchNumber }),
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    // });
 
-    if (status === 250) {
-      cleanNotifications()
-      showNotification({
-        title: 'Mail sent',
-        message: message,
-        color: 'teal',
-      });
-      // dispatch(studentAction.updateStudentStatus({ id: student.id, status: "sent"}));
-    } else {
-      showNotification({
-        title: 'Error',
-        message: message,
-        color: 'red',
-        icon: '🚨',
-      });
-    }
+    // const { status, message } = await res.json();
+    // cleanNotifications()
+    // // setIsEmailSending(false);
+
+    // if (status === 250) {
+    //   cleanNotifications()
+    //   showNotification({
+    //     title: 'Mail sent',
+    //     message: message,
+    //     color: 'teal',
+    //   });
+    //   // dispatch(studentAction.updateStudentStatus({ id: student.id, status: "sent"}));
+    // } else {
+    //   showNotification({
+    //     title: 'Error',
+    //     message: message,
+    //     color: 'red',
+    //     icon: '🚨',
+    //   });
+    // }
   };
 
   const rows = sortedData.map((row) => (

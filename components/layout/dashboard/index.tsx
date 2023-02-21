@@ -27,7 +27,7 @@ export default function Dashboard({ students }: StudentProps) {
         </Stack>
       </div>
       <div className="flex-[12]">
-        <Stack ml="xl" mt="xl">
+        <Stack mt="xl">
           <StatsGrid />
         </Stack>
       </div>
