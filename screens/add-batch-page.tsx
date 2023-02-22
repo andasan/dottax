@@ -186,15 +186,6 @@ const StepOne = ({ form }: { form: any }) => {
         Step 1: Input a batch number
       </Title>
       <Box sx={{ maxWidth: 300 }} mx="auto">
-        {/* existing */}
-        <Select
-          data={["data1", "data2", "data3"]}
-          label="Select with native scrollbars"
-          placeholder="Dropdown with native scrollbars"
-          dropdownComponent="div"
-        />
-
-        {/* new batch */}
         <TextInput label="Batch Number" type="number" {...form.getInputProps('batchNumber')} />
       </Box>
     </Container>
