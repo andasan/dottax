@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { MantineProvider, ColorScheme, ColorSchemeProvider } from '@mantine/core';
 import { NotificationsProvider } from '@mantine/notifications';
 import { SessionProvider } from 'next-auth/react';
+import { RouterTransition } from '@/components/common/router-transition';
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const {
@@ -30,6 +31,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
       <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
         <MantineProvider theme={{ colorScheme }} withGlobalStyles withNormalizeCSS>
           <NotificationsProvider>
+            <RouterTransition />
             <SessionProvider session={session}>
               <Component {...pageProps} />
             </SessionProvider>
