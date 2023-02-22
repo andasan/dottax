@@ -10,7 +10,7 @@ export default async function middleware(req: NextRequest, res: NextResponse) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  const protectedRoutes = ["/dashboard", "/students", "/add-student", "add-batch", "batch-email", "file-upload"];
+  const protectedRoutes = ["/dashboard", "/students", "/add-student", "/add-batch", "/batch-email", "/file-upload"];
 
   if (protectedRoutes.includes(path) && !session) {
     return NextResponse.redirect(new URL("/", req.url));
