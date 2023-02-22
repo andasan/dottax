@@ -1,15 +1,12 @@
 import MailingListTable from "@/components/common/table/mailing-list"
 import prisma from '@/lib/prisma';
 
-export default async function StudentBatch({ params }: { params: any}) {
-  const { batchNumber } = params
-
-  //convert batchNumber to integer
-  const parseBatchNumber = parseInt(batchNumber)
+export default async function StudentBatch({ params }: { params: { batchnum: number } }) {
+  const { batchnum } = params
 
   const students = await prisma.student.findMany({
     where: {
-      batch: parseBatchNumber
+      batch: +batchnum || 0
     },
     select: {
       id: true,
@@ -28,7 +25,7 @@ export default async function StudentBatch({ params }: { params: any}) {
     },
   });
 
-  return <MailingListTable data={students} batchNumber={batchNumber} studentsBatchOnly={studentsBatchOnly} />
+  return <MailingListTable data={students} batchNumber={batchnum} studentsBatchOnly={studentsBatchOnly} />
 
 }
 
