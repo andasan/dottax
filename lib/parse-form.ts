@@ -6,8 +6,24 @@ import formidable from "formidable";
 import { mkdir, stat } from "fs/promises";
 
 export const FormidableError = formidable.errors.FormidableError;
+export type FormidableFiles = formidable.Files;
 
 export const parseForm = async (
+  req: NextApiRequest
+): Promise<{ fields: formidable.Fields; files: FormidableFiles }> => {
+  return new Promise(async (resolve, reject) => {
+
+    const form = formidable({ multiples: true });
+
+    form.parse(req, function (err, fields, files) {
+      if (err) reject(err);
+      else resolve({ fields, files });
+    });
+
+  });
+};
+
+export const oldparseForm = async (
   req: NextApiRequest
 ): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
   return new Promise(async (resolve, reject) => {

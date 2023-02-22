@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { parseForm, FormidableError } from "@/lib/parse-form";
+import { parseForm, FormidableError, FormidableFiles } from "@/lib/parse-form";
+import cloudinary from "@/utils/cloudinary";
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,16 +19,24 @@ export default async function handler(
   }
   // Just after the "Method Not Allowed" code
   try {
-    const { fields, files } = await parseForm(req);
+    const { files }: { files: FormidableFiles } = await parseForm(req);
 
-    const file = files.media;
-    console.log(file)
+    console.log('FILES: ', files);
+
+    // await cloudinary.v2.uploader.upload(files.file, (err: any, result: any) => {
+    //   if (err) {
+    //     console.error(err.message);
+    //     return;
+    //   }
+
+    //   console.log(result.secure_url);
+    // });
 
     res.status(200).json({
       message: "File uploaded successfully",
       error: null,
     });
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof FormidableError) {
       res.status(e.httpCode || 400).json({ message: null, error: e.message });
     } else {
