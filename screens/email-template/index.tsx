@@ -198,8 +198,8 @@ export default function EmailTemplatePage({ data }: AddStudentProps) {
                         <td>
                           <Link href="https://ciccc.ca/">
                             <Image
-                              width="22"
-                              height="22"
+                              width="22px"
+                              height="22px"
                               src={`${baseUrl}/ciccc-logo-square.png`}
                             />
                           </Link>
@@ -207,8 +207,8 @@ export default function EmailTemplatePage({ data }: AddStudentProps) {
                         <td>
                           <Link href="https://www.facebook.com/cicccvancouver">
                             <Image
-                              width="28"
-                              height="28"
+                              width="28px"
+                              height="28px"
                               src={`${baseUrl}/icons8-facebook-48.png`}
                             />
                           </Link>
@@ -216,8 +216,8 @@ export default function EmailTemplatePage({ data }: AddStudentProps) {
                         <td>
                           <Link href="https://www.linkedin.com/school/cornerstone-international-community-college-of-canada/?originalSubdomain=ca">
                             <Image
-                              width="28"
-                              height="28"
+                              width="28px"
+                              height="28px"
                               src={`${baseUrl}/icons8-linkedin-48.png`}
                             />
                           </Link>
@@ -225,8 +225,8 @@ export default function EmailTemplatePage({ data }: AddStudentProps) {
                         <td>
                           <Link href="https://twitter.com/cicccvancouver">
                             <Image
-                              width="28"
-                              height="28"
+                              width="28px"
+                              height="28px"
                               src={`${baseUrl}/icons8-twitter-squared-48.png`}
                             />
                           </Link>
@@ -234,8 +234,8 @@ export default function EmailTemplatePage({ data }: AddStudentProps) {
                         <td>
                           <Link href="https://www.youtube.com/channel/UCDj9ILg0V9aAF0NxCVDUlww">
                             <Image
-                              width="28"
-                              height="28"
+                              width="28px"
+                              height="28px"
                               src={`${baseUrl}/icons8-youtube-48.png`}
                             />
                           </Link>
@@ -243,8 +243,8 @@ export default function EmailTemplatePage({ data }: AddStudentProps) {
                         <td>
                           <Link href="https://www.instagram.com/cicccvancouver/?hl=en">
                             <Image
-                              width="28"
-                              height="28"
+                              width="28px"
+                              height="28px"
                               src={`${baseUrl}/icons8-instagram-48.png`}
                             />
                           </Link>
