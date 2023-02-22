@@ -65,6 +65,21 @@ export default function FileUploadPage({ data }: AddStudentProps) {
 
     const data = await res.json();
     console.log('data', data);
+
+    if(data.error){
+      showNotification({
+        title: 'Opps!',
+        message: data.error,
+        color: 'red',
+      });
+      return;
+    }
+
+    showNotification({
+      title: 'Success!',
+      message: 'File uploaded successfully',
+      color: 'green',
+    });
   };
 
   return (

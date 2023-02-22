@@ -35,7 +35,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "pages/api/file-upload/index.js"  ],
   "exclude": [
     "node_modules"
   ]

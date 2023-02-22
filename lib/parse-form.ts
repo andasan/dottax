@@ -8,12 +8,26 @@ import { mkdir, stat } from "fs/promises";
 export const FormidableError = formidable.errors.FormidableError;
 export type FormidableFiles = formidable.Files;
 
+
+
 export const parseForm = async (
   req: NextApiRequest
-): Promise<{ fields: formidable.Fields; files: FormidableFiles }> => {
+): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
   return new Promise(async (resolve, reject) => {
 
-    const form = formidable({ multiples: true });
+    const form = new formidable.IncomingForm({
+      multiples: true,
+      keepExtensions: true,
+      filename: (_name, _ext, part) => {
+        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+        const filename = part.originalFilename || `${part.name || "unknown"}-${uniqueSuffix}.${
+          mime.getExtension(part.mimetype || "") || "unknown"
+        }`;
+        console.log("FILENAME", filename)
+        return filename;
+      },
+      uploadDir: join(process.env.ROOT_DIR || process.cwd(),`/uploads`),
+    });
 
     form.parse(req, function (err, fields, files) {
       if (err) reject(err);

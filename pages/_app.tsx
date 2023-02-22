@@ -28,16 +28,16 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
         <link rel="shortcut icon" href="/favicon.svg" />
       </Head>
 
-      <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
         <MantineProvider theme={{ colorScheme }} withGlobalStyles withNormalizeCSS>
+      <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
           <NotificationsProvider>
             <RouterTransition />
             <SessionProvider session={session}>
               <Component {...pageProps} />
             </SessionProvider>
           </NotificationsProvider>
-        </MantineProvider>
       </ColorSchemeProvider>
+        </MantineProvider>
     </>
   );
 }
