@@ -39,6 +39,7 @@ export default function AddBatchPage({ data }: AddBatchProps) {
 
   useEffect(() => {
     dispatch(studentAction.loadStudents(data));
+    dispatch(studentAction.loadBatches(data));
   }, [data]);
 
   const [active, setActive] = useState(0);
