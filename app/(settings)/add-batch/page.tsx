@@ -1,4 +1,4 @@
-import AddBatchPage from '@/screens/add-batch-page';
+import AddBatchPage from '@/screens/add-batch';
 import prisma from '@/lib/prisma';
 
 export default async function AddBatch() {

@@ -308,6 +308,9 @@ const StepThree = ({ form, setStudentRecords }: IStepThreeProps) => {
           <Text py={10}>
             File: <b>{form.values?.file?.name}</b>{' '}
             <small>({formatBytes(form.values?.file.size)})</small>
+          </Text>
+          <Text py={10}>
+            No. of students: <b>{data.length}</b>
             <BatchTable data={data} />
           </Text>
         </Paper>

@@ -4,6 +4,10 @@ import TextStyle from '@tiptap/extension-text-style';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 
+import {
+    Button,
+  } from '@mantine/core';
+
 export default function CustomTextArea() {
   const editor = useEditor({
     extensions: [
