@@ -1,15 +1,22 @@
+const keys = process.env
+
 export const config = {
-  port: process.env.PORT,
-  databaseURL: process.env.DATABASE_URL,
-  clientUrl: process.env.CLIENT_URL,
-  assetsUrl: process.env.ASSETS_URL,
+  port: keys.PORT,
+  databaseURL: keys.DATABASE_URL,
+  clientUrl: keys.CLIENT_URL,
+  assetsUrl: keys.ASSETS_URL,
   email: {
-    host: process.env.NODEMAILER_HOST,
-    port: Number(process.env.NODEMAILER_PORT),
-    username: process.env.NODEMAILER_USER,
-    password: process.env.NODEMAILER_PASS,
-    from: process.env.EMAIL_FROM,
-    subject: process.env.EMAIL_SUBJECT,
+    host: keys.NODEMAILER_HOST,
+    port: Number(keys.NODEMAILER_PORT),
+    username: keys.NODEMAILER_USER,
+    password: keys.NODEMAILER_PASS,
+    from: keys.EMAIL_FROM,
+    subject: keys.EMAIL_SUBJECT,
   },
-  sibApiKey: process.env.SIB_API_KEY,
-};
+  sibApiKey: keys.SIB_API_KEY,
+  cloudinary: {
+    cloud_name: keys.CLOUDINARY_NAME,
+    api_key: keys.CLOUDINARY_API_KEY,
+    api_secret: keys.CLOUDINARY_API_SECRET,
+  },
+}
