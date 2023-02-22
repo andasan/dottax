@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   Paper,
   Container,
@@ -8,38 +9,42 @@ import {
   Group,
   Title,
   Text,
+  TextInput,
   useMantineTheme,
   Button,
   SimpleGrid,
+  Grid,
+  Textarea,
+  Stack,
+  Divider,
+  Image,
+  TypographyStylesProvider,
 } from '@mantine/core';
-
-import { Head } from '@react-email/head';
-import { Hr } from '@react-email/hr';
-import { Html } from '@react-email/html';
-import { Img } from '@react-email/img';
-import { Link } from '@react-email/link';
-import { Preview } from '@react-email/preview';
-import { Section } from '@react-email/section';
-import { Text as TxT } from '@react-email/text';
 
 import { useStoreDispatch, useStoreSelector } from '@/lib/hooks';
 import { studentAction, studentState } from '@/store/index';
-import { formatBytes } from '@/utils/formatBytes';
-import { Dropzone, PDF_MIME_TYPE } from '@mantine/dropzone';
-import { IconUpload, IconX, IconFileDelta } from '@tabler/icons-react';
 import { showNotification } from '@mantine/notifications';
 import { useForm } from '@mantine/form';
-import EmailTemplate from '@/email/emails/ciccc-t2202';
+
+import { CustomTextArea } from '@/components/common';
 
 interface AddStudentProps {
   data: any;
 }
 
 type FormValues = {
-  name: string;
+  fullName: string;
   header: string;
   body: string;
+  footer: string;
 };
+
+// `<p>A digital Tuition Enrolment Certificate (T2202) has been issued to you and is ready for viewing.
+//     Please see the attached file for your T2202.</p>
+//     <p>If you have any queries, please contact <a href="mailto:info@ciccc.ca">here</a></p>
+
+//     Thank you,<br>
+//     Cornerstone International Community College Admin`,
 
 export default function EmailTemplatePage({ data }: AddStudentProps) {
   const dispatch = useStoreDispatch();
@@ -50,17 +55,43 @@ export default function EmailTemplatePage({ data }: AddStudentProps) {
   }, [data]);
 
   const [templateState, setTemplateState] = useState<FormValues>({
-    name: 'John Doe',
-    header: 'Header',
-    body: 'Body',
+    fullName: 'John Doe',
+    header: 'Tuition Enrolment Certificate (T2202)',
+    body: `
+      <p>A digital Tuition Enrolment Certificate (T2202) has been issued to you and is ready for viewing.
+      Please see the attached file for your T2202.</p>
+      <p>If you have any queries, please contact <a href="mailto:info@ciccc.ca">here</a></p>
+
+      Thank you,<br>
+      Cornerstone International Community College Admin
+      `,
+    footer:
+      '© 2023 Cornerstone International College of Canada 609 West Hastings St, Vancouver, BC, Canada V6B 4W4',
+  });
+
+
+  const form = useForm({
+    initialValues: {
+      fullName: templateState.fullName,
+      header: templateState.header,
+      body: templateState.body,
+      footer: templateState.footer,
+    },
+
+    validate: {
+      fullName: (value: string) =>
+        value.length > 4 ? null : 'Name must be at least 5 characters long',
+      header: (value: string) => (value.length > 0 ? null : 'Header is required'),
+      body: (value: string) => (value.length > 0 ? null : 'Body is required'),
+      footer: (value: string) => (value.length > 0 ? null : 'Footer is required'),
+    },
   });
 
   const baseUrl = '/static';
 
-
   return (
     <Paper shadow="xs" p="xl">
-      <Container p="xl" size={400}>
+      <Container p="xs" size="lg">
         <Title order={3} weight={100} align="center" py={10}>
           Modify email message
         </Title>
@@ -71,148 +102,179 @@ export default function EmailTemplatePage({ data }: AddStudentProps) {
               { minWidth: 'md', cols: 2, spacing: 'xl' },
             ]}
           >
-            <div>1</div>
-            <>
+            <Stack align="stretch" spacing="xs" mt={25}>
+              <form onSubmit={form.onSubmit((values) => console.log(values))}>
+                <TextInput
+                  placeholder="Your name"
+                  label="Full name"
+                  withAsterisk
+                  size="md"
+                  {...form.getInputProps('fullName')}
+                />
 
-          <Box>
-            <Section style={headerBlue}>
-              <Img
-                src={`${baseUrl}/ciccc-header.png`}
-                width="305"
-                height="28"
-                alt="CICCC header blue transparent"
-              />
-            </Section>
-            <Section style={sectionLogo}>
-              <Img
-                src={`${baseUrl}/ciccc-logo.png`}
-                width="320"
-                height="75"
-                alt="CICCC logo"
-              />
-            </Section>
-          </Box>
+                <TextInput
+                  mt={20}
+                  placeholder="Header Title here"
+                  label="Header Title"
+                  withAsterisk
+                  size="md"
+                  {...form.getInputProps('header')}
+                />
 
-          <Box style={paragraphContent}>
-            <Hr style={hr} />
-            <TxT style={heading}>Tuition Enrolment Certificate (T2202)</TxT>
-            <TxT style={{ ...paragraph, fontSize: '18px' }}>Hello {templateState.name},</TxT>
-            <TxT style={paragraph}>
-              A digital Tuition Enrolment Certificate (T2202) has been issued to you
-              and is ready for viewing.
-            </TxT>
+                <CustomTextArea />
 
-            <TxT style={paragraph}>
-              Please see the attached file for your T2202.
-            </TxT>
+                <Textarea
+                  mt={20}
+                  placeholder="Write a message"
+                  label="Message Body"
+                  autosize
+                  minRows={3}
+                  size="md"
+                  {...form.getInputProps('body')}
+                />
+                <TextInput
+                  mt={20}
+                  placeholder="Write a footer here"
+                  label="Footer"
+                  withAsterisk
+                  size="md"
+                  {...form.getInputProps('footer')}
+                />
+              </form>
+            </Stack>
 
-            <TxT style={paragraph}>
-              If you have any queries, please contact{' '}
-              <Link href="mailto:info@ciccc.ca">here</Link>
-            </TxT>
-          </Box>
-
-          <Box style={paragraphContent}>
-            <TxT style={paragraph}>Thank you,</TxT>
-            <TxT style={paragraph}>
-              Cornerstone International Community College Admin
-            </TxT>
-          </Box>
-
-          <Box style={containerContact}>
-            <Section
-              style={{
-                padding: '20px 20px',
-              }}
+            <Stack
+              align="flex-end"
+              spacing="xs"
+              mt={25}
+              sx={(theme) => ({
+                backgroundColor: theme.colorScheme !== 'dark' ? theme.colors.dark[6] : 'white',
+                textAlign: 'left',
+                padding: theme.spacing.xl,
+                borderRadius: theme.radius.md,
+              })}
             >
-              <TxT style={paragraph}>Connect with us</TxT>
-              <table>
-                <tr>
-                  <td>
-                    <Link href="https://ciccc.ca/">
-                      <Img
-                        width="22"
-                        height="22"
-                        src={`${baseUrl}/ciccc-logo-square.png`}
-                      />
-                    </Link>
-                  </td>
-                  <td>
-                    <Link href="https://www.facebook.com/cicccvancouver">
-                      <Img
-                        width="28"
-                        height="28"
-                        src={`${baseUrl}/icons8-facebook-48.png`}
-                      />
-                    </Link>
-                  </td>
-                  <td>
-                    <Link href="https://www.linkedin.com/school/cornerstone-international-community-college-of-canada/?originalSubdomain=ca">
-                      <Img
-                        width="28"
-                        height="28"
-                        src={`${baseUrl}/icons8-linkedin-48.png`}
-                      />
-                    </Link>
-                  </td>
-                  <td>
-                    <Link href="https://twitter.com/cicccvancouver">
-                      <Img
-                        width="28"
-                        height="28"
-                        src={`${baseUrl}/icons8-twitter-squared-48.png`}
-                      />
-                    </Link>
-                  </td>
-                  <td>
-                    <Link href="https://www.youtube.com/channel/UCDj9ILg0V9aAF0NxCVDUlww">
-                      <Img
-                        width="28"
-                        height="28"
-                        src={`${baseUrl}/icons8-youtube-48.png`}
-                      />
-                    </Link>
-                  </td>
-                  <td>
-                    <Link href="https://www.instagram.com/cicccvancouver/?hl=en">
-                      <Img
-                        width="28"
-                        height="28"
-                        src={`${baseUrl}/icons8-instagram-48.png`}
-                      />
-                    </Link>
-                  </td>
-                </tr>
-              </table>
-            </Section>
-            <Img width="540" height="48" src={`${baseUrl}/ciccc-footer.png`} />
-          </Box>
+              <Box>
+                <Box style={headerBlue}>
+                  <Image
+                    src={`${baseUrl}/ciccc-header.png`}
+                    width="305"
+                    height="28"
+                    alt="CICCC header blue transparent"
+                  />
+                </Box>
+                <Box style={sectionLogo}>
+                  <Image
+                    src={`${baseUrl}/ciccc-logo.png`}
+                    width="320"
+                    height="75"
+                    alt="CICCC logo"
+                  />
+                </Box>
+              </Box>
 
-          <Box style={{ ...paragraphContent, paddingBottom: 30 }}>
-            <TxT
-              style={{
-                ...paragraph,
-                fontSize: '12px',
-                textAlign: 'center',
-                margin: 0,
-              }}
-            >
-              © 2023 Cornerstone International College of Canada 609 West Hastings St, Vancouver, BC, Canada V6B 4W4
-            </TxT>
-          </Box>
+              <Box style={paragraphContent}>
+                <Divider size="xs" style={{ opacity: 0.2 }} />
+                <Text style={heading}>{form.values.header}</Text>
+                <Text mt={20} style={{ ...paragraph, fontSize: '16px' }}>
+                  Hello {form.values.fullName},
+                </Text>
+                <TypographyStylesProvider my={20} style={paragraph}>
+                  <div dangerouslySetInnerHTML={{ __html: `${templateState.body}` }} />
+                </TypographyStylesProvider>
+              </Box>
 
+              <Box style={containerContact}>
+                <Box
+                  style={{
+                    padding: '20px 20px',
+                  }}
+                >
+                  <Text style={paragraph}>Connect with us</Text>
+                  <table>
+                    <thead />
+                    <tbody>
+                      <tr>
+                        <td>
+                          <Link href="https://ciccc.ca/">
+                            <Image
+                              width="22"
+                              height="22"
+                              src={`${baseUrl}/ciccc-logo-square.png`}
+                            />
+                          </Link>
+                        </td>
+                        <td>
+                          <Link href="https://www.facebook.com/cicccvancouver">
+                            <Image
+                              width="28"
+                              height="28"
+                              src={`${baseUrl}/icons8-facebook-48.png`}
+                            />
+                          </Link>
+                        </td>
+                        <td>
+                          <Link href="https://www.linkedin.com/school/cornerstone-international-community-college-of-canada/?originalSubdomain=ca">
+                            <Image
+                              width="28"
+                              height="28"
+                              src={`${baseUrl}/icons8-linkedin-48.png`}
+                            />
+                          </Link>
+                        </td>
+                        <td>
+                          <Link href="https://twitter.com/cicccvancouver">
+                            <Image
+                              width="28"
+                              height="28"
+                              src={`${baseUrl}/icons8-twitter-squared-48.png`}
+                            />
+                          </Link>
+                        </td>
+                        <td>
+                          <Link href="https://www.youtube.com/channel/UCDj9ILg0V9aAF0NxCVDUlww">
+                            <Image
+                              width="28"
+                              height="28"
+                              src={`${baseUrl}/icons8-youtube-48.png`}
+                            />
+                          </Link>
+                        </td>
+                        <td>
+                          <Link href="https://www.instagram.com/cicccvancouver/?hl=en">
+                            <Image
+                              width="28"
+                              height="28"
+                              src={`${baseUrl}/icons8-instagram-48.png`}
+                            />
+                          </Link>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </Box>
+                <Image width="540" height="48" src={`${baseUrl}/ciccc-footer.png`} />
+              </Box>
 
-
-
-            </>
+              <Box style={{ ...paragraphContent, paddingBottom: 30 }}>
+                <Text
+                  style={{
+                    ...paragraph,
+                    fontSize: '12px',
+                    textAlign: 'center',
+                    margin: 0,
+                  }}
+                >
+                  {form.values.footer}
+                </Text>
+              </Box>
+            </Stack>
           </SimpleGrid>
         </Box>
       </Container>
     </Paper>
   );
 }
-
-
 
 const fontFamily =
   '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif';
@@ -222,21 +284,14 @@ const main = {
 };
 
 const sectionLogo = {
+  marginLeft: 0,
   padding: '0 40px',
 };
 
 const headerBlue = {
-  width: 0,
+  // width: 0,
   marginRight: 0,
-};
-
-const container = {
-  margin: '30px auto',
-  width: '610px',
-  backgroundColor: '#fff',
-  borderRadius: 5,
-  overflow: 'hidden',
-  maxWidth: '100%',
+  padding: '0 40px',
 };
 
 const containerContact = {
@@ -257,10 +312,6 @@ const heading = {
 
 const paragraphContent = {
   padding: '0 40px',
-};
-
-const paragraphList = {
-  paddingLeft: 40,
 };
 
 const paragraph = {
