@@ -1,16 +1,14 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { render } from "@react-email/render";
-import nodemailer from "nodemailer";
-import prisma from "@/lib/prisma";
-import path from "path";
-import fs from "fs";
+import { NextApiRequest, NextApiResponse } from 'next';
+import { render } from '@react-email/render';
+import nodemailer from 'nodemailer';
+import prisma from '@/lib/prisma';
+import path from 'path';
+import fs from 'fs';
 
-import EmailTemplate from "@/email/emails/ciccc-t2202";
+import EmailTemplate from '@/email/emails/ciccc-t2202';
+import cloudinary from '@/utils/cloudinary';
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { email, id } = req.body;
 
   //commented out for now until all emails are unique in production
@@ -22,8 +20,8 @@ export default async function handler(
 
   const exists = await prisma.student.findUnique({
     where: {
-      id
-    }
+      id,
+    },
   });
 
   if (exists) {
@@ -34,11 +32,11 @@ export default async function handler(
         //update the status of the student
         await prisma.student.update({
           where: {
-            id
+            id,
           },
           data: {
-            status: "sent"
-          }
+            status: 'sent',
+          },
         });
       }
 
@@ -51,7 +49,7 @@ export default async function handler(
   }
 }
 
-type StudentProps = { studentId: string; email: string, firstName: string };
+type StudentProps = { studentId: string; email: string; firstName: string };
 
 function sendEmail({
   studentId,
@@ -65,50 +63,50 @@ function sendEmail({
         port: 587,
         auth: {
           user: process.env.NODEMAILER_USER,
-          pass: process.env.NODEMAILER_PASS
+          pass: process.env.NODEMAILER_PASS,
+        },
+      });
+
+      cloudinary.v2.api.resource(studentId, function (error, result) {
+        if (error) {
+          console.log('cloud error: ', error);
+          reject({
+            message: "Failed to send email. Student's T2202 form doesn't exists",
+            status: 404,
+          });
+
+        } else {
+          const emailHtml = render(<EmailTemplate studentName={name} />, { pretty: true });
+
+          const mailOptions = {
+            from: `CICCC <${process.env.EMAIL_FROM}>`,
+            to: email,
+            subject: `T2202 form for ${studentId}`,
+            text: 'This email contains an attachment',
+            attachments: [
+              {
+                filename: 't2202-fill-21e.pdf',
+                path: result.secure_url,
+                contentType: 'application/pdf',
+              },
+            ],
+            html: emailHtml,
+          };
+
+          transporter.sendMail(mailOptions, (error: any, info) => {
+            if (error) {
+              reject({
+                message: error.message || error.response,
+                status: error.responseCode || 500,
+              });
+            } else {
+              console.info(`Email sent [${email}]: ${info.response}`);
+              resolve({ message: `Email sent to ${email}`, status: 250 });
+            }
+          });
         }
       });
 
-      const pdfDirectory = path.join(process.cwd(), "uploads");
-      const pdfPath = path.join(pdfDirectory, studentId + ".pdf");
-
-      if (fs.existsSync(pdfPath)) {
-        //file exists
-        const emailHtml = render(<EmailTemplate studentName={name} />, { pretty: true })
-
-        const mailOptions = {
-          from: `CICCC <${process.env.EMAIL_FROM}>`,
-          to: email,
-          subject: `T2202 form for ${studentId}`,
-          text: "This email contains an attachment",
-          attachments: [
-            {
-              filename: "t2202-fill-21e.pdf",
-              path: pdfPath,
-              contentType: "application/pdf"
-            }
-          ],
-          html: emailHtml
-        };
-
-        transporter.sendMail(mailOptions, (error: any, info) => {
-          if (error) {
-            reject({
-              message: error.message || error.response,
-              status: error.responseCode || 500
-            });
-          } else {
-            console.info(`Email sent [${email}]: ${info.response}`);
-            resolve({ message: `Email sent to ${email}`, status: 250 });
-          }
-        });
-      } else {
-        //file does not exist
-        reject({
-          message: "Failed to send email. Student's T2202 form doesn't exists",
-          status: 404
-        });
-      }
     } catch (err: any) {
       // Handle the error.
       reject({ message: err.message || err, status: 500 });

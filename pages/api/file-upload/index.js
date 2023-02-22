@@ -18,29 +18,51 @@ export default async function handler(req, res) {
 
     const data = JSON.parse(JSON.stringify({ files }))
 
-    const filesToUpload = data.files.media.filter((file) => {
-      return file;
-    });
+    if(Array.isArray(data.files.media)){
 
-    filesToUpload.forEach(async (file) => {
-      await cloudinary.v2.uploader.upload(file.filepath, {
-        unique_filename: false,
-        use_filename: true
-      }, (err, result) => {
-        if (err) {
-          console.error(err.message);
-          throw new Error(err.message)
-        }
+      const filesToUpload = data.files.media.filter((file) => {
+        return file;
+      });
 
-        // console.log(result.secure_url);
-        fs.unlink(file.filepath, function(err) {
+      filesToUpload.forEach(async (file) => {
+        await cloudinary.v2.uploader.upload(file.filepath, {
+          unique_filename: false,
+          use_filename: true
+        }, (err, result) => {
+
           if (err) {
-            console.error(err);
+            console.error(err.message);
             throw new Error(err.message)
           }
+
+          fs.unlink(file.filepath, function(err) {
+            if (err) {
+              console.error(err);
+              throw new Error(err.message)
+            }
+          });
         });
-      });
-    })
+      })
+    }else{
+
+      await cloudinary.v2.uploader.upload(data.files.media.filepath, {
+          unique_filename: false,
+          use_filename: true
+        }, (err, result) => {
+          if (err) {
+            console.error(err.message);
+            throw new Error(err.message)
+          }
+
+          // console.log(result.secure_url);
+          fs.unlink(data.files.media.filepath, function(err) {
+            if (err) {
+              console.error(err);
+              throw new Error(err.message)
+            }
+          });
+        });
+    }
 
     res.status(200).json({
       message: 'File uploaded successfully',
