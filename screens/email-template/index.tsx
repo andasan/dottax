@@ -1,5 +1,18 @@
-import { config } from '@/lib/config';
-import { Container } from '@react-email/container';
+'use client';
+
+import { useEffect, useState } from 'react';
+import {
+  Paper,
+  Container,
+  Box,
+  Group,
+  Title,
+  Text,
+  useMantineTheme,
+  Button,
+  SimpleGrid,
+} from '@mantine/core';
+
 import { Head } from '@react-email/head';
 import { Hr } from '@react-email/hr';
 import { Html } from '@react-email/html';
@@ -7,24 +20,64 @@ import { Img } from '@react-email/img';
 import { Link } from '@react-email/link';
 import { Preview } from '@react-email/preview';
 import { Section } from '@react-email/section';
-import { Text } from '@react-email/text';
-import * as React from 'react';
+import { Text as TxT } from '@react-email/text';
 
-export default function EmailTemplate({ studentName = "Student" }: { studentName: string }) {
-  const baseUrl = config.assetsUrl ? config.assetsUrl : '@/email/static';
+import { useStoreDispatch, useStoreSelector } from '@/lib/hooks';
+import { studentAction, studentState } from '@/store/index';
+import { formatBytes } from '@/utils/formatBytes';
+import { Dropzone, PDF_MIME_TYPE } from '@mantine/dropzone';
+import { IconUpload, IconX, IconFileDelta } from '@tabler/icons-react';
+import { showNotification } from '@mantine/notifications';
+import { useForm } from '@mantine/form';
+import EmailTemplate from '@/email/emails/ciccc-t2202';
 
-  console.log('\x1b[32m%s\x1b[0m', 'ciccc-t2202.tsx line:16 `${baseUrl}/ciccc-header.png`', `${baseUrl}/ciccc-header.png`);
+interface AddStudentProps {
+  data: any;
+}
+
+type FormValues = {
+  name: string;
+  header: string;
+  body: string;
+};
+
+export default function EmailTemplatePage({ data }: AddStudentProps) {
+  const dispatch = useStoreDispatch();
+
+  useEffect(() => {
+    dispatch(studentAction.loadStudents(data));
+    dispatch(studentAction.loadBatches(data));
+  }, [data]);
+
+  const [templateState, setTemplateState] = useState<FormValues>({
+    name: 'John Doe',
+    header: 'Header',
+    body: 'Body',
+  });
+
+  const baseUrl = '/static';
+
 
   return (
-    <Html>
-      <Head />
-      <Preview>Cornerstone International Community College Admin</Preview>
-      <Section style={main}>
-        <Container style={container}>
-          <Section>
+    <Paper shadow="xs" p="xl">
+      <Container p="xl" size={400}>
+        <Title order={3} weight={100} align="center" py={10}>
+          Modify email message
+        </Title>
+        <Box mx="auto">
+          <SimpleGrid
+            breakpoints={[
+              { minWidth: 'sm', cols: 1, spacing: 'xl' },
+              { minWidth: 'md', cols: 2, spacing: 'xl' },
+            ]}
+          >
+            <div>1</div>
+            <>
+
+          <Box>
             <Section style={headerBlue}>
               <Img
-                src={`${baseUrl}/ciccc-header_omyhrd.png`}
+                src={`${baseUrl}/ciccc-header.png`}
                 width="305"
                 height="28"
                 alt="CICCC header blue transparent"
@@ -32,47 +85,47 @@ export default function EmailTemplate({ studentName = "Student" }: { studentName
             </Section>
             <Section style={sectionLogo}>
               <Img
-                src={`${baseUrl}/ciccc-logo_xg9dv1.png`}
+                src={`${baseUrl}/ciccc-logo.png`}
                 width="320"
                 height="75"
                 alt="CICCC logo"
               />
             </Section>
-          </Section>
+          </Box>
 
-          <Section style={paragraphContent}>
+          <Box style={paragraphContent}>
             <Hr style={hr} />
-            <Text style={heading}>Tuition Enrolment Certificate (T2202)</Text>
-            <Text style={{ ...paragraph, fontSize: '18px' }}>Hello {studentName},</Text>
-            <Text style={paragraph}>
+            <TxT style={heading}>Tuition Enrolment Certificate (T2202)</TxT>
+            <TxT style={{ ...paragraph, fontSize: '18px' }}>Hello {templateState.name},</TxT>
+            <TxT style={paragraph}>
               A digital Tuition Enrolment Certificate (T2202) has been issued to you
               and is ready for viewing.
-            </Text>
+            </TxT>
 
-            <Text style={paragraph}>
+            <TxT style={paragraph}>
               Please see the attached file for your T2202.
-            </Text>
+            </TxT>
 
-            <Text style={paragraph}>
+            <TxT style={paragraph}>
               If you have any queries, please contact{' '}
               <Link href="mailto:info@ciccc.ca">here</Link>
-            </Text>
-          </Section>
+            </TxT>
+          </Box>
 
-          <Section style={paragraphContent}>
-            <Text style={paragraph}>Thank you,</Text>
-            <Text style={paragraph}>
+          <Box style={paragraphContent}>
+            <TxT style={paragraph}>Thank you,</TxT>
+            <TxT style={paragraph}>
               Cornerstone International Community College Admin
-            </Text>
-          </Section>
+            </TxT>
+          </Box>
 
-          <Section style={containerContact}>
+          <Box style={containerContact}>
             <Section
               style={{
                 padding: '20px 20px',
               }}
             >
-              <Text style={paragraph}>Connect with us</Text>
+              <TxT style={paragraph}>Connect with us</TxT>
               <table>
                 <tr>
                   <td>
@@ -80,7 +133,7 @@ export default function EmailTemplate({ studentName = "Student" }: { studentName
                       <Img
                         width="22"
                         height="22"
-                        src={`${baseUrl}/ciccc-logo-square_j1wswd.png`}
+                        src={`${baseUrl}/ciccc-logo-square.png`}
                       />
                     </Link>
                   </td>
@@ -89,7 +142,7 @@ export default function EmailTemplate({ studentName = "Student" }: { studentName
                       <Img
                         width="28"
                         height="28"
-                        src={`${baseUrl}/icons8-facebook-48_jqtzhc.png`}
+                        src={`${baseUrl}/icons8-facebook-48.png`}
                       />
                     </Link>
                   </td>
@@ -98,7 +151,7 @@ export default function EmailTemplate({ studentName = "Student" }: { studentName
                       <Img
                         width="28"
                         height="28"
-                        src={`${baseUrl}/icons8-linkedin-48_swmk5q.png`}
+                        src={`${baseUrl}/icons8-linkedin-48.png`}
                       />
                     </Link>
                   </td>
@@ -107,7 +160,7 @@ export default function EmailTemplate({ studentName = "Student" }: { studentName
                       <Img
                         width="28"
                         height="28"
-                        src={`${baseUrl}/icons8-twitter-squared-48_migqpq.png`}
+                        src={`${baseUrl}/icons8-twitter-squared-48.png`}
                       />
                     </Link>
                   </td>
@@ -116,7 +169,7 @@ export default function EmailTemplate({ studentName = "Student" }: { studentName
                       <Img
                         width="28"
                         height="28"
-                        src={`${baseUrl}/icons8-youtube-48_bgvguv.png`}
+                        src={`${baseUrl}/icons8-youtube-48.png`}
                       />
                     </Link>
                   </td>
@@ -125,18 +178,18 @@ export default function EmailTemplate({ studentName = "Student" }: { studentName
                       <Img
                         width="28"
                         height="28"
-                        src={`${baseUrl}/icons8-instagram-48_y60vni.png`}
+                        src={`${baseUrl}/icons8-instagram-48.png`}
                       />
                     </Link>
                   </td>
                 </tr>
               </table>
             </Section>
-            <Img width="540" height="48" src={`${baseUrl}/ciccc-footer_bjxn0x.png`} />
-          </Section>
+            <Img width="540" height="48" src={`${baseUrl}/ciccc-footer.png`} />
+          </Box>
 
-          <Section style={{ ...paragraphContent, paddingBottom: 30 }}>
-            <Text
+          <Box style={{ ...paragraphContent, paddingBottom: 30 }}>
+            <TxT
               style={{
                 ...paragraph,
                 fontSize: '12px',
@@ -145,13 +198,21 @@ export default function EmailTemplate({ studentName = "Student" }: { studentName
               }}
             >
               © 2023 Cornerstone International College of Canada 609 West Hastings St, Vancouver, BC, Canada V6B 4W4
-            </Text>
-          </Section>
-        </Container>
-      </Section>
-    </Html>
+            </TxT>
+          </Box>
+
+
+
+
+            </>
+          </SimpleGrid>
+        </Box>
+      </Container>
+    </Paper>
   );
 }
+
+
 
 const fontFamily =
   '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif';
