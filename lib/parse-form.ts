@@ -14,6 +14,20 @@ export const parseForm = async (
   req: NextApiRequest
 ): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
   return new Promise(async (resolve, reject) => {
+    const uploadDir = join(process.env.ROOT_DIR || process.cwd(),`/uploads`)
+
+    try {
+      await stat(uploadDir);
+    } catch (e: any) {
+      if (e.code === "ENOENT") {
+        await mkdir(uploadDir, { recursive: true });
+      } else {
+        console.error(e);
+        reject(e);
+        return;
+      }
+    }
+
 
     const form = new formidable.IncomingForm({
       multiples: true,
@@ -26,7 +40,7 @@ export const parseForm = async (
         console.log("FILENAME", filename)
         return filename;
       },
-      uploadDir: join(process.env.ROOT_DIR || process.cwd(),`/uploads`),
+      uploadDir
     });
 
     form.parse(req, function (err, fields, files) {
