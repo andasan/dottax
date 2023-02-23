@@ -177,6 +177,17 @@ import StarterKit from '@tiptap/starter-kit';
 
 import { Box, Button, Text, Divider } from '@mantine/core';
 
+const headerBlue = {
+  border: '1px solid #373A40',
+  backgroundColor: '#25262b',
+  borderRadius: '4px',
+  marginRight: 0,
+  padding: '10px 14px',
+  textAlign: 'left',
+  minHeight: '42px',
+};
+
+
 const MenuBar = ({ editor }) => {
   if (!editor) {
     return null;
@@ -342,13 +353,3 @@ export default function CustomTextArea({ label, templateState, setTemplateState 
     </>
   );
 }
-
-const headerBlue = {
-  border: '1px solid #373A40',
-  backgroundColor: '#25262b',
-  borderRadius: '4px',
-  marginRight: 0,
-  padding: '10px 14px',
-  textAlign: 'left',
-  minHeight: '42px',
-};

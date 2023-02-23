@@ -28,6 +28,61 @@ import { useForm } from '@mantine/form';
 
 import { CustomTextArea } from '@/components/common';
 
+const fontFamily =
+  '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif';
+
+const main = {
+  backgroundColor: '#dbddde',
+};
+
+const sectionLogo = {
+  marginLeft: 0,
+  padding: '0 40px',
+};
+
+const headerBlue = {
+  // width: 0,
+  marginRight: 0,
+  padding: '0 40px',
+};
+
+const containerContact = {
+  backgroundColor: '#f0fcff',
+  width: '90%',
+  borderRadius: '5px',
+  overflow: 'hidden',
+  marginBottom: 20,
+};
+
+const heading = {
+  fontFamily,
+  fontSize: '14px',
+  lineHeight: '26px',
+  fontWeight: 700,
+  color: '#004dcf',
+};
+
+const paragraphContent = {
+  padding: '0 40px',
+};
+
+const paragraph = {
+  fontFamily,
+  fontSize: '14px',
+  lineHeight: '22px',
+  color: '#3c4043',
+};
+
+const link = {
+  ...paragraph,
+  color: '#004dcf',
+};
+
+const hr = {
+  borderColor: '#e8eaed',
+  margin: '20px 0',
+};
+
 type FormValues = {
   fullName: string;
   header: string;
@@ -264,58 +319,3 @@ export default function EmailTemplatePage() {
     </Paper>
   );
 }
-
-const fontFamily =
-  '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif';
-
-const main = {
-  backgroundColor: '#dbddde',
-};
-
-const sectionLogo = {
-  marginLeft: 0,
-  padding: '0 40px',
-};
-
-const headerBlue = {
-  // width: 0,
-  marginRight: 0,
-  padding: '0 40px',
-};
-
-const containerContact = {
-  backgroundColor: '#f0fcff',
-  width: '90%',
-  borderRadius: '5px',
-  overflow: 'hidden',
-  marginBottom: 20,
-};
-
-const heading = {
-  fontFamily,
-  fontSize: '14px',
-  lineHeight: '26px',
-  fontWeight: 700,
-  color: '#004dcf',
-};
-
-const paragraphContent = {
-  padding: '0 40px',
-};
-
-const paragraph = {
-  fontFamily,
-  fontSize: '14px',
-  lineHeight: '22px',
-  color: '#3c4043',
-};
-
-const link = {
-  ...paragraph,
-  color: '#004dcf',
-};
-
-const hr = {
-  borderColor: '#e8eaed',
-  margin: '20px 0',
-};
