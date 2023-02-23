@@ -1,4 +1,4 @@
-const keys = process.env
+const keys = process?.env
 
 export const config = {
   port: keys.PORT,

@@ -6,6 +6,7 @@ import { Student } from '@/types/schema.types';
 type StudentState = {
   students: Student[];
   populateStudents: Student[];
+  studentsByBatch: Student[];
   batches: number[];
   studentSelected: Student;
   loading: boolean;
@@ -14,6 +15,7 @@ type StudentState = {
 const initialState: StudentState = {
   students: [],
   populateStudents: [],
+  studentsByBatch: [],
   batches: [],
   studentSelected: {
     id: 0,
@@ -38,6 +40,9 @@ export const studentSlice = createSlice({
     },
     loadBatches: (state, action) => {
       state.batches = [...new Set(action.payload.map((student: Student) => student.batch))].sort().reverse() as number[];
+    },
+    loadStudentsByBatch: (state, action) => {
+      state.studentsByBatch = state.students.filter((student) => student.batch === +action.payload)
     },
     selectedProfileData: (state, action) => {
       state.studentSelected = action.payload;
@@ -81,11 +86,6 @@ export const studentSlice = createSlice({
     },
     deleteStudent: (state, action) => {
       state.populateStudents = state.students.filter((student) => student.id !== action.payload);
-    },
-    getBatches: (state) => {
-      state.batches = [...new Set(state.students.map((student) => student.batch))].sort(
-        (a, b) => b - a // sort in descending order
-      );
     },
   },
 });

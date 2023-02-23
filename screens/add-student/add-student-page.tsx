@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import {
   Paper,
   Container,
@@ -9,23 +8,14 @@ import {
 } from '@mantine/core';
 
 import { useStoreDispatch, useStoreSelector } from '@/lib/hooks';
-import { studentAction, studentState } from '@/store/index';
+import { studentState } from '@/store/index';
 
 import MultipleStudents from './stepper';
 
-interface AddStudentProps {
-  data: any;
-}
-
-export default function AddStudentPage({ data }: AddStudentProps) {
+export default function AddStudentPage() {
   const dispatch = useStoreDispatch();
 
   const { loading, batches } = useStoreSelector(studentState);
-
-  useEffect(() => {
-    dispatch(studentAction.loadStudents(data));
-    dispatch(studentAction.getBatches());
-  }, [data]);
 
   if (loading) {
     return(

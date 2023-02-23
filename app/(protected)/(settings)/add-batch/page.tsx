@@ -1,7 +1,7 @@
-import Dashboard from '@/components/layout/dashboard';
+import AddBatchPage from '@/screens/add-batch';
 import prisma from '@/lib/prisma';
 
-export default async function Home() {
+export default async function AddBatch() {
 
   const students = await prisma.student.findMany({
     select: {
@@ -15,5 +15,5 @@ export default async function Home() {
     },
   });
 
-  return <Dashboard students={students} />;
+  return <AddBatchPage />
 }

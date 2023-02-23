@@ -1,14 +1,11 @@
-import { useState, useEffect } from 'react';
 import { createStyles, Navbar, ScrollArea, Skeleton } from '@mantine/core';
 
 import { navData } from '@/data/navData';
-import prisma from '@/lib/prisma';
 import { useStoreSelector } from '@/lib/hooks';
-import { studentAction, studentState } from '@/store/index';
+import { studentState } from '@/store/index';
 
 import LinksGroup from './nav-link-group';
 import { UserButton } from './user-button';
-import { Student } from '@/types/schema.types';
 
 const useStyles = createStyles((theme) => ({
   navbar: {
@@ -51,7 +48,7 @@ interface NavigationBarProps {
 }
 
 export default function NavigationBar({ opened }: NavigationBarProps) {
-  const { populateStudents, loading, batches } = useStoreSelector(studentState);
+  const { loading, batches } = useStoreSelector(studentState);
   const { classes } = useStyles();
 
   const links = navData(batches).map((item) => <LinksGroup {...item} key={item.label} />);

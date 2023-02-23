@@ -3,26 +3,13 @@
 import { useEffect, useState } from 'react';
 import { Paper, Container, Box, Group, Title, Text, useMantineTheme, Button } from '@mantine/core';
 
-import { useStoreDispatch, useStoreSelector } from '@/lib/hooks';
-import { studentAction, studentState } from '@/store/index';
 import { formatBytes } from '@/utils/formatBytes';
 import { Dropzone, PDF_MIME_TYPE } from '@mantine/dropzone';
 import { IconUpload, IconX, IconFileDelta } from '@tabler/icons-react';
 import { showNotification } from '@mantine/notifications';
 import { useForm } from '@mantine/form';
 
-interface AddStudentProps {
-  data: any;
-}
-
-export default function FileUploadPage({ data }: AddStudentProps) {
-  const dispatch = useStoreDispatch();
-
-  useEffect(() => {
-    dispatch(studentAction.loadStudents(data));
-    dispatch(studentAction.loadBatches(data));
-  }, [data]);
-
+export default function FileUploadPage() {
   const [fileState, setFileState] = useState<any>(null);
   const theme = useMantineTheme();
 
@@ -64,7 +51,6 @@ export default function FileUploadPage({ data }: AddStudentProps) {
     });
 
     const data = await res.json();
-    console.log('data', data);
 
     if(data.error){
       showNotification({
@@ -94,7 +80,6 @@ export default function FileUploadPage({ data }: AddStudentProps) {
             onReject={(files) => console.log('rejected files', files)}
             accept={PDF_MIME_TYPE}
             {...form.getInputProps('file')}
-            //   {...props}
           >
             <Group position="center" spacing="xl" style={{ minHeight: 220, pointerEvents: 'none' }}>
               <Dropzone.Accept>
