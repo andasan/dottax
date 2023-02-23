@@ -24,15 +24,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <RootStyleRegistry>
-          <NotificationRegistry>
-            <ReduxRegistry>
-              <QueryClientRegistry>
-                <ModalRegistry>
-                  <AuthSessionRegistry>{children}</AuthSessionRegistry>
-                </ModalRegistry>
-              </QueryClientRegistry>
-            </ReduxRegistry>
-          </NotificationRegistry>
+          <AuthSessionRegistry>{children}</AuthSessionRegistry>
         </RootStyleRegistry>
       </body>
     </html>

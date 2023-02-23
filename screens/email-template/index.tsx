@@ -28,10 +28,6 @@ import { useForm } from '@mantine/form';
 
 import { CustomTextArea } from '@/components/common';
 
-interface AddStudentProps {
-  data: any;
-}
-
 type FormValues = {
   fullName: string;
   header: string;
@@ -46,13 +42,7 @@ type FormValues = {
 //     Thank you,<br>
 //     Cornerstone International Community College Admin`,
 
-export default function EmailTemplatePage({ data }: AddStudentProps) {
-  const dispatch = useStoreDispatch();
-
-  useEffect(() => {
-    dispatch(studentAction.loadStudents(data));
-    dispatch(studentAction.loadBatches(data));
-  }, [data]);
+export default function EmailTemplatePage() {
 
   const [templateState, setTemplateState] = useState<FormValues>({
     fullName: 'John Doe',
@@ -61,9 +51,8 @@ export default function EmailTemplatePage({ data }: AddStudentProps) {
       <p>A digital Tuition Enrolment Certificate (T2202) has been issued to you and is ready for viewing.
       Please see the attached file for your T2202.</p>
       <p>If you have any queries, please contact <a href="mailto:info@ciccc.ca">here</a></p>
-
-      Thank you,<br>
-      Cornerstone International Community College Admin
+      <p>Thank you,<br>
+      Cornerstone International Community College Admin</p>
       `,
     footer:
       '© 2023 Cornerstone International College of Canada 609 West Hastings St, Vancouver, BC, Canada V6B 4W4',
@@ -121,7 +110,7 @@ export default function EmailTemplatePage({ data }: AddStudentProps) {
                   {...form.getInputProps('header')}
                 />
 
-                <CustomTextArea />
+                <CustomTextArea label={"Message Body"} templateState={templateState} setTemplateState={setTemplateState} />
 
                 <Textarea
                   mt={20}
@@ -130,7 +119,7 @@ export default function EmailTemplatePage({ data }: AddStudentProps) {
                   autosize
                   minRows={3}
                   size="md"
-                  {...form.getInputProps('body')}
+
                 />
                 <TextInput
                   mt={20}
@@ -148,7 +137,7 @@ export default function EmailTemplatePage({ data }: AddStudentProps) {
               spacing="xs"
               mt={25}
               sx={(theme) => ({
-                backgroundColor: theme.colorScheme !== 'dark' ? theme.colors.dark[6] : 'white',
+                backgroundColor: theme.colorScheme !== 'dark' ? theme.colors.dark[1] : 'white',
                 textAlign: 'left',
                 padding: theme.spacing.xl,
                 borderRadius: theme.radius.md,

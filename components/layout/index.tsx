@@ -1,19 +1,32 @@
 "use client";
 
+import { Student } from '@/types/schema.types';
 import { AppShell, useMantineTheme } from '@mantine/core'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+import { useStoreDispatch } from '@/lib/hooks';
+import { studentAction } from '@/store/index';
 
 import FooterBar from './footer/Footer'
 import HeaderBar from './header/Header'
-import NavigationBar from './navbar/Navbar';
+import NavigationBar from './navbar/navigation-bar';
 
 type LayoutType = {
-  children: React.ReactNode
+  children: React.ReactNode,
+  students: Student[]
 }
 
-export default function Layout({ children }: LayoutType) {
+export default function Layout({ children, students }: LayoutType) {
+  const dispatch = useStoreDispatch();
+
   const theme = useMantineTheme()
   const [opened, setOpened] = useState(false)
+
+  useEffect(() => {
+    dispatch(studentAction.loadStudents(students));
+    dispatch(studentAction.loadBatches(students));
+  }, [students, dispatch]);
+
   return (
     <AppShell
       styles={{

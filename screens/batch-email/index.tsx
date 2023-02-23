@@ -5,33 +5,28 @@ import { Paper, Container, Box, Title, Text, Center, Button } from '@mantine/cor
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 
-import { useStoreDispatch } from '@/lib/hooks';
-import { studentAction } from '@/store/index';
+import { useStoreDispatch, useStoreSelector } from '@/lib/hooks';
+import { studentAction, studentState } from '@/store/index';
 
 import BatchTable from '@/components/common/table/batch-table/email';
 
-interface AddStudentProps {
-  data: any;
-  batchNumber: number;
-}
-
-export default function BatchEmailPage({ data, batchNumber }: AddStudentProps) {
+export default function BatchEmailPage({ batch }: { batch: number}) {
   const [batchData, setBatchData] = useState<any>(null);
   const [messageSent, setMessageSent] = useState<boolean>(false);
 
+  const { studentsByBatch } = useStoreSelector(studentState)
   const dispatch = useStoreDispatch();
   const router = useRouter();
 
   useEffect(() => {
-    dispatch(studentAction.loadStudents(data));
-    dispatch(studentAction.loadBatches(data));
+    dispatch(studentAction.loadStudentsByBatch(batch));
+  }, []);
 
-    const batch = data.filter((student: any) => student.batch === Number(batchNumber));
-    setBatchData(batch);
-  }, [data]);
+  useEffect(() => {
+    setBatchData(studentsByBatch);
+  }, [studentsByBatch]);
 
   const handleBatchSubmit = async () => {
-    console.log('batch submit');
 
     showNotification({
       title: 'Sending mass mail in progress',
@@ -42,7 +37,7 @@ export default function BatchEmailPage({ data, batchNumber }: AddStudentProps) {
     // setIsEmailSending(true);
     const res = await fetch('/api/send-email/bulk', {
       method: 'POST',
-      body: JSON.stringify({ batchNumber }),
+      body: JSON.stringify({ batch }),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -93,7 +88,7 @@ export default function BatchEmailPage({ data, batchNumber }: AddStudentProps) {
     <Paper shadow="xs" p="xl">
       <Container p="xl">
         <Title order={3} weight={500} align="center" py={50}>
-          Batch email to students of <i>{batchNumber}</i>
+          Batch email to students of <i>{batch}</i>
         </Title>
         <Box mx="auto">
           <Paper shadow="xs" p="md" withBorder>

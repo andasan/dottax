@@ -54,12 +54,6 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-interface TableSortProps {
-  data: Student[];
-  batchNumber: number;
-  studentsBatchOnly: {batch: number}[]
-}
-
 interface ThProps {
   children: React.ReactNode;
   reversed: boolean;
@@ -121,8 +115,8 @@ function sortData(
   );
 }
 
-export default function MailingListTable({ data, batchNumber, studentsBatchOnly }: TableSortProps) {
-  const { populateStudents, loading } = useStoreSelector(studentState);
+export default function MailingListTable({ batch }: { batch: number }) {
+  const { studentsByBatch, loading } = useStoreSelector(studentState);
   const dispatch = useStoreDispatch();
   const router = useRouter();
 
@@ -139,19 +133,18 @@ export default function MailingListTable({ data, batchNumber, studentsBatchOnly 
   const mobileScreen = useMediaQuery('(max-width: 600px)');
 
   useEffect(() => {
-    dispatch(studentAction.loadStudents(data));
-    dispatch(studentAction.loadBatches(studentsBatchOnly));
-  }, [data]);
+    dispatch(studentAction.loadStudentsByBatch(batch));
+  }, [batch]);
 
   useEffect(() => {
-    setSortedData(populateStudents);
-  }, [populateStudents]);
+    setSortedData(studentsByBatch);
+  }, [studentsByBatch]);
 
   const setSorting = (field: keyof Student) => {
     const reversed = field === sortBy ? !reverseSortDirection : false;
     setReverseSortDirection(reversed);
     setSortBy(field);
-    setSortedData(sortData(populateStudents, { sortBy: field, reversed, search }));
+    setSortedData(sortData(studentsByBatch, { sortBy: field, reversed, search }));
   };
 
   const handleEmailMode = (value: string) => {
@@ -159,13 +152,13 @@ export default function MailingListTable({ data, batchNumber, studentsBatchOnly 
       case 'sent':
       case 'pending':
         setSortedData(
-          populateStudents.filter(
+          studentsByBatch.filter(
             (item: Student) => item.status.toLowerCase() === value.toLowerCase()
           )
         );
         break;
       default:
-        setSortedData(populateStudents);
+        setSortedData(studentsByBatch);
         break;
     }
 
@@ -176,7 +169,7 @@ export default function MailingListTable({ data, batchNumber, studentsBatchOnly 
     const { value } = event.currentTarget;
     setSearch(value);
     setSortedData(
-      sortData(populateStudents, { sortBy, reversed: reverseSortDirection, search: value })
+      sortData(studentsByBatch, { sortBy, reversed: reverseSortDirection, search: value })
     );
   };
 
@@ -265,7 +258,7 @@ export default function MailingListTable({ data, batchNumber, studentsBatchOnly 
   };
 
   const handleSendBulkEmail = async () => {
-    router.push(`/batch-email/${batchNumber}`);
+    router.push(`/batch-email/${batch}`);
   };
 
   const rows = sortedData.map((row) => (
@@ -308,7 +301,7 @@ export default function MailingListTable({ data, batchNumber, studentsBatchOnly 
 
         <Grid align="baseline" justify={'center'}>
           <Grid.Col sm={12} md={3} lg={3}>
-            <Title order={2}>Batch {batchNumber}</Title>
+            <Title order={2}>Batch {batch}</Title>
           </Grid.Col>
           <Grid.Col sm={12} md={5} lg={5} style={{justifyContent: "center"}}>
             <Center>

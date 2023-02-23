@@ -21,26 +21,16 @@ import { Dropzone, MS_EXCEL_MIME_TYPE } from '@mantine/dropzone';
 import { showNotification } from '@mantine/notifications';
 
 import { useStoreDispatch } from '@/lib/hooks';
-import { studentAction } from '@/store/index';
 import { formatBytes } from '@/utils/formatBytes';
 import { readFile } from '@/utils/readFile';
 
 import BatchTable from '@/components/common/table/batch-table';
 
-interface AddBatchProps {
-  data: any;
-}
-
-export default function AddBatchPage({ data }: AddBatchProps) {
+export default function AddBatchPage() {
   const dispatch = useStoreDispatch();
   const router = useRouter();
 
   const [studentRecords, setStudentRecords] = useState<any>([]);
-
-  useEffect(() => {
-    dispatch(studentAction.loadStudents(data));
-    dispatch(studentAction.loadBatches(data));
-  }, [data]);
 
   const [active, setActive] = useState(0);
   const nextStep = () => setActive((current) => (current < 3 ? current + 1 : current));

@@ -7,6 +7,7 @@ import path from 'path';
 import fs from 'fs';
 
 import EmailTemplate from '@/email/emails/ciccc-t2202';
+import cloudinary from '@/utils/cloudinary';
 
 type SendBulkEmailReturnType = {
   message: string;
@@ -16,7 +17,7 @@ type SendBulkEmailReturnType = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const studentsEmailList = await prisma.student.findMany({
     where: {
-      batch: Number(req.body.batchNumber),
+      batch: Number(req.body.batch),
     },
     select: {
       id: true,
@@ -28,7 +29,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (studentsEmailList.length > 0) {
     const result = await sendBulkEmail(studentsEmailList);
-    console.log('>>> studentsEmailList: ', result);
     res.status(200).json({ message: 'Email has been sent', status: 250 });
     // const { message, status }: SendBulkEmailReturnType = await sendBulkEmail(studentsEmailList);
     // res.status(status).json({ message, status });
@@ -148,72 +148,27 @@ async function sendBulkEmail(studentsEmailList: StudentEmailProps) {
 type AccType = { id: number; firstName: string; email: string; attachmentPath: string };
 type Acc = AccType[];
 
-// const studentReducer = (acc: Acc, student: StudentType) => {
-//   const { id, email, studentId, firstName } = student;
-//   const pdfDirectory = path.join(process.cwd(), "uploads");
-
-//   const pdfPath = path.join(pdfDirectory, studentId + ".pdf");
-//   // const pdfPath = path.join(pdfDirectory, studentId + '-t2202-fill-21e.pdf');
-
-//   if (fs.existsSync(pdfPath)) {
-//     return [...acc, { id, firstName, email, attachmentPath: pdfPath }];
-//   } else {
-//     //file does not exist
-//     throw new Error("Failed to send email. Student's T2202 form doesn't exists");
-//   }
-
-//   return acc;
-// };
-
-// function getAttachments(data: StudentEmailProps) {
-//   return data.reduce(studentReducer, []);
-// }
-
-const studentReducer = (acc: Acc, student: StudentType) => {
-  const { id, email, studentId, firstName } = student;
-  const pdfDirectory = path.join(process.cwd(), 'uploads');
-
-  const pdfPath = path.join(pdfDirectory, studentId + '.pdf');
-  // const pdfPath = path.join(pdfDirectory, studentId + '-t2202-fill-21e.pdf');
-
-  if (fs.existsSync(pdfPath)) {
-    return [...acc, { id, firstName, email, attachmentPath: pdfPath }];
-  } else {
-    //file does not exist
-    throw new Error("Failed to send email. Student's T2202 form doesn't exists");
-  }
-
-  return acc;
-};
-
 async function getAttachments(data: StudentEmailProps) {
-  // return data.reduce(studentReducer, []);
-  // Example usage
 
-  const sum = await asyncReduce(
+  const accumulatedStudentsWithPDF = await asyncReduce(
     data,
     async (acc: Acc, val: StudentType) => {
       const { id, email, studentId, firstName } = val;
-      const pdfDirectory = path.join(process.cwd(), 'uploads');
 
-      const pdfPath = path.join(pdfDirectory, studentId + '.pdf');
-      // const pdfPath = path.join(pdfDirectory, studentId + '-t2202-fill-21e.pdf');
+      return new Promise((resolve) => {
+        cloudinary.v2.api.resource(studentId, function (error, result) {
+          if (error) {
+            resolve(acc)
+          }
 
-      if (fs.existsSync(pdfPath)) {
-        return [...acc, { id, firstName, email, attachmentPath: pdfPath }];
-      }
-
-      return [...acc, val]
-
+          resolve([...acc, { id, firstName, email, attachmentPath: result.secure_url }])
+        });
+      })
     },
-    // async (acc: Acc, val: StudentType) => {
-    //   return acc.push({ ...val, attachmentPath: 'test' });
-    // },
     []
   );
 
-  console.log("SUM : ", sum.length)
-  return sum;
+  return accumulatedStudentsWithPDF;
 }
 
 const asyncReduce = async (array: StudentEmailProps, reducer: any, initialValue: Acc) => {
