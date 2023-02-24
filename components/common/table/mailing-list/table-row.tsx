@@ -82,7 +82,7 @@ const TableRow = ({ student, toggleDrawer, copyProfile, deleteProfile, mobileScr
       <td>{student.firstName}</td>
       {!mobileScreen && <td>{student.lastName}</td>}
       {!mobileScreen && <td>{student.email}</td>}
-      <td>{student.studentId}</td>
+      <td>{student.studentId} ({student.id})</td>
       <td>
         <Badge color={student.status === 'pending' ? 'yellow' : 'blue'}>{student.status}</Badge>
       </td>

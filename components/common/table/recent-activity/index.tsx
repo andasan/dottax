@@ -140,7 +140,6 @@ export default function RecentActivityTable(/*props*/) {
                 <th>E-mail</th>
                 <th>Student ID</th>
                 <th>Status</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -149,6 +148,7 @@ export default function RecentActivityTable(/*props*/) {
                 toggleDrawer={toggleDrawer}
                 copyProfile={copyProfile}
                 deleteProfile={deleteProfile}
+                hideDetails={true}
               />
             </tbody>
           </Table>

@@ -18,6 +18,7 @@ type TableRowType = {
   toggleDrawer: Dispatch<React.SetStateAction<boolean>>;
   copyProfile: (user: Student) => void;
   deleteProfile: (user: Student) => void;
+  hideDetails: boolean;
 };
 
 const useStyles = createStyles((theme) => ({
@@ -37,6 +38,7 @@ const TableRow = ({
   toggleDrawer,
   copyProfile,
   deleteProfile,
+  hideDetails = false,
 }: TableRowType) => {
   const { classes } = useStyles();
   const dispatch = useStoreDispatch();
@@ -52,41 +54,43 @@ const TableRow = ({
           <td>
             <Badge color={student.status === 'pending' ? 'yellow' : 'blue'}>{student.status}</Badge>
           </td>
-          <td>
-            <Menu classNames={classes}>
-              <Menu.Target>
-                <IconDots size={16} />
-              </Menu.Target>
+          {!hideDetails && (
+            <td>
+              <Menu classNames={classes}>
+                <Menu.Target>
+                  <IconDots size={16} />
+                </Menu.Target>
 
-              <Menu.Dropdown>
-                <Menu.Label>{`${student.firstName} ${student.lastName}`}</Menu.Label>
-                <Menu.Item icon={<IconMailForward size={14} />}>Send Email</Menu.Item>
-                <Menu.Item
-                  icon={<IconEdit size={14} />}
-                  onClick={() => {
-                    dispatch(studentAction.selectedProfileData(student));
-                    toggleDrawer(true);
-                  }}
-                >
-                  Edit Profile
-                </Menu.Item>
-                <Divider />
-                <Menu.Item
-                  icon={<IconDeviceFloppy size={14} />}
-                  onClick={() => copyProfile(student)}
-                >
-                  Copy Profile
-                </Menu.Item>
-                <Menu.Item
-                  icon={<IconBackspace size={14} />}
-                  onClick={() => deleteProfile(student)}
-                  color="red"
-                >
-                  Delete Profile
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-          </td>
+                <Menu.Dropdown>
+                  <Menu.Label>{`${student.firstName} ${student.lastName}`}</Menu.Label>
+                  <Menu.Item icon={<IconMailForward size={14} />}>Send Email</Menu.Item>
+                  <Menu.Item
+                    icon={<IconEdit size={14} />}
+                    onClick={() => {
+                      dispatch(studentAction.selectedProfileData(student));
+                      toggleDrawer(true);
+                    }}
+                  >
+                    Edit Profile
+                  </Menu.Item>
+                  <Divider />
+                  <Menu.Item
+                    icon={<IconDeviceFloppy size={14} />}
+                    onClick={() => copyProfile(student)}
+                  >
+                    Copy Profile
+                  </Menu.Item>
+                  <Menu.Item
+                    icon={<IconBackspace size={14} />}
+                    onClick={() => deleteProfile(student)}
+                    color="red"
+                  >
+                    Delete Profile
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </td>
+          )}
         </tr>
       ))}
     </>

@@ -32,6 +32,7 @@ import EditUserForm from '@/components/common/forms/edit-user';
 import TableRow from './table-row';
 
 import { Student } from '@/types/schema.types';
+import { fetchDataIfEmpty } from '@/store/thunk';
 
 const useStyles = createStyles((theme) => ({
   th: {
@@ -51,6 +52,28 @@ const useStyles = createStyles((theme) => ({
     width: 21,
     height: 21,
     borderRadius: 21,
+  },
+
+  header: {
+    position: 'sticky',
+    top: 0,
+    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.white,
+    transition: 'box-shadow 150ms ease',
+
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      borderBottom: `1px solid ${
+        theme.colorScheme === 'dark' ? theme.colors.dark[3] : theme.colors.gray[2]
+      }`,
+    },
+  },
+
+  scrolled: {
+    boxShadow: theme.shadows.sm,
   },
 }));
 
@@ -116,9 +139,10 @@ function sortData(
 }
 
 export default function MailingListTable({ batch }: { batch: number }) {
-  const { studentsByBatch, loading } = useStoreSelector(studentState);
+  const { studentsByBatch, loading, students } = useStoreSelector(studentState);
   const dispatch = useStoreDispatch();
   const router = useRouter();
+  const { classes, cx } = useStyles();
 
   const [search, setSearch] = useState('');
   const [sortedData, setSortedData] = useState([] as Student[]);
@@ -126,19 +150,26 @@ export default function MailingListTable({ batch }: { batch: number }) {
   const [reverseSortDirection, setReverseSortDirection] = useState(false);
   const [emailMode, setEmailMode] = useState('all');
   const [drawerOpened, toggleDrawer] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const clipboard = useClipboard();
   const modals = useModals();
 
   const mobileScreen = useMediaQuery('(max-width: 600px)');
 
-  useEffect(() => {
-    dispatch(studentAction.loadStudentsByBatch(batch));
-  }, [batch]);
 
   useEffect(() => {
+    dispatch(studentAction.loadStudentsByBatch(batch));
+  }, [batch, students]);
+
+
+  useEffect(() => {
+    if(students.length === 0){
+      // dispatch(fetchDataIfEmpty);
+    }
     setSortedData(studentsByBatch);
   }, [studentsByBatch]);
+
 
   const setSorting = (field: keyof Student) => {
     const reversed = field === sortBy ? !reverseSortDirection : false;
@@ -288,7 +319,8 @@ export default function MailingListTable({ batch }: { batch: number }) {
 
   return (
     <Paper p="sm">
-      <ScrollArea>
+      <ScrollArea sx={{ height: '80vh' }} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
+      <div style={{ width: '99%' }}>
         <Drawer
           opened={drawerOpened}
           onClose={() => toggleDrawer(false)}
@@ -325,12 +357,12 @@ export default function MailingListTable({ batch }: { batch: number }) {
           onChange={handleSearchChange}
         />
         <Table
-          horizontalSpacing="md"
+          horizontalSpacing="sm"
           verticalSpacing="xs"
           highlightOnHover
           fontSize="xs"
         >
-          <thead>
+          <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
             <tr>
               <Th
                 sorted={sortBy === 'firstName'}
@@ -386,6 +418,7 @@ export default function MailingListTable({ batch }: { batch: number }) {
             )}
           </tbody>
         </Table>
+        </div>
       </ScrollArea>
     </Paper>
   );

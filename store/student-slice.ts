@@ -1,9 +1,10 @@
-import { Prisma } from '@prisma/client';
-import { createSlice, isPending } from '@reduxjs/toolkit';
+import { createSlice, isPending, PayloadAction } from '@reduxjs/toolkit';
 
+import {StoreState} from '.'
 import { Student } from '@/types/schema.types';
+import { fetchDataIfEmpty } from './thunk';
 
-type StudentState = {
+export interface StudentState {
   students: Student[];
   populateStudents: Student[];
   studentsByBatch: Student[];
@@ -48,7 +49,7 @@ export const studentSlice = createSlice({
       state.studentSelected = action.payload;
     },
     updateStudent: (state, action) => {
-      state.populateStudents = state.students.map((student) => {
+      state.studentsByBatch = state.studentsByBatch.map((student) => {
         if (student.id === action.payload.id) {
           return action.payload;
         }
@@ -59,33 +60,30 @@ export const studentSlice = createSlice({
       state.studentSelected = { ...state.studentSelected, ...action.payload };
     },
     updateStudentStatus: (state, action) => {
-      state.populateStudents = state.students.map((student) => {
+      state.studentsByBatch = state.students.map((student) => {
         if (student.id === action.payload.id) {
           return { ...student, status: action.payload.status };
         }
         return student;
       });
     },
-    updateStudentsStatuses: (state, action) => {
-      state.populateStudents = state.students.map((student) => {
-        if (action.payload.includes(student.id)) {
-          return { ...student, status: 'sent' };
-        }
-        return student;
-      });
-    },
-    filterStudents: (state, { payload }) => {
-      state.populateStudents = state.students.filter((student) => {
-        return (
-          student.firstName.toLowerCase().includes(payload.toLowerCase()) ||
-          student.lastName.toLowerCase().includes(payload.toLowerCase()) ||
-          student.email.toLowerCase().includes(payload.toLowerCase()) ||
-          student.studentId.toLowerCase().includes(payload.toLowerCase())
-        );
-      });
-    },
+    // filterStudents: (state, { payload }) => {
+    //   state.populateStudents = state.students.filter((student) => {
+    //     return (
+    //       student.firstName.toLowerCase().includes(payload.toLowerCase()) ||
+    //       student.lastName.toLowerCase().includes(payload.toLowerCase()) ||
+    //       student.email.toLowerCase().includes(payload.toLowerCase()) ||
+    //       student.studentId.toLowerCase().includes(payload.toLowerCase())
+    //     );
+    //   });
+    // },
     deleteStudent: (state, action) => {
-      state.populateStudents = state.students.filter((student) => student.id !== action.payload);
+      state.studentsByBatch = state.studentsByBatch.filter((student) => student.id !== action.payload);
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchDataIfEmpty.fulfilled, (state, { payload }) => {
+      state.students = payload;
+    });
   },
 });

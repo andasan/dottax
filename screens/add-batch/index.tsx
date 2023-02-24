@@ -19,6 +19,7 @@ import { IconUpload, IconFileSpreadsheet, IconX } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
 import { Dropzone, MS_EXCEL_MIME_TYPE } from '@mantine/dropzone';
 import { showNotification } from '@mantine/notifications';
+import { v4 as uuidv4 } from 'uuid';
 
 import { useStoreDispatch } from '@/lib/hooks';
 import { formatBytes } from '@/utils/formatBytes';
@@ -71,6 +72,7 @@ export default function AddBatchPage() {
   const handleSubmit = async () => {
     //submit form to server
 
+    //Student Mapping { id, firstName, lastName, email, studentId, batch, status }
     const remapRecords = studentRecords.slice(1).map((item: any) => {
       return {
         firstName: item[0],
@@ -81,6 +83,19 @@ export default function AddBatchPage() {
       };
     });
 
+    const remapRecordsV2 = studentRecords.slice(4).map((item: any) => {
+      const [firstName, lastName] = item[1].split('_')
+      return {
+        firstName,
+        lastName,
+        email: item[0],
+        studentId: uuidv4(),
+        batch: Number(form.values.batchNumber),
+      }
+    })
+
+    console.log(remapRecordsV2)
+
     try {
       //save  to database
       const res = await fetch('/api/add-students', {
@@ -88,7 +103,7 @@ export default function AddBatchPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ remapRecords }),
+        body: JSON.stringify({ remapRecords: remapRecordsV2 }),
       });
 
       // In case we need to return data from the server

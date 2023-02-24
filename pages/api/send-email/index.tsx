@@ -49,12 +49,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-type StudentProps = { studentId: string; email: string; firstName: string };
+type StudentProps = { studentId: string; email: string; firstName: string, lastName: string };
 
 function sendEmail({
   studentId,
   email,
-  firstName: name,
+  firstName,
+  lastName
 }: StudentProps): Promise<{ message: string; status: number }> {
   return new Promise((resolve, reject) => {
     try {
@@ -67,7 +68,11 @@ function sendEmail({
         },
       });
 
-      cloudinary.v2.api.resource(studentId, function (error, result) {
+      // cloudinary.v2.api.resources().then((result) => console.log(result))
+
+      const identifier = `${firstName.split(' ').join('_')}_${lastName.split(' ').join('_')}`
+      cloudinary.v2.api.resource(identifier, function (error, result) {
+
         if (error) {
           console.log('cloud error: ', error);
           reject({
@@ -76,7 +81,7 @@ function sendEmail({
           });
 
         } else {
-          const emailHtml = render(<EmailTemplate studentName={name} />, { pretty: true });
+          const emailHtml = render(<EmailTemplate studentName={firstName} />, { pretty: true });
 
           const mailOptions = {
             from: `CICCC <${process.env.EMAIL_FROM}>`,
