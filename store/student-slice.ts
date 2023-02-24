@@ -77,6 +77,7 @@ export const studentSlice = createSlice({
     //     );
     //   });
     // },
+
     deleteStudent: (state, action) => {
       state.studentsByBatch = state.studentsByBatch.filter((student) => student.id !== action.payload);
     },
@@ -84,7 +85,7 @@ export const studentSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchDataIfEmpty.fulfilled, (state, { payload }) => {
       state.students = payload;
-      state.populateStudents = payload;
+      state.studentsByBatch = payload.filter((student) => student.batch === +payload)
       state.loading = false;
     });
   },

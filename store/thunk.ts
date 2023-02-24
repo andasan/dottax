@@ -3,15 +3,15 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { StoreState } from '.';
 import { StudentState } from './student-slice';
 
-export const fetchDataIfEmpty = createAsyncThunk<Student[], void, { state: StoreState }>(
+export const fetchDataIfEmpty = createAsyncThunk<Student[], number, { state: StoreState }>(
   'data/fetchDataIfEmpty',
-  async (_, { getState }) => {
+  async (batch: number, { getState }) => {
     const state = getState();
-    if (Object.keys(state.students).length > 0) {
-      return state.students;
+    if (Object.keys(state.students.students).length > 0) {
+      return state.students.students;
     }
 
-    const response = await fetch('/api/data');
+    const response = await fetch(`/api/fetch-data?batch=${batch}`);
     const data = await response.json();
     return data;
   }

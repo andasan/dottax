@@ -165,7 +165,9 @@ export default function MailingListTable({ batch }: { batch: number }) {
 
   useEffect(() => {
     if(students.length === 0){
-      // dispatch(fetchDataIfEmpty);
+      console.log("run")
+      console.log("run >>>", studentsByBatch)
+      dispatch(fetchDataIfEmpty(batch) );
     }
     setSortedData(studentsByBatch);
   }, [studentsByBatch]);
