@@ -84,6 +84,8 @@ export const studentSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchDataIfEmpty.fulfilled, (state, { payload }) => {
       state.students = payload;
+      state.populateStudents = payload;
+      state.loading = false;
     });
   },
 });
