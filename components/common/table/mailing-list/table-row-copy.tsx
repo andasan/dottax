@@ -50,7 +50,7 @@ const TableRow = ({
           <td>{student.email}</td>
           <td>{student.studentId}</td>
           <td>
-            <Badge color={student.status === 'pending' ? 'yellow' : 'blue'}>{student.status}</Badge>
+            <Badge color={student.status === 'idle' ? 'yellow' : 'blue'}>{student.status}</Badge>
           </td>
           <td>
             <Menu classNames={classes}>

@@ -51,11 +51,11 @@ export default function EditProfileForm({ submitForm }: EditProfileFormProps) {
         mt={20}
         size="lg"
         onLabel="Sent"
-        offLabel="Pending"
+        offLabel="Idle"
         label="Status"
         checked={form.values.status === 'sent' ? true : false}
         onChange={(event) =>
-          form.setFieldValue('status', event.currentTarget.checked ? 'sent' : 'pending')
+          form.setFieldValue('status', event.currentTarget.checked ? 'sent' : 'idle')
         }
       />
 

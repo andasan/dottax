@@ -183,7 +183,7 @@ export default function MailingListTable({ batch }: { batch: number }) {
   const handleEmailMode = (value: string) => {
     switch (value) {
       case 'sent':
-      case 'pending':
+      case 'idle':
         setSortedData(
           studentsByBatch.filter(
             (item: Student) => item.status.toLowerCase() === value.toLowerCase()
@@ -344,7 +344,7 @@ export default function MailingListTable({ batch }: { batch: number }) {
           </Grid.Col>
           <Grid.Col sm={12} md={4} lg={4}>
             <Chip.Group value={emailMode} onChange={handleEmailMode} spacing="sm" mb="lg" style={{justifyContent: "flex-end"}}>
-              <Chip value="pending">Pending</Chip>
+              <Chip value="idle">Idle</Chip>
               <Chip value="sent">Sent</Chip>
               <Chip value="all">All</Chip>
             </Chip.Group>
