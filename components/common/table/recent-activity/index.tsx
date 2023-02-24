@@ -100,7 +100,7 @@ export default function RecentActivityTable(/*props*/) {
 
     showNotification({
       title: 'Delete Profile',
-      message: `You have successfully deleted${user.firstName}'s profile`,
+      message: `You have successfully deleted ${user.firstName}'s profile`,
       color: 'red',
     });
   };

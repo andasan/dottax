@@ -251,7 +251,7 @@ export default function MailingListTable({ batch }: { batch: number }) {
     } else {
       showNotification({
         title: 'Delete Profile',
-        message: `You have successfully deleted${student.firstName}'s profile`,
+        message: `You have successfully deleted ${student.firstName}'s profile`,
         color: 'teal',
       });
     }

@@ -1,3 +1,4 @@
+/* eslint-disable newline-per-chained-call */
 // import { Color } from '@tiptap/extension-color';
 // import ListItem from '@tiptap/extension-list-item';
 // import TextStyle from '@tiptap/extension-text-style';
@@ -187,7 +188,6 @@ const headerBlue = {
   minHeight: '42px',
 };
 
-
 const MenuBar = ({ editor }) => {
   if (!editor) {
     return null;
@@ -345,11 +345,11 @@ export default function CustomTextArea({ label, templateState, setTemplateState 
   return (
     <>
       <Text mt={20}>{label}</Text>
-    <Box style={headerBlue}>
-      <MenuBar editor={editor} />
-      <Divider mt={5} mb={20} />
-      <EditorContent editor={editor} />
-    </Box>
+      <Box style={headerBlue}>
+        <MenuBar editor={editor} />
+        <Divider mt={5} mb={20} />
+        <EditorContent editor={editor} />
+      </Box>
     </>
   );
 }
