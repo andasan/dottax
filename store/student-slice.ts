@@ -1,6 +1,5 @@
 import { createSlice, isPending, PayloadAction } from '@reduxjs/toolkit';
 
-import {StoreState} from '.'
 import { Student } from '@/types/schema.types';
 import { fetchDataIfEmpty } from './thunk';
 
@@ -26,6 +25,7 @@ const initialState: StudentState = {
     studentId: '',
     status: '',
     batch: 0,
+    updatedAt: new Date(),
   },
   loading: true,
 };
@@ -60,13 +60,26 @@ export const studentSlice = createSlice({
       state.studentSelected = { ...state.studentSelected, ...action.payload };
     },
     updateStudentStatus: (state, action) => {
-      state.studentsByBatch = state.students.map((student) => {
+      state.studentsByBatch = state.studentsByBatch.map((student) => {
         if (student.id === action.payload.id) {
           return { ...student, status: action.payload.status };
         }
         return student;
       });
     },
+    updateSelectedStudentStatus: (state, action) => {
+      action.payload.forEach((studentPayload : { id: number, firstName: string, email: string, attachmentPath: string}) => {
+
+        const found = state.studentsByBatch.find((element) => element.id === studentPayload.id);
+
+        if (found){
+          console.log("Found and update!")
+          state.studentsByBatch = state.studentsByBatch.map((student) => ({ ...student, status: found.status }))
+        }
+
+      })
+    },
+
     // filterStudents: (state, { payload }) => {
     //   state.populateStudents = state.students.filter((student) => {
     //     return (
@@ -81,6 +94,9 @@ export const studentSlice = createSlice({
     deleteStudent: (state, action) => {
       state.studentsByBatch = state.studentsByBatch.filter((student) => student.id !== action.payload);
     },
+    deleteBatch: (state, action) => {
+      state.batches = state.batches.filter((batch) => batch !== action.payload);
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(fetchDataIfEmpty.fulfilled, (state, { payload }) => {

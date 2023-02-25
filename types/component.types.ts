@@ -49,6 +49,14 @@ export type LoginCredentialsType = {
   confirmPassword?: string;
 }
 
+export type BatchData = {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  studentId: string;
+}
+
 /**
   * Transactional email status
  * Sent: the transactional email has been sent to the recipient

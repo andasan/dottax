@@ -22,6 +22,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       studentId: true,
       status: true,
       batch: true,
+      updatedAt: true,
     },
   });
 

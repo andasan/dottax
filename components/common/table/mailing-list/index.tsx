@@ -18,9 +18,11 @@ import {
   Skeleton,
   MediaQuery,
   Button,
+  Menu,
+  Divider,
 } from '@mantine/core';
 import { keys } from '@mantine/utils';
-import { IconSelector, IconChevronDown, IconChevronUp, IconSearch } from '@tabler/icons-react';
+import { IconSelector, IconChevronDown, IconChevronUp, IconSearch, IconTrash, IconDotsVertical, IconPlus, IconSend } from '@tabler/icons-react';
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useModals } from '@mantine/modals';
 import { useClipboard, useMediaQuery } from '@mantine/hooks';
@@ -31,8 +33,10 @@ import { studentState, studentAction } from '@/store/index';
 import EditUserForm from '@/components/common/forms/edit-user';
 import TableRow from './table-row';
 
+import { BatchData } from '@/types/component.types';
 import { Student } from '@/types/schema.types';
 import { fetchDataIfEmpty } from '@/store/thunk';
+import { filterData, sortData } from '@/lib/helper';
 
 const useStyles = createStyles((theme) => ({
   th: {
@@ -52,6 +56,7 @@ const useStyles = createStyles((theme) => ({
     width: 21,
     height: 21,
     borderRadius: 21,
+    cursor: 'pointer',
   },
 
   header: {
@@ -66,9 +71,15 @@ const useStyles = createStyles((theme) => ({
       left: 0,
       right: 0,
       bottom: 0,
-      borderBottom: `1px solid ${
-        theme.colorScheme === 'dark' ? theme.colors.dark[3] : theme.colors.gray[2]
-      }`,
+      borderBottom: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[3] : theme.colors.gray[2]
+        }`,
+    },
+  },
+
+  item: {
+    '&[data-hovered]': {
+      backgroundColor: theme.colors[theme.primaryColor][theme.fn.primaryShade()],
+      color: theme.white,
     },
   },
 
@@ -109,36 +120,13 @@ function Th({ children, reversed, sorted, onSort, hide }: ThProps) {
   );
 }
 
-function filterData(data: Student[], search: string) {
-  const query = search.toLowerCase().trim();
-  return data.filter((item) =>
-    keys(data[0]).some((key) => String(item[key]).toLowerCase().includes(query))
-  );
+interface MailingListTableProps {
+  batchData: BatchData[];
+  batch: number;
 }
 
-function sortData(
-  data: Student[],
-  payload: { sortBy: keyof Student | null; reversed: boolean; search: string }
-) {
-  const { sortBy } = payload;
 
-  if (!sortBy) {
-    return filterData(data, payload.search);
-  }
-
-  return filterData(
-    [...data].sort((a, b) => {
-      if (payload.reversed) {
-        return String(b[sortBy]).localeCompare(String(a[sortBy]));
-      }
-
-      return String(a[sortBy]).localeCompare(String(b[sortBy]));
-    }),
-    payload.search
-  );
-}
-
-export default function MailingListTable({ batch }: { batch: number }) {
+export default function MailingListTable({ batchData, batch }: MailingListTableProps) {
   const { studentsByBatch, loading, students } = useStoreSelector(studentState);
   const dispatch = useStoreDispatch();
   const router = useRouter();
@@ -162,16 +150,13 @@ export default function MailingListTable({ batch }: { batch: number }) {
     dispatch(studentAction.loadStudentsByBatch(batch));
   }, [batch, students]);
 
-
   useEffect(() => {
-    if(students.length === 0){
-      console.log("run")
-      console.log("run >>>", studentsByBatch)
-      dispatch(fetchDataIfEmpty(batch) );
+    if (studentsByBatch.length === 0 && students.length === 0) {
+      dispatch(fetchDataIfEmpty(batch));
     }
+
     setSortedData(studentsByBatch);
   }, [studentsByBatch]);
-
 
   const setSorting = (field: keyof Student) => {
     const reversed = field === sortBy ? !reverseSortDirection : false;
@@ -294,6 +279,56 @@ export default function MailingListTable({ batch }: { batch: number }) {
     router.push(`/batch-email/${batch}`);
   };
 
+  const handleAddStudent = async () => {
+    router.push(`/add-student/${batch}`);
+  };
+
+  const handleRemoveBatch = async () => {
+    modals.openConfirmModal({
+      title: 'Delete batch',
+      children: (
+        <Text size="sm" lineClamp={2}>
+          Are you sure you want to delete this batch?
+          <br />
+          This action cannot be undone!
+        </Text>
+      ),
+      centered: true,
+      labels: { confirm: 'Ok', cancel: 'Cancel' },
+      confirmProps: { color: 'red' },
+      onConfirm: () => onDeleteBatch(),
+    });
+  };
+
+  const onDeleteBatch = async () => {
+    // remove data in db
+    const res = await fetch('/api/delete-batch', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ batch }),
+    });
+
+    if (!res.ok) {
+      showNotification({
+        title: 'Something went wrong!',
+        message: `Unable to delete batch ${batch}`,
+        color: 'red',
+      });
+    } else {
+      showNotification({
+        title: 'Delete Batch',
+        message: `You have successfully deleted batch ${batch}`,
+        color: 'teal',
+      });
+      router.push('/dashboard');
+
+      //update redux to remove batch
+      dispatch(studentAction.deleteBatch(batch));
+    }
+  };
+
   const rows = sortedData.map((row) => (
     <TableRow
       key={row.id}
@@ -321,105 +356,133 @@ export default function MailingListTable({ batch }: { batch: number }) {
 
   return (
     <Paper p="sm">
-      <ScrollArea sx={{ height: '80vh' }} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
-      <div style={{ width: '99%' }}>
-        <Drawer
-          opened={drawerOpened}
-          onClose={() => toggleDrawer(false)}
-          title="Modify Student Profile"
-          padding="xl"
-          size="xl"
-        >
-          <EditUserForm submitForm={onSubmitEditForm} />
-        </Drawer>
+      <ScrollArea
+        sx={{ height: '80vh' }}
+        onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
+        scrollHideDelay={0}
 
-        <Grid align="baseline" justify={'center'}>
-          <Grid.Col sm={12} md={3} lg={3}>
-            <Title order={2}>Batch {batch}</Title>
-          </Grid.Col>
-          <Grid.Col sm={12} md={5} lg={5} style={{justifyContent: "center"}}>
-            <Center>
-              <Button compact onClick={handleSendBulkEmail}>Send Email to all</Button>
-            </Center>
-          </Grid.Col>
-          <Grid.Col sm={12} md={4} lg={4}>
-            <Chip.Group value={emailMode} onChange={handleEmailMode} spacing="sm" mb="lg" style={{justifyContent: "flex-end"}}>
-              <Chip value="idle">Idle</Chip>
-              <Chip value="sent">Sent</Chip>
-              <Chip value="all">All</Chip>
-            </Chip.Group>
-          </Grid.Col>
-        </Grid>
+      >
+        <div style={{ width: '99%' }}>
+          <Drawer
+            opened={drawerOpened}
+            onClose={() => toggleDrawer(false)}
+            title="Modify Student Profile"
+            padding="xl"
+            size="xl"
+          >
+            <EditUserForm submitForm={onSubmitEditForm} />
+          </Drawer>
 
-        <TextInput
-          placeholder="Search by any field"
-          mb="md"
-          icon={<IconSearch size={14} stroke={1.5} />}
-          value={search}
-          onChange={handleSearchChange}
-        />
-        <Table
-          horizontalSpacing="sm"
-          verticalSpacing="xs"
-          highlightOnHover
-          fontSize="xs"
-        >
-          <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
-            <tr>
-              <Th
-                sorted={sortBy === 'firstName'}
-                reversed={reverseSortDirection}
-                onSort={() => setSorting('firstName')}
-              >
-                First Name
-              </Th>
-              <Th
-                sorted={sortBy === 'lastName'}
-                reversed={reverseSortDirection}
-                onSort={() => setSorting('lastName')}
-                hide={mobileScreen}
-              >
-                Last Name
-              </Th>
-              <Th
-                sorted={sortBy === 'email'}
-                reversed={reverseSortDirection}
-                onSort={() => setSorting('email')}
-                hide={mobileScreen}
-              >
-                Email
-              </Th>
-              <Th
-                sorted={sortBy === 'studentId'}
-                reversed={reverseSortDirection}
-                onSort={() => setSorting('studentId')}
-              >
-                Student ID
-              </Th>
-              <Th
-                sorted={sortBy === 'status'}
-                reversed={reverseSortDirection}
-                onSort={() => setSorting('status')}
-              >
-                Status
-              </Th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.length > 0 ? (
-              rows
-            ) : (
+          <Grid align="baseline" justify={'center'}>
+            <Grid.Col sm={12} md={6} lg={6}>
+              <Group>
+                <Title order={2}>Batch {batch}</Title>
+              </Group>
+            </Grid.Col>
+            <Grid.Col sm={12} md={6} lg={6}>
+              <Chip.Group value={emailMode} onChange={handleEmailMode} spacing="sm" mb="lg" style={{ justifyContent: "flex-end" }}>
+                <Chip value="idle">Idle</Chip>
+                <Chip value="sent">Sent</Chip>
+                <Chip value="all">All</Chip>
+
+
+                <Menu classNames={classes}>
+                  <Menu.Target>
+                    <IconDotsVertical size={18} style={{ cursor: 'pointer' }} />
+                  </Menu.Target>
+
+                  <Menu.Dropdown>
+                    <Menu.Label>Batch Menu</Menu.Label>
+                    <Menu.Item
+                      icon={<IconSend size={14} />}
+                      onClick={handleSendBulkEmail}
+                      color="cyan"
+                    >
+                      Send Bulk Email
+                    </Menu.Item>
+                    <Menu.Item
+                      icon={<IconPlus size={14} />}
+                      onClick={handleAddStudent}
+                    >
+                      Add Student(s)
+                    </Menu.Item>
+                    <Divider />
+                    <Menu.Item
+                      icon={<IconTrash size={14} />}
+                      onClick={handleRemoveBatch}
+                      color="red"
+                    >
+                      Delete Batch
+                    </Menu.Item>
+
+                  </Menu.Dropdown>
+                </Menu>
+              </Chip.Group>
+            </Grid.Col>
+          </Grid>
+
+          <TextInput
+            placeholder="Search by any field"
+            mb="md"
+            icon={<IconSearch size={14} stroke={1.5} />}
+            value={search}
+            onChange={handleSearchChange}
+          />
+          <Table
+            horizontalSpacing="sm"
+            verticalSpacing="xs"
+            highlightOnHover
+            fontSize="xs"
+          >
+            <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
               <tr>
-                <td colSpan={6}>
-                  <Text weight={500} align="center">
-                    Nothing found
-                  </Text>
-                </td>
+                <Th
+                  sorted={sortBy === 'firstName'}
+                  reversed={reverseSortDirection}
+                  onSort={() => setSorting('firstName')}
+                >
+                  First Name
+                </Th>
+                <Th
+                  sorted={sortBy === 'lastName'}
+                  reversed={reverseSortDirection}
+                  onSort={() => setSorting('lastName')}
+                  hide={mobileScreen}
+                >
+                  Last Name
+                </Th>
+                <Th
+                  sorted={sortBy === 'email'}
+                  reversed={reverseSortDirection}
+                  onSort={() => setSorting('email')}
+                  hide={mobileScreen}
+                >
+                  Email
+                </Th>
+                <Th
+                  sorted={sortBy === 'status'}
+                  reversed={reverseSortDirection}
+                  onSort={() => setSorting('status')}
+                >
+                  Status
+                </Th>
+                <th></th>
               </tr>
-            )}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {rows.length > 0 ? (
+                rows
+              ) : (
+                <tr>
+                  <td colSpan={6}>
+                    <Text weight={500} align="center">
+                      Nothing found
+                    </Text>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
         </div>
       </ScrollArea>
     </Paper>

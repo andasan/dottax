@@ -38,8 +38,6 @@ export const navData = (batchLinks: number[]): NavLinkType[] => [
     icon: IconAdjustments,
     initiallyOpened: true,
     links: [
-      { label: 'Add a Batch', link: '/add-batch' },
-      { label: 'Add Students', link: '/add-student' },
       { label: 'Email Template', link: '/email-template' },
       { label: 'File upload', link: '/file-upload' },
     ]

@@ -157,15 +157,15 @@ export default function AddBatchPage() {
           </Stepper>
 
           <Group position="center" mt="xl">
-            <Button variant="default" onClick={prevStep}>
+            <Button variant="outline" onClick={prevStep}>
               Back
             </Button>
             {active === 3 ? (
-              <Button onClick={() => router.push('/dashboard')}>Dashboard</Button>
+              <Button variant='gradient' onClick={() => router.push('/dashboard')}>Dashboard</Button>
             ) : active === 2 ? (
               <Button onClick={handleSubmit}>Submit</Button>
             ) : (
-              <Button onClick={handleStep}>Next step</Button>
+              <Button variant='gradient' onClick={handleStep}>Next step</Button>
             )}
           </Group>
         </form>

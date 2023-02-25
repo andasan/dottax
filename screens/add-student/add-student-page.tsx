@@ -12,7 +12,7 @@ import { studentState } from '@/store/index';
 
 import MultipleStudents from './stepper';
 
-export default function AddStudentPage() {
+export default function AddStudentPage({batch} : {batch: number}) {
   const dispatch = useStoreDispatch();
 
   const { loading, batches } = useStoreSelector(studentState);

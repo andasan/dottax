@@ -9,8 +9,10 @@ import { useStoreDispatch, useStoreSelector } from '@/lib/hooks';
 import { studentAction, studentState } from '@/store/index';
 
 import BatchTable from '@/components/common/table/batch-table/email';
+import { Student } from '@/types/schema.types';
+import Link from 'next/link';
 
-export default function BatchEmailPage({ batch }: { batch: number}) {
+export default function BatchEmailPage({ batch }: { batch: number }) {
   const [batchData, setBatchData] = useState<any>(null);
   const [messageSent, setMessageSent] = useState<boolean>(false);
 
@@ -23,7 +25,7 @@ export default function BatchEmailPage({ batch }: { batch: number}) {
   }, []);
 
   useEffect(() => {
-    setBatchData(studentsByBatch);
+    setBatchData(studentsByBatch.filter(student => student.status === 'idle').slice(0, 10));
   }, [studentsByBatch]);
 
   const handleBatchSubmit = async () => {
@@ -43,11 +45,11 @@ export default function BatchEmailPage({ batch }: { batch: number}) {
       },
     });
 
-    const { status, message } = await res.json();
+    const { status, message, data } = await res.json();
     cleanNotifications();
     // setIsEmailSending(false);
 
-    if (status === 250) {
+    if (status >= 200 && status < 300) {
       setMessageSent(true)
       cleanNotifications();
 
@@ -56,7 +58,9 @@ export default function BatchEmailPage({ batch }: { batch: number}) {
         message: message,
         color: 'teal',
       });
-      // dispatch(studentAction.updateStudentStatus({ id: student.id, status: "sent"}));
+
+      dispatch(studentAction.updateSelectedStudentStatus(data));
+
     } else {
       showNotification({
         title: 'Error',
@@ -67,20 +71,27 @@ export default function BatchEmailPage({ batch }: { batch: number}) {
     }
   };
 
-  if(messageSent){
-    return(
+  if (messageSent) {
+    return (
       <Paper shadow="xs" p="xl">
-      <Container p="xl">
-        <Title order={3} weight={500} align="center" py={50}>
-          Batch email is currently running on the background
-        </Title>
-        <Center>
-            <Button mt={20} type="submit" onClick={() => router.push('/dashboard')}>
+        <Container p="xl">
+          <Title order={3} weight={500} align="center" py={50}>
+            Batch email is currently running on the background
+          </Title>
+          <Center>
+            <Button mt={20} type="submit" href={`/students/${batch}`} component={Link}>
+              Send another batch email
+            </Button>
+            <Button mt={20} type="submit" href={`/dashboard`} component={Link}>
+            {/* <Button mt={20} type="submit" onClick={() => router.push(`/dashboard`)}> */}
               Return to Dashboard
             </Button>
+            {/* <Button mt={20} type="submit" onClick={() => router.push(`/students/${batch}`)}>
+              Return to Student List
+            </Button> */}
           </Center>
-      </Container>
-    </Paper>
+        </Container>
+      </Paper>
     )
   }
 
@@ -97,9 +108,15 @@ export default function BatchEmailPage({ batch }: { batch: number}) {
             </Text>
           </Paper>
           <Center>
-            <Button mt={20} type="submit" onClick={handleBatchSubmit}>
-              Send Batch Email
-            </Button>
+            {batchData && batchData.length > 0 ? (
+              <Button mt={20} type="submit" onClick={handleBatchSubmit}>
+                Send Batch Email
+              </Button>
+            ):(
+              <Button mt={20} type="submit" href={`/students/${batch}`} component={Link}>
+                Return to Student List
+              </Button>
+            )}
           </Center>
         </Box>
       </Container>

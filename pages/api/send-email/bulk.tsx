@@ -18,18 +18,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const studentsEmailList = await prisma.student.findMany({
     where: {
       batch: Number(req.body.batch),
+      status: 'idle',
     },
     select: {
       id: true,
       email: true,
       firstName: true,
+      lastName: true,
       studentId: true,
     },
+    take: 10,
   });
 
   if (studentsEmailList.length > 0) {
     const result = await sendBulkEmail(studentsEmailList);
-    res.status(200).json({ message: 'Email has been sent', status: 250 });
+
+    //log the result
+    // console.log("result: ", result)
+
+    res.status(200).json({ message: 'Email has been sent', status: 250, data: result.data });
     // const { message, status }: SendBulkEmailReturnType = await sendBulkEmail(studentsEmailList);
     // res.status(status).json({ message, status });
   } else {
@@ -41,6 +48,7 @@ type StudentType = {
   id: number;
   email: string;
   firstName: string;
+  lastName: string;
   studentId: string;
   attachmentPath?: string;
 };
@@ -132,9 +140,10 @@ async function sendBulkEmail(studentsEmailList: StudentEmailProps) {
       return { message: err.message, status: 500 };
     });
 
-    return emailQueue.drain();
+    // return emailQueue.drain();
     return {
       message: `Email sending in process...\nNumber of emails to send: ${emailAmount}`,
+      data: batchEmailWithAttachments,
       status: 200,
     };
   } catch (err: any) {
@@ -145,7 +154,7 @@ async function sendBulkEmail(studentsEmailList: StudentEmailProps) {
 }
 
 // type AccType = { [key: string]: string };
-type AccType = { id: number; firstName: string; email: string; attachmentPath: string };
+type AccType = { id: number; firstName: string; lastName: string, email: string; attachmentPath: string };
 type Acc = AccType[];
 
 async function getAttachments(data: StudentEmailProps) {
@@ -153,15 +162,17 @@ async function getAttachments(data: StudentEmailProps) {
   const accumulatedStudentsWithPDF = await asyncReduce(
     data,
     async (acc: Acc, val: StudentType) => {
-      const { id, email, studentId, firstName } = val;
+      const { id, email, studentId, firstName, lastName } = val;
 
       return new Promise((resolve) => {
-        cloudinary.v2.api.resource(studentId, function (error, result) {
+
+        const identifier = `${firstName.split(' ').join('_')}_${lastName.split(' ').join('_')}`
+        cloudinary.v2.api.resource(identifier, function (error, result) {
           if (error) {
             resolve(acc)
+          }else{
+            resolve([...acc, { id, firstName, email, attachmentPath: result.secure_url }])
           }
-
-          resolve([...acc, { id, firstName, email, attachmentPath: result.secure_url }])
         });
       })
     },

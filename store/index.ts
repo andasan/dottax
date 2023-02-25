@@ -7,7 +7,10 @@ const store = configureStore({
   reducer: {
     modal: modalSlice.reducer,
     students: studentSlice.reducer
-  }
+  },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    serializableCheck: false,
+  }),
 });
 
 export default store;

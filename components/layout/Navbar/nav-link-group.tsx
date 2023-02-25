@@ -8,7 +8,7 @@ import {
   ThemeIcon,
   UnstyledButton
 } from '@mantine/core'
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
+import { IconChevronLeft, IconChevronRight, IconPlus } from '@tabler/icons-react'
 import { useState } from 'react'
 import Link from 'next/link'
 
@@ -54,11 +54,27 @@ const useStyles = createStyles((theme) => ({
           ? theme.colors.dark[7]
           : theme.colors.gray[0],
       color: theme.colorScheme === 'dark' ? theme.white : theme.black
-    }
+    },
   },
 
   chevron: {
     transition: 'transform 200ms ease'
+  },
+
+  prompt: {
+    backgroundColor:
+      theme.colorScheme === 'dark'
+        ? 'transparent'
+        : theme.white,
+    color: theme.colorScheme === 'dark' ? theme.colors.dark[3] : theme.colors.blue[3],
+
+    '&:hover': {
+      backgroundColor:
+        theme.colorScheme === 'dark'
+          ? theme.colors.blue[7]
+          : theme.colors.blue[7],
+      color: theme.colorScheme === 'dark' ? theme.white : theme.colors.blue[0]
+    },
   }
 }))
 
@@ -84,6 +100,28 @@ export default function LinksGroup({
       {elLink.label}
     </UnstyledButton>
   ))
+
+  //unstyled button to add a student
+  const addBatch = (
+    <UnstyledButton
+      component={Link}
+      className={`${classes.link} ${classes.prompt}`}
+      href="/add-batch"
+      key="add-batch"
+    >
+      <Group
+        position="apart"
+        spacing={0}
+
+      >
+      Add a Batch
+      <IconPlus
+        size={14}
+      />
+
+      </Group>
+    </UnstyledButton>
+  )
 
   return (
     <>
@@ -116,6 +154,7 @@ export default function LinksGroup({
           )}
         </Group>
       </UnstyledButton>
+      {hasLinks && label === 'Students' ? <Collapse in={opened}>{addBatch}</Collapse> : null}
       {hasLinks ? <Collapse in={opened}>{items}</Collapse> : null}
     </>
   )
