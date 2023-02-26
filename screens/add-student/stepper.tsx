@@ -66,8 +66,6 @@ const MultipleStudents = ({ batches }: { batches: number[] }) => {
     const handleSubmit = async () => {
       //submit form to server
 
-      console.log(form.values)
-
       const remapRecords = studentRecords.slice(1).map((item: any) => {
         return {
           firstName: item[0],

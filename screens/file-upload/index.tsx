@@ -27,7 +27,6 @@ export default function FileUploadPage() {
 
   useEffect(() => {
     form.setFieldValue('file', fileState);
-    console.log('fileState', fileState);
   }, [fileState]);
 
   //check for form error

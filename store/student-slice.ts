@@ -73,7 +73,6 @@ export const studentSlice = createSlice({
         const found = state.studentsByBatch.find((element) => element.id === studentPayload.id);
 
         if (found){
-          console.log("Found and update!")
           state.studentsByBatch = state.studentsByBatch.map((student) => ({ ...student, status: found.status }))
         }
 

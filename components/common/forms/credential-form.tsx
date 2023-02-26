@@ -108,7 +108,6 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
         password: values.password,
         // @ts-ignore
       }).then(({ ok, error }) => {
-        console.log('ok: ', ok);
         setLoading(false);
         if (ok) {
           router.push('/dashboard');

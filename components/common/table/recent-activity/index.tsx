@@ -8,8 +8,6 @@ import TableRow from './table-row';
 export default function RecentActivityTable(/*props*/) {
   const { populateStudents, loading } = useStoreSelector(studentState);
 
-  console.log(populateStudents)
-
   if(loading) {
     return (
       <>

@@ -1,14 +1,12 @@
 import type { NextApiRequest } from "next";
-import mime from "mime";
-import { join } from "path";
-import * as dateFn from "date-fns";
-import formidable from "formidable";
 import { mkdir, stat } from "fs/promises";
+import formidable from "formidable";
+import * as dateFn from "date-fns";
+import { join } from "path";
+import mime from "mime";
 
 export const FormidableError = formidable.errors.FormidableError;
 export type FormidableFiles = formidable.Files;
-
-
 
 export const parseForm = async (
   req: NextApiRequest
@@ -28,7 +26,6 @@ export const parseForm = async (
       }
     }
 
-
     const form = new formidable.IncomingForm({
       multiples: true,
       keepExtensions: true,
@@ -37,7 +34,6 @@ export const parseForm = async (
         const filename = part.originalFilename || `${part.name || "unknown"}-${uniqueSuffix}.${
           mime.getExtension(part.mimetype || "") || "unknown"
         }`;
-        console.log("FILENAME", filename)
         return filename;
       },
       uploadDir

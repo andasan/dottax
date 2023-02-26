@@ -1,4 +1,4 @@
-import AddStudentPage from '@/screens/add-student/add-student-page';
+import AddStudentPage from '@/screens/add-student';
 
 export default async function AddStudent({ params }: { params: { batch: number }}) {
 

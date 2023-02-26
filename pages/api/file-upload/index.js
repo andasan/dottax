@@ -1,5 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { parseForm, FormidableError, FormidableFiles, IncomingForm } from '@/lib/parse-form';
+import { parseForm } from '@/lib/parse-form';
 import cloudinary from '@/utils/cloudinary';
 import fs from 'fs';
 
@@ -54,7 +53,6 @@ export default async function handler(req, res) {
             throw new Error(err.message)
           }
 
-          // console.log(result.secure_url);
           fs.unlink(data.files.media.filepath, function(err) {
             if (err) {
               console.error(err);

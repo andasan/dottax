@@ -3,7 +3,6 @@ import { default as dayjs } from 'dayjs';
 
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { AggregatedReport } from '@/types/api.types';
 import { config } from '@/lib/config'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

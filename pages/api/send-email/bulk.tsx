@@ -33,9 +33,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (studentsEmailList.length > 0) {
     const result = await sendBulkEmail(studentsEmailList);
 
-    //log the result
-    // console.log("result: ", result)
-
     res.status(200).json({ message: 'Email has been sent', status: 250, data: result.data });
     // const { message, status }: SendBulkEmailReturnType = await sendBulkEmail(studentsEmailList);
     // res.status(status).json({ message, status });

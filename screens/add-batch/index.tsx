@@ -28,7 +28,6 @@ import { readFile } from '@/utils/readFile';
 import BatchTable from '@/components/common/table/batch-table';
 
 export default function AddBatchPage() {
-  const dispatch = useStoreDispatch();
   const router = useRouter();
 
   const [studentRecords, setStudentRecords] = useState<any>([]);
@@ -73,6 +72,8 @@ export default function AddBatchPage() {
     //submit form to server
 
     //Student Mapping { id, firstName, lastName, email, studentId, batch, status }
+
+    //this formats the data based on student's school ID number
     const remapRecords = studentRecords.slice(1).map((item: any) => {
       return {
         firstName: item[0],
@@ -83,6 +84,7 @@ export default function AddBatchPage() {
       };
     });
 
+    //this formats the data based on first name and last name filter
     const remapRecordsV2 = studentRecords.slice(4).map((item: any) => {
       const [firstName, lastName] = item[1].split('_')
       return {
@@ -93,8 +95,6 @@ export default function AddBatchPage() {
         batch: Number(form.values.batchNumber),
       }
     })
-
-    console.log(remapRecordsV2)
 
     try {
       //save  to database
