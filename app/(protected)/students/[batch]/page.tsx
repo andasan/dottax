@@ -5,7 +5,10 @@ export default async function StudentBatch({ params }: { params: { batch: number
   const { batch } = params
 
   //implement a prisma query to get the batch data
-  const data = await prisma.student.findMany({
+  const batchData = Number.isInteger(+batch) ? await prisma.student.findMany({
+    where: {
+      batch: +batch,
+    },
     select: {
       id: true,
       email: true,
@@ -16,12 +19,29 @@ export default async function StudentBatch({ params }: { params: { batch: number
       batch: true,
     },
     // take: 10,
-  });
-
-  const batchData = data.filter((student) => student.batch === +batch );
-
+  }) : []
 
   return <MailingListTable batchData={batchData} batch={batch} pageSize={20} />
+  // const { batch } = params
+
+  // //implement a prisma query to get the batch data
+  // const data = await prisma.student.findMany({
+  //   select: {
+  //     id: true,
+  //     email: true,
+  //     firstName: true,
+  //     lastName: true,
+  //     studentId: true,
+  //     status: true,
+  //     batch: true,
+  //   },
+  //   // take: 10,
+  // });
+
+  // const batchData = data.filter((student) => student.batch === +batch );
+
+
+  // return <MailingListTable batchData={batchData} batch={batch} pageSize={20} />
 
 }
 
