@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Dispatch, useMemo, useState } from "react";
+import React, { Dispatch, useEffect, useMemo, useState } from "react";
 
 import { MantineReactTable, MRT_ColumnDef } from "mantine-react-table";
 import { Badge, Box, Button, Divider, Drawer, Menu, Text, Title } from "@mantine/core";
@@ -13,6 +13,7 @@ import EditProfileForm from "@/components/common/forms/edit-user";
 import { useStoreSelector, useStoreDispatch } from '@/lib/hooks';
 import { studentState, studentAction } from '@/store/index';
 import { BatchData } from "@/types/component.types";
+import { fetchDataIfEmpty } from "@/store/thunk";
 
 interface MailingListTableProps {
   batchData: BatchData[];
@@ -30,6 +31,10 @@ export default function MailingListTable({ batchData: data, batch, pageSize }: M
   const router = useRouter();
   const modals = useModals();
   const dispatch = useStoreDispatch();
+
+  useEffect(() => {
+    dispatch(studentAction.loadStudentsByBatch(batch));
+  }, [batch]);
 
   const onSubmitEditForm = async (student: any) => {
     toggleDrawer(false);
@@ -349,7 +354,7 @@ const RowActions = ({ student, toggleDrawer }: { student: BatchData, toggleDrawe
       <Menu.Label>{`${student.firstName} ${student.lastName}`}</Menu.Label>
       <Menu.Item
         icon={<IconMailForward size={14} />}
-        onClick={() => handleSendEmail}
+        onClick={() => handleSendEmail(student)}
       >
         Send Email
       </Menu.Item>

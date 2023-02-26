@@ -18,7 +18,8 @@ const nextConfig = {
   reactStrictMode: true,
   experimental: {
     appDir: true,
-    serverComponentsExternalPackages: ["prisma", "@prisma/client"]
+    serverComponentsExternalPackages: ["prisma", "@prisma/client"],
+    swcPlugins: [["next-superjson-plugin", {}]],
   },
   images: {
     domains: ["images.unsplash.com","img.freepik.com"]

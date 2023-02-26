@@ -27,13 +27,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       lastName: true,
       studentId: true,
     },
-    take: 10,
+    take: Number(req.body.take),
   });
 
   if (studentsEmailList.length > 0) {
     const result = await sendBulkEmail(studentsEmailList);
 
-    res.status(200).json({ message: 'Email has been sent', status: 250, data: result.data });
+    res.status(200).json({ message: 'Email has been sent', status: 250, ...(result.data && {data: result?.data}) });
     // const { message, status }: SendBulkEmailReturnType = await sendBulkEmail(studentsEmailList);
     // res.status(status).json({ message, status });
   } else {
@@ -163,7 +163,8 @@ async function getAttachments(data: StudentEmailProps) {
 
       return new Promise((resolve) => {
 
-        const identifier = `${firstName.split(' ').join('_')}_${lastName.split(' ').join('_')}`
+        const identifier = `${firstName.trim().split(' ').join('_')}_${lastName.trim().split(' ').join('_')}`
+        console.log(identifier)
         cloudinary.v2.api.resource(identifier, function (error, result) {
           if (error) {
             resolve(acc)

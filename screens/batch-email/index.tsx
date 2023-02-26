@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Paper, Container, Box, Title, Text, Center, Button } from '@mantine/core';
+import { Paper, Container, Box, Title, Text, Center, Button, Select } from '@mantine/core';
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 
@@ -14,7 +14,9 @@ import Link from 'next/link';
 
 export default function BatchEmailPage({ batch }: { batch: number }) {
   const [batchData, setBatchData] = useState<any>(null);
+  const [filteredBatchData, setFilteredBatchData] = useState<any>(null);
   const [messageSent, setMessageSent] = useState<boolean>(false);
+  const [sliceValue, setSliceValue] = useState<string>('10');
 
   const { studentsByBatch } = useStoreSelector(studentState)
   const dispatch = useStoreDispatch();
@@ -25,7 +27,11 @@ export default function BatchEmailPage({ batch }: { batch: number }) {
   }, []);
 
   useEffect(() => {
-    setBatchData(studentsByBatch.filter(student => student.status === 'idle').slice(0, 10));
+    setFilteredBatchData(studentsByBatch.filter(student => student.status === 'idle').slice(0, +sliceValue));
+  }, [sliceValue]);
+
+  useEffect(() => {
+    setBatchData(studentsByBatch);
   }, [studentsByBatch]);
 
   const handleBatchSubmit = async () => {
@@ -39,7 +45,7 @@ export default function BatchEmailPage({ batch }: { batch: number }) {
     // setIsEmailSending(true);
     const res = await fetch('/api/send-email/bulk', {
       method: 'POST',
-      body: JSON.stringify({ batch }),
+      body: JSON.stringify({ batch, take: +sliceValue }),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -97,10 +103,33 @@ export default function BatchEmailPage({ batch }: { batch: number }) {
         <Title order={3} weight={500} align="center" py={50}>
           Batch email to students of <i>{batch}</i>
         </Title>
+        <Select
+          label="Set an amount of students to send email to"
+          placeholder="Custom active styles"
+          defaultValue={sliceValue}
+          onSearchChange={setSliceValue}
+          data={['10', '20', '30', '40', '50', '60', '70', '80', '90', '100']}
+          sx={{ width: 300 }}
+          styles={(theme) => ({
+            item: {
+              // applies styles to selected item
+              '&[data-selected]': {
+                '&, &:hover': {
+                  backgroundColor:
+                    theme.colorScheme === 'dark' ? theme.colors.teal[9] : theme.colors.teal[1],
+                  color: theme.colorScheme === 'dark' ? theme.white : theme.colors.teal[9],
+                },
+              },
+
+              // applies styles to hovered item (with mouse or keyboard)
+              '&[data-hovered]': {},
+            },
+          })}
+        />
         <Box mx="auto">
           <Paper shadow="xs" p="md" withBorder>
             <Text py={10}>
-              <BatchTable data={batchData} />
+              <BatchTable data={filteredBatchData} />
             </Text>
           </Paper>
           <Center>
@@ -108,7 +137,7 @@ export default function BatchEmailPage({ batch }: { batch: number }) {
               <Button mt={20} type="submit" onClick={handleBatchSubmit}>
                 Send Batch Email
               </Button>
-            ):(
+            ) : (
               <Button mt={20} type="submit" href={`/students/${batch}`} component={Link}>
                 Return to Student List
               </Button>

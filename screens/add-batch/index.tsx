@@ -15,7 +15,7 @@ import {
   Box,
   Select,
 } from '@mantine/core';
-import { IconUpload, IconFileSpreadsheet, IconX } from '@tabler/icons-react';
+import { IconUpload, IconFileSpreadsheet, IconX, IconCloudUpload } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
 import { Dropzone, MS_EXCEL_MIME_TYPE } from '@mantine/dropzone';
 import { showNotification } from '@mantine/notifications';
@@ -84,13 +84,14 @@ export default function AddBatchPage() {
       };
     });
 
+
     //this formats the data based on first name and last name filter
-    const remapRecordsV2 = studentRecords.slice(4).map((item: any) => {
-      const [firstName, lastName] = item[1].split('_')
+    const remapRecordsV2 = studentRecords.slice(1).map((item: any) => {
+      const [_, firstName, lastName, email] = item
       return {
         firstName,
         lastName,
-        email: item[0],
+        email,
         studentId: uuidv4(),
         batch: Number(form.values.batchNumber),
       }
@@ -233,7 +234,7 @@ const StepTwo = ({ form }: { form: any }) => {
         >
           <Group position="center" spacing="xl" style={{ minHeight: 220, pointerEvents: 'none' }}>
             <Dropzone.Accept>
-              <IconUpload
+              <IconFileSpreadsheet
                 size={50}
                 stroke={1.5}
                 color={theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 6]}
@@ -247,7 +248,7 @@ const StepTwo = ({ form }: { form: any }) => {
               />
             </Dropzone.Reject>
             <Dropzone.Idle>
-              <IconFileSpreadsheet size={50} stroke={1.5} />
+              <IconCloudUpload size={50} stroke={1.5} />
             </Dropzone.Idle>
 
             <div>
@@ -316,7 +317,7 @@ const StepThree = ({ form, setStudentRecords }: IStepThreeProps) => {
             <small>({formatBytes(form.values?.file.size)})</small>
           </Text>
           <Text py={10}>
-            No. of students: <b>{data.length}</b>
+            No. of students: <b>{data.length - 1}</b>
             <BatchTable data={data} />
           </Text>
         </Paper>

@@ -31,7 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <ReduxRegistry>
         <QueryClientRegistry>
           <ModalRegistry>
-            <Layout students={students}>{children}</Layout>
+            <Layout students={students} data-superjson>{children}</Layout>
             </ModalRegistry>
         </QueryClientRegistry>
       </ReduxRegistry>

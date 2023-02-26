@@ -12,7 +12,7 @@ const TableRow = ({ students }: TableRowType) => {
   return (
     <>
       {students.slice(0, 5).sort(
-        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime() // Sort by most recent
+        (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime() // Sort by most recent
       ).map((student) => (
         <tr key={student.id}>
           <td>{student.firstName}</td>

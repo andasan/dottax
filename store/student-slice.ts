@@ -55,12 +55,24 @@ export const studentSlice = createSlice({
         }
         return student;
       });
+      state.populateStudents = state.populateStudents.map((student) => {
+        if (student.id === action.payload.id) {
+          return action.payload;
+        }
+        return student;
+      });
     },
     updateStudentModal: (state, action) => {
       state.studentSelected = { ...state.studentSelected, ...action.payload };
     },
     updateStudentStatus: (state, action) => {
       state.studentsByBatch = state.studentsByBatch.map((student) => {
+        if (student.id === action.payload.id) {
+          return { ...student, status: action.payload.status };
+        }
+        return student;
+      });
+      state.populateStudents = state.populateStudents.map((student) => {
         if (student.id === action.payload.id) {
           return { ...student, status: action.payload.status };
         }
@@ -91,10 +103,13 @@ export const studentSlice = createSlice({
     // },
 
     deleteStudent: (state, action) => {
-      state.studentsByBatch = state.studentsByBatch.filter((student) => student.id !== action.payload);
+      state.studentsByBatch = state.studentsByBatch.filter((student) => student.id !== +action.payload);
+      state.populateStudents = state.populateStudents.filter((student) => student.id !== +action.payload);
     },
     deleteBatch: (state, action) => {
-      state.batches = state.batches.filter((batch) => batch !== action.payload);
+      state.batches = state.batches.filter((batch) => batch !== +action.payload);
+      state.students = state.students.filter((student) => student.batch !== +action.payload);
+      state.populateStudents = state.populateStudents.filter((student) => student.batch !== +action.payload);
     }
   },
   extraReducers: (builder) => {
@@ -105,3 +120,4 @@ export const studentSlice = createSlice({
     });
   },
 });
+

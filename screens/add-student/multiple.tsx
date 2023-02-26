@@ -18,6 +18,7 @@ import { IconUpload, IconFileSpreadsheet, IconX, IconCloudUpload } from '@tabler
 import { useForm } from '@mantine/form';
 import { Dropzone, MS_EXCEL_MIME_TYPE } from '@mantine/dropzone';
 import { showNotification } from '@mantine/notifications';
+import { v4 as uuidv4 } from 'uuid';
 
 import { formatBytes } from '@/utils/formatBytes';
 import { readFile } from '@/utils/readFile';
@@ -87,15 +88,26 @@ const MultipleStudents = ({ batch }: { batch: number }) => {
   const handleSubmit = async () => {
     //submit form to server
 
-    const remapRecords = () => studentRecords.slice(1).map((item: any) => {
+    // const remapRecords = () => studentRecords.slice(1).map((item: any) => {
+    //   return {
+    //     firstName: item[0],
+    //     lastName: item[1],
+    //     email: item[2],
+    //     studentId: String(item[3]),
+    //     batch: Number(batch),
+    //   };
+    // });
+
+    const remapRecords = studentRecords.slice(1).map((item: any) => {
+      const [_, firstName, lastName, email] = item
       return {
-        firstName: item[0],
-        lastName: item[1],
-        email: item[2],
-        studentId: String(item[3]),
-        batch: Number(batch),
-      };
-    });
+        firstName,
+        lastName,
+        email,
+        studentId: uuidv4(),
+        batch: Number(form.values.batch),
+      }
+    })
 
     try {
       //save  to database
@@ -209,7 +221,7 @@ const StepOne = ({ form, openRef }: { form: any, openRef: RefObject<() => void> 
         >
           <Group position="center" spacing="xl" style={{ minHeight: 220, pointerEvents: 'none' }}>
             <Dropzone.Accept>
-              <IconUpload
+              <IconFileSpreadsheet
                 size={50}
                 stroke={1.5}
                 color={theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 6]}

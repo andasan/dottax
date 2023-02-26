@@ -86,8 +86,7 @@ function sendEmail({
           const mailOptions = {
             from: `CICCC <${process.env.EMAIL_FROM}>`,
             to: email,
-            subject: `T2202 form for ${studentId}`,
-            text: 'This email contains an attachment',
+            subject: process.env.EMAIL_SUBJECT || '',
             attachments: [
               {
                 filename: 't2202-fill-21e.pdf',
