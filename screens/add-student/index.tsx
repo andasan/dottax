@@ -12,12 +12,12 @@ import {
 import { useStoreSelector } from '@/lib/hooks';
 import { studentState } from '@/store/index';
 
-import MultipleStudents from './stepper';
+import MultipleStudents from './multiple';
 import SingleStudent from './single';
-import { IconPhoto, IconMessageCircle, IconSettings } from '@tabler/icons-react';
+import { IconPhoto, IconMessageCircle } from '@tabler/icons-react';
 
 export default function AddStudentPage({ batch }: { batch: number }) {
-  const { loading, batches } = useStoreSelector(studentState);
+  const { loading } = useStoreSelector(studentState);
 
   if (loading) {
     return (
@@ -37,7 +37,7 @@ export default function AddStudentPage({ batch }: { batch: number }) {
 
   return (
     <Paper shadow="xs" p="xl">
-      <Container size="md" px="xs" pt={20}>
+      <Container size="md" py={20}>
         <Title mb={20}>Add Student(s) to batch: {batch} </Title>
         <Tabs orientation="vertical" defaultValue="multiple">
           <Tabs.List>
@@ -46,7 +46,7 @@ export default function AddStudentPage({ batch }: { batch: number }) {
           </Tabs.List>
 
           <Tabs.Panel value="multiple" pt="xs" px="xl">
-            <MultipleStudents batches={batches} />
+            <MultipleStudents batch={batch} />
           </Tabs.Panel>
 
           <Tabs.Panel value="single" pt="xs" px="xl">

@@ -22,20 +22,7 @@ type TableRowType = {
   mobileScreen: boolean;
 };
 
-const useStyles = createStyles((theme) => ({
-  item: {
-    '&[data-hovered]': {
-      backgroundColor: theme.colors[theme.primaryColor][theme.fn.primaryShade()],
-      color: theme.white,
-    },
-  },
-  icon: {
-    cursor: 'pointer',
-  },
-}));
-
 const TableRow = ({ student, toggleDrawer, copyProfile, deleteProfile, mobileScreen }: TableRowType) => {
-  const { classes } = useStyles();
   const dispatch = useStoreDispatch();
 
   const handleSendEmail = async () => {
@@ -86,7 +73,7 @@ const TableRow = ({ student, toggleDrawer, copyProfile, deleteProfile, mobileScr
         <Badge color={student.status === 'idle' ? 'yellow' : 'blue'}>{student.status}</Badge>
       </td>
       <td>
-        <Menu classNames={classes}>
+        <Menu>
           <Menu.Target>
             <IconDots size={16} style={{ cursor: 'pointer' }} />
           </Menu.Target>

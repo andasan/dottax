@@ -3,7 +3,7 @@ import { Button, TextInput, Switch } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
 import { useStoreDispatch, useStoreSelector } from '@/lib/hooks';
-import { modalAction, studentAction, toggleState, studentState } from '@/store/index';
+import { studentAction, studentState } from '@/store/index';
 
 interface EditProfileFormProps {
   submitForm: (newUser: Student) => void;

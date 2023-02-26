@@ -79,16 +79,12 @@ export default function BatchEmailPage({ batch }: { batch: number }) {
             Batch email is currently running on the background
           </Title>
           <Center>
-            <Button mt={20} type="submit" href={`/students/${batch}`} component={Link}>
+            <Button mt={20} mx={20} type="submit" href={`/students/${batch}`} component={Link}>
               Send another batch email
             </Button>
-            <Button mt={20} type="submit" href={`/dashboard`} component={Link}>
-            {/* <Button mt={20} type="submit" onClick={() => router.push(`/dashboard`)}> */}
+            <Button mt={20} mx={20} type="submit" href={`/dashboard`} component={Link}>
               Return to Dashboard
             </Button>
-            {/* <Button mt={20} type="submit" onClick={() => router.push(`/students/${batch}`)}>
-              Return to Student List
-            </Button> */}
           </Center>
         </Container>
       </Paper>

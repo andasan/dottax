@@ -8,8 +8,9 @@ import {
     SimpleGrid,
     createStyles,
 } from '@mantine/core';
-//   import { ContactIconsList } from '../ContactIcons/ContactIcons';
-//   import bg from './bg.svg';
+import { useForm } from '@mantine/form';
+import { showNotification } from '@mantine/notifications';
+import { useRouter } from 'next/navigation';
 
 const useStyles = createStyles((theme) => {
     const BREAKPOINT = theme.fn.smallerThan('sm');
@@ -66,23 +67,6 @@ const useStyles = createStyles((theme) => {
             },
         },
 
-        contacts: {
-            boxSizing: 'border-box',
-            position: 'relative',
-            borderRadius: theme.radius.lg - 2,
-            // backgroundImage: `url(${bg.src})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            border: '1px solid transparent',
-            padding: theme.spacing.xl,
-            flex: '0 0 280px',
-
-            [BREAKPOINT]: {
-                marginBottom: theme.spacing.sm,
-                paddingLeft: theme.spacing.md,
-            },
-        },
-
         title: {
             marginBottom: theme.spacing.xl * 1.5,
             fontFamily: `Greycliff CF, ${theme.fontFamily}`,
@@ -102,25 +86,77 @@ const useStyles = createStyles((theme) => {
 
 export default function SingleStudent({ batch }: { batch: number }) {
     const { classes } = useStyles();
+    const router = useRouter();
+
+    const form = useForm({
+        initialValues: {
+            firstName: '',
+            lastName: '',
+            email: '',
+            studentId: '',
+            batch: Number(batch),
+        },
+
+        validate: {
+            firstName: (value) => (value.length > 0 ? null : 'First name is required'),
+            lastName: (value) => (value.length > 0 ? null : 'Last name is required'),
+            email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+            studentId: (value) => (value.length > 0 ? null : 'Student ID is required'),
+        },
+    });
+
+    const onSubmitAddForm = async (student: any) => {
+
+        // Add data in db
+        const res = await fetch('/api/add-student', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ student }),
+        });
+
+        const data = await res.json();
+        console.log("Added data: ",data);
+
+        if (!res.ok) {
+          showNotification({
+            title: 'Something went wrong!',
+            message: `Unable to add ${student.firstName}'s profile`,
+            color: 'red',
+          });
+        } else {
+          showNotification({
+            title: 'Edit profile',
+            message: `You have successfully added ${student.firstName}'s profile`,
+            color: 'teal',
+          });
+        }
+
+        //redirect to student list after 3 seconds
+        setTimeout(() => {
+            router.push(`/students/${batch}`);
+        }, 3000);
+      };
 
     return (
         <Paper shadow="md" radius="lg">
             <div className={classes.wrapper}>
 
-                <form className={classes.form} onSubmit={(event) => event.preventDefault()}>
+                <form className={classes.form} onSubmit={form.onSubmit((values) => onSubmitAddForm(values))}>
                     <Text size="lg" weight={700} className={classes.title}>
                         Student Information
                     </Text>
 
                     <div className={classes.fields}>
                         <SimpleGrid cols={2} breakpoints={[{ maxWidth: 'sm', cols: 1 }]}>
-                            <TextInput label="First name" placeholder="First name" required />
-                            <TextInput label="Last name" placeholder="Last name" required />
+                            <TextInput label="First name" placeholder="First name" required {...form.getInputProps('firstName')} />
+                            <TextInput label="Last name" placeholder="Last name" required {...form.getInputProps('lastName')} />
                         </SimpleGrid>
 
-                        <TextInput mt="md" label="Email" placeholder="hello@student.com" required />
-                        <TextInput mt="md" label="Student ID" placeholder="20231234" required />
-                        <TextInput mt="md" label="Batch" value={batch} readOnly />
+                        <TextInput mt="md" label="Email" placeholder="hello@student.com" required {...form.getInputProps('email')} />
+                        <TextInput mt="md" label="Student ID" placeholder="20231234" required {...form.getInputProps('studentId')} />
+                        <TextInput mt="md" label="Batch" readOnly {...form.getInputProps('batch')} type="number" />
 
                         <Group position="right" mt="md">
                             <Button type="submit" className={classes.control}>

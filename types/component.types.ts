@@ -55,6 +55,7 @@ export type BatchData = {
   firstName: string;
   lastName: string;
   studentId: string;
+  status?: string;
 }
 
 /**

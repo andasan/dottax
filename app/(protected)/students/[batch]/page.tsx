@@ -15,12 +15,13 @@ export default async function StudentBatch({ params }: { params: { batch: number
       firstName: true,
       lastName: true,
       studentId: true,
+      status: true,
     },
-    take: 10,
+    // take: 10,
   });
 
 
-  return <MailingListTable batchData={batchData} batch={batch} />
+  return <MailingListTable batchData={batchData} batch={batch} pageSize={20} />
 
 }
 

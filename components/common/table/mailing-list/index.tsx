@@ -1,195 +1,35 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import {
-  createStyles,
-  Table,
-  ScrollArea,
-  UnstyledButton,
-  Group,
-  Text,
-  Center,
-  TextInput,
-  Paper,
-  Grid,
-  Title,
-  Chip,
-  Drawer,
-  Skeleton,
-  MediaQuery,
-  Button,
-  Menu,
-  Divider,
-} from '@mantine/core';
-import { keys } from '@mantine/utils';
-import { IconSelector, IconChevronDown, IconChevronUp, IconSearch, IconTrash, IconDotsVertical, IconPlus, IconSend } from '@tabler/icons-react';
-import { cleanNotifications, showNotification } from '@mantine/notifications';
-import { useModals } from '@mantine/modals';
-import { useClipboard, useMediaQuery } from '@mantine/hooks';
-import { useRouter } from 'next/navigation';
+import React, { Dispatch, useMemo, useState } from "react";
 
+import { MantineReactTable, MRT_ColumnDef } from "mantine-react-table";
+import { Badge, Box, Button, Divider, Drawer, Menu, Text, Title } from "@mantine/core";
+import { useModals } from '@mantine/modals';
+import { IconUserCircle, IconSend, IconDeviceFloppy, IconEdit, IconMailForward, IconBackspace, IconDotsVertical, IconPlus, IconTrash } from "@tabler/icons-react";
+import { cleanNotifications, showNotification } from "@mantine/notifications";
+import { useRouter } from "next/navigation";
+
+import EditProfileForm from "@/components/common/forms/edit-user";
 import { useStoreSelector, useStoreDispatch } from '@/lib/hooks';
 import { studentState, studentAction } from '@/store/index';
-import EditUserForm from '@/components/common/forms/edit-user';
-import TableRow from './table-row';
-
-import { BatchData } from '@/types/component.types';
-import { Student } from '@/types/schema.types';
-import { fetchDataIfEmpty } from '@/store/thunk';
-import { filterData, sortData } from '@/lib/helper';
-
-const useStyles = createStyles((theme) => ({
-  th: {
-    padding: '0 !important',
-  },
-
-  control: {
-    width: '100%',
-    padding: `${theme.spacing.xs}px ${theme.spacing.md}px`,
-
-    '&:hover': {
-      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
-    },
-  },
-
-  icon: {
-    width: 21,
-    height: 21,
-    borderRadius: 21,
-    cursor: 'pointer',
-  },
-
-  header: {
-    position: 'sticky',
-    top: 0,
-    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.white,
-    transition: 'box-shadow 150ms ease',
-
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      bottom: 0,
-      borderBottom: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[3] : theme.colors.gray[2]
-        }`,
-    },
-  },
-
-  item: {
-    '&[data-hovered]': {
-      backgroundColor: theme.colors[theme.primaryColor][theme.fn.primaryShade()],
-      color: theme.white,
-    },
-  },
-
-  scrolled: {
-    boxShadow: theme.shadows.sm,
-  },
-}));
-
-interface ThProps {
-  children: React.ReactNode;
-  reversed: boolean;
-  sorted: boolean;
-  onSort(): void;
-  hide?: boolean;
-}
-
-function Th({ children, reversed, sorted, onSort, hide }: ThProps) {
-  const { classes } = useStyles();
-  const Icon = sorted ? (reversed ? IconChevronUp : IconChevronDown) : IconSelector;
-
-  if (hide) {
-    return null;
-  }
-
-  return (
-    <th className={classes.th}>
-      <UnstyledButton onClick={onSort} className={classes.control}>
-        <Group position="apart">
-          <Text weight={500} size="sm">
-            {children}
-          </Text>
-          <Center className={classes.icon}>
-            <Icon size={14} stroke={1.5} />
-          </Center>
-        </Group>
-      </UnstyledButton>
-    </th>
-  );
-}
+import { BatchData } from "@/types/component.types";
 
 interface MailingListTableProps {
   batchData: BatchData[];
   batch: number;
+  pageSize: number;
 }
 
 
-export default function MailingListTable({ batchData, batch }: MailingListTableProps) {
-  const { studentsByBatch, loading, students } = useStoreSelector(studentState);
-  const dispatch = useStoreDispatch();
-  const router = useRouter();
-  const { classes, cx } = useStyles();
-
-  const [search, setSearch] = useState('');
-  const [sortedData, setSortedData] = useState([] as Student[]);
-  const [sortBy, setSortBy] = useState<keyof Student | null>(null);
-  const [reverseSortDirection, setReverseSortDirection] = useState(false);
-  const [emailMode, setEmailMode] = useState('all');
+export default function MailingListTable({ batchData: data, batch, pageSize }: MailingListTableProps) {
   const [drawerOpened, toggleDrawer] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  const clipboard = useClipboard();
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize, //customize the default page size
+  });
+  const router = useRouter();
   const modals = useModals();
-
-  const mobileScreen = useMediaQuery('(max-width: 600px)');
-
-
-  useEffect(() => {
-    dispatch(studentAction.loadStudentsByBatch(batch));
-  }, [batch, students]);
-
-  useEffect(() => {
-    if (studentsByBatch.length === 0 && students.length === 0) {
-      dispatch(fetchDataIfEmpty(batch));
-    }
-
-    setSortedData(studentsByBatch);
-  }, [studentsByBatch]);
-
-  const setSorting = (field: keyof Student) => {
-    const reversed = field === sortBy ? !reverseSortDirection : false;
-    setReverseSortDirection(reversed);
-    setSortBy(field);
-    setSortedData(sortData(studentsByBatch, { sortBy: field, reversed, search }));
-  };
-
-  const handleEmailMode = (value: string) => {
-    switch (value) {
-      case 'sent':
-      case 'idle':
-        setSortedData(
-          studentsByBatch.filter(
-            (item: Student) => item.status.toLowerCase() === value.toLowerCase()
-          )
-        );
-        break;
-      default:
-        setSortedData(studentsByBatch);
-        break;
-    }
-
-    setEmailMode(value);
-  };
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.currentTarget;
-    setSearch(value);
-    setSortedData(
-      sortData(studentsByBatch, { sortBy, reversed: reverseSortDirection, search: value })
-    );
-  };
+  const dispatch = useStoreDispatch();
 
   const onSubmitEditForm = async (student: any) => {
     toggleDrawer(false);
@@ -202,78 +42,7 @@ export default function MailingListTable({ batchData, batch }: MailingListTableP
       },
       body: JSON.stringify({ student }),
     });
-
-    // In case we need to return data from the server
-    // const data = await res.json();
-
-    if (!res.ok) {
-      showNotification({
-        title: 'Something went wrong!',
-        message: `Unable to edit ${student.firstName}'s profile`,
-        color: 'red',
-      });
-    } else {
-      showNotification({
-        title: 'Edit profile',
-        message: `You have successfully edited ${student.firstName}'s profile`,
-        color: 'teal',
-      });
-    }
-  };
-
-  const copyProfile = (user: Student) => {
-    clipboard.copy(JSON.stringify(user));
-
-    showNotification({
-      title: 'Copy profile',
-      message: `${user.firstName}'s profile has been successfully saved to the clipboard in JSON format`,
-      color: 'teal',
-    });
-  };
-
-  const deleteProfile = (student: Student) => {
-    modals.openConfirmModal({
-      title: 'Delete profile',
-      children: (
-        <Text size="sm" lineClamp={2}>
-          Are you sure you want to delete <b>{student.firstName}</b>'s profile?
-          <br />
-          This action cannot be undone!
-        </Text>
-      ),
-      centered: true,
-      labels: { confirm: 'Ok', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
-      onConfirm: () => onDeleteProfile(student),
-    });
-  };
-
-  const onDeleteProfile = async (student: Student) => {
-    // remove data in db
-    const res = await fetch('/api/delete-student', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id: student.id }),
-    });
-
-    dispatch(studentAction.deleteStudent(student.id));
-
-    if (!res.ok) {
-      showNotification({
-        title: 'Something went wrong!',
-        message: `Unable to delete ${student.firstName}'s profile`,
-        color: 'red',
-      });
-    } else {
-      showNotification({
-        title: 'Delete Profile',
-        message: `You have successfully deleted ${student.firstName}'s profile`,
-        color: 'teal',
-      });
-    }
-  };
+  }
 
   const handleSendBulkEmail = async () => {
     router.push(`/batch-email/${batch}`);
@@ -329,162 +98,278 @@ export default function MailingListTable({ batchData, batch }: MailingListTableP
     }
   };
 
-  const rows = sortedData.map((row) => (
-    <TableRow
-      key={row.id}
-      student={row}
-      toggleDrawer={toggleDrawer}
-      copyProfile={copyProfile}
-      deleteProfile={deleteProfile}
-      mobileScreen={mobileScreen}
-    />
-  ));
-
-  if (loading) {
-    return (
-      <>
-        <Skeleton height={28} mt={20} radius="sm" />
-        <Skeleton height={18} mt={8} radius="sm" />
-        <Skeleton height={18} mt={8} radius="sm" />
-        <Skeleton height={18} mt={8} radius="sm" />
-        <Skeleton height={18} mt={8} radius="sm" />
-        <Skeleton height={18} mt={8} radius="sm" />
-        <Skeleton height={18} mt={8} radius="sm" />
-      </>
-    );
-  }
+  const columns = useMemo<MRT_ColumnDef<BatchData>[]>(() => [
+    {
+      accessorKey: "firstName", //accessorKey used to define `data` column. `id` gets set to accessorKey automatically
+      enableClickToCopy: true,
+      header: "First Name",
+      size: 200
+    },
+    {
+      accessorKey: "lastName", //accessorKey used to define `data` column. `id` gets set to accessorKey automatically
+      enableClickToCopy: true,
+      header: "Last Name",
+      size: 200
+    },
+    {
+      accessorKey: "email", //accessorKey used to define `data` column. `id` gets set to accessorKey automatically
+      enableClickToCopy: true,
+      header: "Email",
+      size: 200
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      size: 200,
+      Cell: ({ cell }) => {
+        const status = cell.getValue() as string;
+        return (
+          <Badge color={status === 'idle' ? 'yellow' : 'blue'}>{status}</Badge>
+        )
+      },
+      filterFn: 'equals',
+      mantineFilterSelectProps: {
+        data: ['Idle', 'Sent'] as any,
+      },
+      filterVariant: 'select',
+    }
+  ], []);
 
   return (
-    <Paper p="sm">
-      <ScrollArea
-        sx={{ height: '80vh' }}
-        onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
-        scrollHideDelay={0}
+    <MantineReactTable
+      columns={columns}
+      data={data}
+      enableColumnOrdering
+      onPaginationChange={setPagination} //hoist pagination state to your state when it changes internally
+      state={{ pagination }} //pass the pagination state to the table
+      mantineFilterTextInputProps={{
+        sx: { borderBottom: 'unset', marginTop: '8px' },
+        variant: 'filled',
+      }}
+      mantineFilterSelectProps={{
+        sx: { borderBottom: 'unset', marginTop: '8px' },
+        variant: 'filled',
+      }}
 
-      >
-        <div style={{ width: '99%' }}>
-          <Drawer
-            opened={drawerOpened}
-            onClose={() => toggleDrawer(false)}
-            title="Modify Student Profile"
-            padding="xl"
-            size="xl"
-          >
-            <EditUserForm submitForm={onSubmitEditForm} />
-          </Drawer>
+      enablePinning
+      enableRowActions
+      // enableRowSelection
+      initialState={{ showColumnFilters: false }}
+      positionToolbarAlertBanner="bottom"
+      renderRowActionMenuItems={({ row }) => (
+        <RowActions student={row.original} toggleDrawer={toggleDrawer} />
+      )}
+      renderTopToolbarCustomActions={({ table }) => {
+        // const handleDeactivate = () => {
+        //   table.getSelectedRowModel().flatRows.map((row) => {
+        //     alert("deactivating " + row.getValue("name"));
+        //   });
+        // };
 
-          <Grid align="baseline" justify={'center'}>
-            <Grid.Col sm={12} md={6} lg={6}>
-              <Group>
-                <Title order={2}>Batch {batch}</Title>
-              </Group>
-            </Grid.Col>
-            <Grid.Col sm={12} md={6} lg={6}>
-              <Chip.Group value={emailMode} onChange={handleEmailMode} spacing="sm" mb="lg" style={{ justifyContent: "flex-end" }}>
-                <Chip value="idle">Idle</Chip>
-                <Chip value="sent">Sent</Chip>
-                <Chip value="all">All</Chip>
+        // const handleActivate = () => {
+        //   table.getSelectedRowModel().flatRows.map((row) => {
+        //     alert("activating " + row.getValue("name"));
+        //   });
+        // };
 
+        // const handleContact = () => {
+        //   const allStudents = table.getSelectedRowModel().flatRows.map((row) => ({
+        //     firstName: row.getValue("firstName"),
+        //     lastName: row.getValue("lastName"),
+        //     email: row.getValue("email"),
+        //   }));
+        // };
 
-                <Menu classNames={classes}>
-                  <Menu.Target>
-                    <IconDotsVertical size={18} style={{ cursor: 'pointer' }} />
-                  </Menu.Target>
+        return (
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <Drawer
+              opened={drawerOpened}
+              onClose={() => toggleDrawer(false)}
+              title="Modify Student Profile"
+              padding="xl"
+              size="xl"
+            >
+              <EditProfileForm submitForm={onSubmitEditForm} />
+            </Drawer>
 
-                  <Menu.Dropdown>
-                    <Menu.Label>Batch Menu</Menu.Label>
-                    <Menu.Item
-                      icon={<IconSend size={14} />}
-                      onClick={handleSendBulkEmail}
-                      color="cyan"
-                    >
-                      Send Bulk Email
-                    </Menu.Item>
-                    <Menu.Item
-                      icon={<IconPlus size={14} />}
-                      onClick={handleAddStudent}
-                    >
-                      Add Student(s)
-                    </Menu.Item>
-                    <Divider />
-                    <Menu.Item
-                      icon={<IconTrash size={14} />}
-                      onClick={handleRemoveBatch}
-                      color="red"
-                    >
-                      Delete Batch
-                    </Menu.Item>
+            <Title order={2}>Batch {batch}</Title>
 
-                  </Menu.Dropdown>
-                </Menu>
-              </Chip.Group>
-            </Grid.Col>
-          </Grid>
+            <Menu>
+              <Menu.Target>
+                <IconDotsVertical size={18} style={{ cursor: 'pointer' }} />
+              </Menu.Target>
 
-          <TextInput
-            placeholder="Search by any field"
-            mb="md"
-            icon={<IconSearch size={14} stroke={1.5} />}
-            value={search}
-            onChange={handleSearchChange}
-          />
-          <Table
-            horizontalSpacing="sm"
-            verticalSpacing="xs"
-            highlightOnHover
-            fontSize="xs"
-          >
-            <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
-              <tr>
-                <Th
-                  sorted={sortBy === 'firstName'}
-                  reversed={reverseSortDirection}
-                  onSort={() => setSorting('firstName')}
+              <Menu.Dropdown>
+                <Menu.Label>Batch Menu</Menu.Label>
+                <Menu.Item
+                  icon={<IconSend size={18} />}
+                  onClick={handleSendBulkEmail}
+                  color="cyan"
                 >
-                  First Name
-                </Th>
-                <Th
-                  sorted={sortBy === 'lastName'}
-                  reversed={reverseSortDirection}
-                  onSort={() => setSorting('lastName')}
-                  hide={mobileScreen}
+                  Send Bulk Email
+                </Menu.Item>
+                <Menu.Item
+                  icon={<IconPlus size={14} />}
+                  onClick={handleAddStudent}
                 >
-                  Last Name
-                </Th>
-                <Th
-                  sorted={sortBy === 'email'}
-                  reversed={reverseSortDirection}
-                  onSort={() => setSorting('email')}
-                  hide={mobileScreen}
+                  Add Student(s)
+                </Menu.Item>
+                <Divider />
+                <Menu.Item
+                  icon={<IconTrash size={14} />}
+                  onClick={handleRemoveBatch}
+                  color="red"
                 >
-                  Email
-                </Th>
-                <Th
-                  sorted={sortBy === 'status'}
-                  reversed={reverseSortDirection}
-                  onSort={() => setSorting('status')}
-                >
-                  Status
-                </Th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.length > 0 ? (
-                rows
-              ) : (
-                <tr>
-                  <td colSpan={6}>
-                    <Text weight={500} align="center">
-                      Nothing found
-                    </Text>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </Table>
-        </div>
-      </ScrollArea>
-    </Paper>
+                  Delete Batch
+                </Menu.Item>
+
+              </Menu.Dropdown>
+            </Menu>
+            {/* <Button
+              color="red"
+              disabled={!table.getIsSomeRowsSelected()}
+              onClick={handleDeactivate}
+              variant="filled"
+            >
+              Deactivate
+            </Button>
+            <Button
+              color="green"
+              disabled={!table.getIsSomeRowsSelected()}
+              onClick={handleActivate}
+              variant="filled"
+            >
+              Activate
+            </Button>
+            <Button
+              color="blue"
+              disabled={!table.getIsAllRowsSelected()}
+              onClick={handleContact}
+              variant="filled"
+            >
+              Contact
+            </Button> */}
+          </div>
+        );
+      }}
+    />
   );
+}
+
+
+const RowActions = ({ student, toggleDrawer }: { student: BatchData, toggleDrawer: Dispatch<React.SetStateAction<boolean>>; }) => {
+  const modals = useModals();
+  const dispatch = useStoreDispatch();
+
+  const handleSendEmail = async (student: BatchData) => {
+    showNotification({
+      title: 'Sending mail',
+      message: "Please wait...",
+      color: 'green',
+      loading: true,
+    });
+
+    const res = await fetch("/api/send-email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: student.email,
+        id: student.id
+      })
+    });
+
+    const { status, message } = await res.json();
+    cleanNotifications()
+
+    if (status === 250) {
+      showNotification({
+        title: 'Mail sent',
+        message: message,
+        color: 'teal',
+      });
+      dispatch(studentAction.updateStudentStatus({ id: student.id, status: "sent" }));
+    } else {
+      showNotification({
+        title: 'Error',
+        message: message,
+        color: 'red',
+        icon: '🚨',
+      });
+    }
+  }
+
+  const deleteProfile = async (student: BatchData) => {
+    modals.openConfirmModal({
+      title: 'Delete profile',
+      children: (
+        <Text size="sm" lineClamp={2}>
+          Are you sure you want to delete <b>{student.firstName}</b>'s profile?
+          <br />
+          This action cannot be undone!
+        </Text>
+      ),
+      centered: true,
+      labels: { confirm: 'Ok', cancel: 'Cancel' },
+      confirmProps: { color: 'red' },
+      onConfirm: () => onDeleteProfile(student),
+    });
+  };
+
+  const onDeleteProfile = async (student: BatchData) => {
+    // remove data in db
+    const res = await fetch('/api/delete-student', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: student.id }),
+    });
+
+    dispatch(studentAction.deleteStudent(student.id));
+
+    if (!res.ok) {
+      showNotification({
+        title: 'Something went wrong!',
+        message: `Unable to delete ${student.firstName}'s profile`,
+        color: 'red',
+      });
+    } else {
+      showNotification({
+        title: 'Delete Profile',
+        message: `You have successfully deleted ${student.firstName}'s profile`,
+        color: 'teal',
+      });
+    }
+  };
+
+  return (
+    <>
+      <Menu.Label>{`${student.firstName} ${student.lastName}`}</Menu.Label>
+      <Menu.Item
+        icon={<IconMailForward size={14} />}
+        onClick={() => handleSendEmail}
+      >
+        Send Email
+      </Menu.Item>
+      <Menu.Item
+        icon={<IconEdit size={14} />}
+        onClick={() => {
+          dispatch(studentAction.selectedProfileData(student));
+          toggleDrawer(true);
+        }}
+      >
+        Edit Profile
+      </Menu.Item>
+      <Divider />
+      <Menu.Item
+        icon={<IconBackspace size={14} />}
+        onClick={() => deleteProfile(student)}
+        color="red"
+      >
+        Delete Profile
+      </Menu.Item>
+    </>
+  )
 }
