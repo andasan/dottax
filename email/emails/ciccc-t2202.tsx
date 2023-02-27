@@ -41,27 +41,22 @@ export default function EmailTemplate({ studentName = "Student" }: { studentName
           <Section style={paragraphContent}>
             <Hr style={hr} />
             <Text style={heading}>Tuition Enrolment Certificate (T2202)</Text>
-            <Text style={{ ...paragraph, fontSize: '18px' }}>Hello {studentName},</Text>
             <Text style={paragraph}>
-              A digital Tuition Enrolment Certificate (T2202) has been issued to you
-              and is ready for viewing.
+              Do Not Reply. This is an automated email using a third-party secure portal.
+
+              Dear student
+
+              Please find attached your confidential tax form.
+
+              Your tax form contains sensitive personal information. Download it using a trusted, secure connection instead of over free, public wi-fi, such as at airports or coffee shops, etc.
+
+              If you need assistance to file your tax, please contact our preferred partner, Phoenix Accounting Services: <a href="https://phoenixcanada.ca/file-your-taxes/">https://phoenixcanada.ca/file-your-taxes/</a>
             </Text>
 
-            <Text style={paragraph}>
-              Please see the attached file for your T2202.
-            </Text>
-
-            <Text style={paragraph}>
-              If you have any queries, please contact{' '}
-              <Link href="mailto:info@ciccc.ca">here</Link>
-            </Text>
           </Section>
 
           <Section style={paragraphContent}>
-            <Text style={paragraph}>Thank you,</Text>
-            <Text style={paragraph}>
-              Cornerstone International Community College Admin
-            </Text>
+            <Text style={paragraph}>Thank you</Text>
           </Section>
 
           <Section style={containerContact}>
