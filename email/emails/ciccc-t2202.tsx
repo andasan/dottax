@@ -43,13 +43,17 @@ export default function EmailTemplate({ studentName = "Student" }: { studentName
             <Text style={heading}>Tuition Enrolment Certificate (T2202)</Text>
             <Text style={paragraph}>
               Do Not Reply. This is an automated email using a third-party secure portal.
-
+            </Text>
+            <Text style={paragraph}>
               Dear student
-
+            </Text>
+            <Text style={paragraph}>
               Please find attached your confidential tax form.
-
+            </Text>
+            <Text style={paragraph}>
               Your tax form contains sensitive personal information. Download it using a trusted, secure connection instead of over free, public wi-fi, such as at airports or coffee shops, etc.
-
+            </Text>
+            <Text style={paragraph}>
               If you need assistance to file your tax, please contact our preferred partner, Phoenix Accounting Services: <a href="https://phoenixcanada.ca/file-your-taxes/">https://phoenixcanada.ca/file-your-taxes/</a>
             </Text>
 
