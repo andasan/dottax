@@ -8,51 +8,52 @@ import cron from 'node-cron';
 import EmailTemplate from '@/email/emails/ciccc-t2202';
 import cloudinary from '@/utils/cloudinary';
 import { config } from '@/lib/config';
+import dayjs from 'dayjs';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const studentsEmailList = async (BATCH_NUMBER: number, BULK_LIMIT: number) => await prisma.student.findMany({
-    where: {
-      batch: Number(BATCH_NUMBER),
-      status: 'idle',
-    },
-    select: {
-      id: true,
-      email: true,
-      firstName: true,
-      lastName: true,
-      studentId: true,
-    },
-    take: Number(BULK_LIMIT),
-  });
-
-  const cronJob = cron.schedule('*/2 * * * *', async () => {
-
-    cronJob.on('start', () => {
-      console.log('Bulk email task started');
+  try{
+    const studentsEmailList = async (BATCH_NUMBER: number, BULK_LIMIT: number) => await prisma.student.findMany({
+      where: {
+        batch: Number(BATCH_NUMBER),
+        status: 'idle',
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        studentId: true,
+      },
+      take: Number(BULK_LIMIT),
     });
 
-    cronJob.on('run', (x) => {
-      console.log('Cron job is now running: ', x);
+    //cron job every 2 minutes
+    // const cronJob = cron.schedule('*/2 * * * *', async () => {
+      //cron job per hour
+    const cronJob = cron.schedule('0 0 */1 * * *', async () => {
+
+      const BULK_LIMIT = req.body?.take
+      const BATCH_NUMBER = req.body?.batch
+
+      const getList = await studentsEmailList(BATCH_NUMBER, BULK_LIMIT)
+
+      if (getList.length > 0) {
+        cronJob.start();
+        const result = await sendBulkEmail(getList);
+        // res.status(200).json({ message: `Bulk email is currently tasked to send ${req.body.take} emails every hours starting from ${dayjs().hour() + 1}:00`, status: 250, ...(result.data && { data: result?.data }) });
+      } else {
+        cronJob.stop();
+        // res.status(200).json({ message: 'All students have received an email blast' });
+      }
+    }, {
+      scheduled: true,
+      timezone: 'America/Vancouver'
     });
 
-    const BULK_LIMIT = req.body?.take
-    const BATCH_NUMBER = req.body?.batch
-
-    const getList = await studentsEmailList(BATCH_NUMBER, BULK_LIMIT)
-
-    if (getList.length > 0) {
-      const result = await sendBulkEmail(getList);
-      res.status(200).json({ message: `Bulk email is currently tasked to send ${req.body.take} email per 2 minutes`, status: 250, ...(result.data && { data: result?.data }) });
-    } else {
-      cronJob.stop();
-      res.status(200).json({ message: 'All students have received an email blast' });
-    }
-  }, {
-    scheduled: true,
-    timezone: 'America/Vancouver'
-  });
-
-  cronJob.start();
+    res.status(250).json({ message: `Bulk email is currently tasked to send ${req.body.take} emails every hour starting from ${dayjs().hour() + 1}:00`, status: 250 });
+  }catch(err){
+    res.status(500).json(err)
+  }
 }
 
 type StudentType = {

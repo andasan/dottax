@@ -66,7 +66,8 @@ export default function BatchEmailPage({ batch }: { batch: number }) {
         autoClose: false
       });
 
-      dispatch(studentAction.updateSelectedStudentStatus(data));
+      // if(data){}
+      // dispatch(studentAction.updateSelectedStudentStatus(data));
 
     } else {
       showNotification({
