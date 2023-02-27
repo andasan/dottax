@@ -11,18 +11,7 @@ const TableRow = ({ students }: TableRowType) => {
 
   return (
     <>
-      {students.slice(0, 5).sort(
-        //sort by date from earliest to latest
-        (a, b) => {
-          if (dayjs(a.updatedAt).isBefore(b.updatedAt)) {
-            return 1;
-          } else if (dayjs(a.updatedAt).isAfter(b.updatedAt)) {
-            return -1;
-          } else {
-            return 0;
-          }
-        }
-      ).map((student) => (
+      {students.map((student) => (
         <tr key={student.id}>
           <td>{student.firstName}</td>
           <td>{student.lastName}</td>

@@ -26,6 +26,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   });
 
   const cronJob = cron.schedule('*/2 * * * *', async () => {
+
+    cronJob.on('start', () => {
+      console.log('Bulk email task started');
+    });
+
+    cronJob.on('run', (x) => {
+      console.log('Cron job is now running: ', x);
+    });
+
     const BULK_LIMIT = req.body?.take
     const BATCH_NUMBER = req.body?.batch
 
@@ -35,19 +44,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const result = await sendBulkEmail(getList);
       res.status(200).json({ message: `Bulk email is currently tasked to send ${req.body.take} email per 2 minutes`, status: 250, ...(result.data && { data: result?.data }) });
     } else {
+      cronJob.stop();
       res.status(200).json({ message: 'All students have received an email blast' });
     }
   }, {
     scheduled: true,
     timezone: 'America/Vancouver'
-  });
-
-  cronJob.on('start', () => {
-    console.log('Bulk email task started');
-  });
-
-  cronJob.on('run', (x) => {
-    console.log('Cron job is now running: ', x);
   });
 
   cronJob.start();
