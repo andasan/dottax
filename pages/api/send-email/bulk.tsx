@@ -142,7 +142,6 @@ async function sendBulkEmail(studentsEmailList: StudentEmailProps) {
     const emailAmount = emailQueue.length();
 
     emailQueue.drain(function () {
-      console.log('all items have been processed');
       return { message: 'All emails have been processed', status: 250 };
     });
 

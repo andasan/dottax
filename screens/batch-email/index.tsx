@@ -36,10 +36,11 @@ export default function BatchEmailPage({ batch }: { batch: number }) {
   const handleBatchSubmit = async () => {
 
     showNotification({
-      title: 'Sending mass mail in progress',
-      message: 'Please wait...',
+      title: 'Please wait...',
+      message: 'Sending bulk mail in progress',
       color: 'green',
       loading: true,
+      autoClose: false,
     });
     // setIsEmailSending(true);
     const res = await fetch('/api/send-email/bulk', {
@@ -59,9 +60,10 @@ export default function BatchEmailPage({ batch }: { batch: number }) {
       cleanNotifications();
 
       showNotification({
-        title: 'Mail sent',
+        title: 'Bulk Email',
         message: message,
         color: 'teal',
+        autoClose: false
       });
 
       dispatch(studentAction.updateSelectedStudentStatus(data));
