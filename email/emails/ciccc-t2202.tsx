@@ -13,8 +13,6 @@ import * as React from 'react';
 export default function EmailTemplate({ studentName = "Student" }: { studentName: string }) {
   const baseUrl = config.assetsUrl ? config.assetsUrl : '@/email/static';
 
-  console.log('\x1b[32m%s\x1b[0m', 'ciccc-t2202.tsx line:16 `${baseUrl}/ciccc-header.png`', `${baseUrl}/ciccc-header.png`);
-
   return (
     <Html>
       <Head />

@@ -7,6 +7,7 @@ import fs from 'fs';
 
 import EmailTemplate from '@/email/emails/ciccc-t2202';
 import cloudinary from '@/utils/cloudinary';
+import { config } from '@/lib/config';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { email, id } = req.body;
@@ -60,11 +61,11 @@ function sendEmail({
   return new Promise((resolve, reject) => {
     try {
       const transporter = nodemailer.createTransport({
-        host: process.env.NODEMAILER_HOST,
+        host: config.email.host,
         port: 587,
         auth: {
-          user: process.env.NODEMAILER_USER,
-          pass: process.env.NODEMAILER_PASS,
+          user: config.email.username,
+          pass: config.email.password,
         },
       });
 
@@ -84,9 +85,9 @@ function sendEmail({
           const emailHtml = render(<EmailTemplate studentName={firstName} />, { pretty: true });
 
           const mailOptions = {
-            from: `CICCC <${process.env.EMAIL_FROM}>`,
+            from: `CICCC <${config.email.from}>`,
             to: email,
-            subject: process.env.EMAIL_SUBJECT || '',
+            subject: config.email.subject || '',
             attachments: [
               {
                 filename: 't2202-fill-21e.pdf',

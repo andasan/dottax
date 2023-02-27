@@ -3,21 +3,16 @@ import { render } from '@react-email/render';
 import nodemailer from 'nodemailer';
 import prisma from '@/lib/prisma';
 import async from 'async';
-import path from 'path';
-import fs from 'fs';
+import cron from 'node-cron';
 
 import EmailTemplate from '@/email/emails/ciccc-t2202';
 import cloudinary from '@/utils/cloudinary';
-
-type SendBulkEmailReturnType = {
-  message: string;
-  status: number;
-};
+import { config } from '@/lib/config';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const studentsEmailList = await prisma.student.findMany({
+  const studentsEmailList = async (BATCH_NUMBER: number, BULK_LIMIT: number) => await prisma.student.findMany({
     where: {
-      batch: Number(req.body.batch),
+      batch: Number(BATCH_NUMBER),
       status: 'idle',
     },
     select: {
@@ -27,18 +22,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       lastName: true,
       studentId: true,
     },
-    take: Number(req.body.take),
+    take: Number(BULK_LIMIT),
   });
 
-  if (studentsEmailList.length > 0) {
-    const result = await sendBulkEmail(studentsEmailList);
+  const cronJob = cron.schedule('*/2 * * * *', async () => {
+    const BULK_LIMIT = req.body?.take
+    const BATCH_NUMBER = req.body?.batch
 
-    res.status(200).json({ message: 'Email has been sent', status: 250, ...(result.data && {data: result?.data}) });
-    // const { message, status }: SendBulkEmailReturnType = await sendBulkEmail(studentsEmailList);
-    // res.status(status).json({ message, status });
-  } else {
-    res.status(200).json({ message: 'All students have received an email blast' });
-  }
+    const getList = await studentsEmailList(BATCH_NUMBER, BULK_LIMIT)
+
+    if (getList.length > 0) {
+      const result = await sendBulkEmail(getList);
+      res.status(200).json({ message: `Bulk email is currently tasked to send ${req.body.take} email per 2 minutes`, status: 250, ...(result.data && { data: result?.data }) });
+    } else {
+      res.status(200).json({ message: 'All students have received an email blast' });
+    }
+  }, {
+    scheduled: true,
+    timezone: 'America/Vancouver'
+  });
+
+  cronJob.on('start', () => {
+    console.log('Bulk email task started');
+  });
+
+  cronJob.on('run', (x) => {
+    console.log('Cron job is now running: ', x);
+  });
+
+  cronJob.start();
 }
 
 type StudentType = {
@@ -67,11 +79,11 @@ async function sendBulkEmail(studentsEmailList: StudentEmailProps) {
 
   try {
     const transporter = nodemailer.createTransport({
-      host: process.env.NODEMAILER_HOST,
+      host: config.email.host,
       port: 587,
       auth: {
-        user: process.env.NODEMAILER_USER,
-        pass: process.env.NODEMAILER_PASS,
+        user: config.email.username,
+        pass: config.email.password,
       },
     });
 
@@ -111,9 +123,9 @@ async function sendBulkEmail(studentsEmailList: StudentEmailProps) {
       // create the email options
       emailQueue.push({
         id: recipient.id,
-        from: `CICCC <${process.env.EMAIL_FROM || ''}>`,
+        from: `CICCC <${config.email.from || ''}>`,
         to: recipient.email,
-        subject: process.env.EMAIL_SUBJECT || '',
+        subject: config.email.subject || '',
         attachments: [
           {
             filename: 't2202-fill-21e.pdf',
@@ -168,7 +180,7 @@ async function getAttachments(data: StudentEmailProps) {
         cloudinary.v2.api.resource(identifier, function (error, result) {
           if (error) {
             resolve(acc)
-          }else{
+          } else {
             resolve([...acc, { id, firstName, email, attachmentPath: result.secure_url }])
           }
         });

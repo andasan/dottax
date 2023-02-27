@@ -6,7 +6,7 @@ import TableRow from './table-row';
 
 
 export default function RecentActivityTable(/*props*/) {
-  const { populateStudents, loading } = useStoreSelector(studentState);
+  const { populateStudents, loading, studentsByBatch } = useStoreSelector(studentState);
 
   if(loading) {
     return (
@@ -36,7 +36,7 @@ export default function RecentActivityTable(/*props*/) {
               </tr>
             </thead>
             <tbody>
-              <TableRow students={populateStudents} />
+              <TableRow students={studentsByBatch} />
             </tbody>
           </Table>
       ) : (

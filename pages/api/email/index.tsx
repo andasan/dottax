@@ -81,7 +81,7 @@ function sendEmail({
         const emailHtml = render(<EmailTemplate studentName={firstName} />, { pretty: true })
 
         const mailOptions = {
-          from: `CICCC <${process.env.EMAIL_FROM}>`,
+          from: `CICCC <${config.email.from}>`,
           to: email,
           subject: `T2202 form for ${studentId}`,
           text: "This email contains an attachment",

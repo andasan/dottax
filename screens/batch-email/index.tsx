@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Paper, Container, Box, Title, Text, Center, Button, Select } from '@mantine/core';
+import { Paper, Container, Box, Title, Text, Center, Button, Select, Stack } from '@mantine/core';
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 
@@ -9,14 +9,13 @@ import { useStoreDispatch, useStoreSelector } from '@/lib/hooks';
 import { studentAction, studentState } from '@/store/index';
 
 import BatchTable from '@/components/common/table/batch-table/email';
-import { Student } from '@/types/schema.types';
 import Link from 'next/link';
 
 export default function BatchEmailPage({ batch }: { batch: number }) {
   const [batchData, setBatchData] = useState<any>(null);
   const [filteredBatchData, setFilteredBatchData] = useState<any>(null);
   const [messageSent, setMessageSent] = useState<boolean>(false);
-  const [sliceValue, setSliceValue] = useState<string>('10');
+  const [sliceValue, setSliceValue] = useState<string>('50');
 
   const { studentsByBatch } = useStoreSelector(studentState)
   const dispatch = useStoreDispatch();
@@ -86,7 +85,7 @@ export default function BatchEmailPage({ batch }: { batch: number }) {
           </Title>
           <Center>
             <Button mt={20} mx={20} type="submit" href={`/students/${batch}`} component={Link}>
-              Send another batch email
+              Return to Batch {batch} List
             </Button>
             <Button mt={20} mx={20} type="submit" href={`/dashboard`} component={Link}>
               Return to Dashboard
@@ -100,15 +99,15 @@ export default function BatchEmailPage({ batch }: { batch: number }) {
   return (
     <Paper shadow="xs" p="xl">
       <Container p="xl">
-        <Title order={3} weight={500} align="center" py={50}>
+        <Stack spacing="md" mb="xl" align="center">
+        <Title order={3} weight={500} align="center" py={20}>
           Batch email to students of <i>{batch}</i>
         </Title>
         <Select
-          label="Set an amount of students to send email to"
-          placeholder="Custom active styles"
+          label="Set an amount of emails to send per hour"
           defaultValue={sliceValue}
           onSearchChange={setSliceValue}
-          data={['10', '20', '30', '40', '50', '60', '70', '80', '90', '100']}
+          data={['10', '50', '100', '200', '300', '500', '1000']}
           sx={{ width: 300 }}
           styles={(theme) => ({
             item: {
@@ -126,6 +125,7 @@ export default function BatchEmailPage({ batch }: { batch: number }) {
             },
           })}
         />
+        </Stack>
         <Box mx="auto">
           <Paper shadow="xs" p="md" withBorder>
             <Text py={10}>

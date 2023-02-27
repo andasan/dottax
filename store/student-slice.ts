@@ -66,6 +66,12 @@ export const studentSlice = createSlice({
       state.studentSelected = { ...state.studentSelected, ...action.payload };
     },
     updateStudentStatus: (state, action) => {
+      state.students = state.students.map((student) => {
+        if (student.id === action.payload.id) {
+          return { ...student, status: action.payload.status };
+        }
+        return student;
+      });
       state.studentsByBatch = state.studentsByBatch.map((student) => {
         if (student.id === action.payload.id) {
           return { ...student, status: action.payload.status };

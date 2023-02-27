@@ -22,7 +22,9 @@ interface MailingListTableProps {
 }
 
 
-export default function MailingListTable({ batchData: data, batch, pageSize }: MailingListTableProps) {
+export default function MailingListTable({ batchData, batch, pageSize }: MailingListTableProps) {
+  const { studentsByBatch } = useStoreSelector(studentState);
+  const [data, setData] = useState<BatchData[]>([]);
   const [drawerOpened, toggleDrawer] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -31,6 +33,14 @@ export default function MailingListTable({ batchData: data, batch, pageSize }: M
   const router = useRouter();
   const modals = useModals();
   const dispatch = useStoreDispatch();
+
+  useEffect(() => {
+    setData(batchData);
+  }, [batchData]);
+
+  useEffect(() => {
+    setData(studentsByBatch);
+  }, [studentsByBatch]);
 
   useEffect(() => {
     dispatch(studentAction.loadStudentsByBatch(batch));
