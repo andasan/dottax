@@ -1,11 +1,10 @@
 import { Table, Text, Skeleton } from '@mantine/core';
+import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 
 import { useStoreSelector } from '@/lib/hooks';
 import { studentState } from '@/store/index';
 import TableRow from './table-row';
-import { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
-
 
 export default function RecentActivityTable(/*props*/) {
   const { populateStudents, loading } = useStoreSelector(studentState);

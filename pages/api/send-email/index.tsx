@@ -1,13 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { render } from '@react-email/render';
-import nodemailer from 'nodemailer';
 import prisma from '@/lib/prisma';
-import path from 'path';
-import fs from 'fs';
 
 import EmailTemplate from '@/email/emails/ciccc-t2202';
 import cloudinary from '@/utils/cloudinary';
 import { config } from '@/lib/config';
+import apiInstance, { sendSmtpEmail } from '@/lib/sendinblue';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { email, id } = req.body;
@@ -60,15 +58,6 @@ function sendEmail({
 }: StudentProps): Promise<{ message: string; status: number }> {
   return new Promise((resolve, reject) => {
     try {
-      const transporter = nodemailer.createTransport({
-        host: config.email.host,
-        port: 587,
-        auth: {
-          user: config.email.username,
-          pass: config.email.password,
-        },
-      });
-
       // cloudinary.v2.api.resources().then((result) => console.log(result))
 
       const identifier = `${firstName.split(' ').join('_')}_${lastName.split(' ').join('_')}`
@@ -85,29 +74,37 @@ function sendEmail({
           const emailHtml = render(<EmailTemplate studentName={firstName} />, { pretty: true });
 
           const mailOptions = {
-            from: `CICCC <${config.email.from}>`,
+            from: config.email.from || 'tax@ciccc.ca',
             to: email,
-            subject: config.email.subject || '',
+            subject: config.email.subject || 'T2202 Form',
             attachments: [
               {
-                filename: 't2202-fill-21e.pdf',
-                path: result.secure_url,
-                contentType: 'application/pdf',
+                name: 't2202-fill-21e.pdf',
+                url: result.secure_url,
               },
             ],
             html: emailHtml,
           };
 
-          transporter.sendMail(mailOptions, (error: any, info) => {
-            if (error) {
-              reject({
-                message: error.message || error.response,
-                status: error.responseCode || 500,
-              });
-            } else {
-              console.info(`Email sent [${email}]: ${info.response}`);
-              resolve({ message: `Email sent to ${email}`, status: 250 });
-            }
+          const { to, from, subject, attachments, html } = mailOptions;
+
+          sendSmtpEmail.subject = subject;
+          sendSmtpEmail.htmlContent = html;
+          sendSmtpEmail.sender = { "name": "Tax CICCC", "email": from };
+          sendSmtpEmail.to = [{ "email": to, "name": `${firstName} ${lastName}` }];
+          sendSmtpEmail.replyTo = { "email": "tax@ciccc.ca", "name": "Tax CICCC" };
+          sendSmtpEmail.attachment = attachments;
+
+          apiInstance.sendTransacEmail(sendSmtpEmail).then(async function (data: any) {
+            // console.info('API called successfully. Returned data: ' + JSON.stringify(data));
+            resolve({ message: `Email sent to ${email}`, status: 250 });
+
+          }, function (error: any) {
+            console.error(error);
+            reject({
+              message: error.message || error.response,
+              status: error.responseCode || 500,
+            });
           });
         }
       });

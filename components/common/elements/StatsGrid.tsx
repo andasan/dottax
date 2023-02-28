@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { createStyles, Group, Paper, SimpleGrid, Text } from '@mantine/core'
 import { IconArrowDownRight, IconArrowUpRight } from '@tabler/icons-react'
+import dayjs from 'dayjs'
 
 import type { StatCardType } from '@/types/component.types'
 import { icons } from '@/utils/data'
@@ -47,7 +48,6 @@ export default function StatsGrid() {
 
       fetchAggregate()
     }
-
   }, [])
 
   const statCards:StatCardType[] = [
@@ -58,10 +58,10 @@ export default function StatsGrid() {
       value: aggregate?.delivered
     },
     {
-      diff: 'clicks',
-      icon: 'click',
-      title: 'Clicks',
-      value: aggregate?.clicks
+      diff: 'opens',
+      icon: 'open',
+      title: 'Opens',
+      value: aggregate?.opens
     },
     {
       diff: 'bounces',
@@ -100,7 +100,7 @@ export default function StatsGrid() {
         </Group>
 
         <Text size="xs" color="dimmed" mt={7}>
-          Compared to previous month
+          Aggregated from {dayjs().subtract(90, 'day').format('YYYY-MM-DD')} to {dayjs().format('YYYY-MM-DD')}
         </Text>
       </Paper>
     )

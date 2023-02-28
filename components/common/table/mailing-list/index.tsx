@@ -3,7 +3,7 @@
 import React, { Dispatch, useEffect, useMemo, useState } from "react";
 
 import { MantineReactTable, MRT_ColumnDef } from "mantine-react-table";
-import { Badge, Box, Button, Divider, Drawer, Menu, Text, Title } from "@mantine/core";
+import { Badge, Box, Button, Divider, Drawer, Menu, Text, Title, Tooltip } from "@mantine/core";
 import { useModals } from '@mantine/modals';
 import { IconUserCircle, IconSend, IconDeviceFloppy, IconEdit, IconMailForward, IconBackspace, IconDotsVertical, IconPlus, IconTrash } from "@tabler/icons-react";
 import { cleanNotifications, showNotification } from "@mantine/notifications";
@@ -21,7 +21,6 @@ interface MailingListTableProps {
   pageSize: number;
 }
 
-
 export default function MailingListTable({ batchData, batch, pageSize }: MailingListTableProps) {
   const { studentsByBatch } = useStoreSelector(studentState);
   const [data, setData] = useState<BatchData[]>([]);
@@ -35,7 +34,30 @@ export default function MailingListTable({ batchData, batch, pageSize }: Mailing
   const dispatch = useStoreDispatch();
 
   useEffect(() => {
-    setData(batchData);
+
+    const fetchEvents = async () => {
+      const response = await fetch("/api/email/activity", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ event: "bounces" }),
+      });
+      const { body: { events } } = await response.json();
+
+      const updatedData = batchData.map((student) => {
+        const bounce = events.find((event: any) => event.email === student.email);
+        if (bounce) {
+          return { ...student, status: "bounced", bouncedReason: bounce.reason };
+        }
+        return student;
+      });
+
+      setData(updatedData);
+    }
+
+    fetchEvents();
+
   }, [batchData]);
 
   useEffect(() => {
@@ -138,13 +160,16 @@ export default function MailingListTable({ batchData, batch, pageSize }: Mailing
       size: 200,
       Cell: ({ cell }) => {
         const status = cell.getValue() as string;
+        const reason = cell.row.original.bouncedReason || undefined;
         return (
-          <Badge color={status === 'idle' ? 'yellow' : 'blue'}>{status}</Badge>
+          <Tooltip label={reason || status} color="yellow" multiline width={reason ? 250 : 100} position="left" transition="skew-up" transitionDuration={300}>
+            <Badge color={status === 'idle' && 'yellow' || status === 'bounced' ? 'red' : 'blue'}>{status}</Badge>
+          </Tooltip>
         )
       },
       filterFn: 'equals',
       mantineFilterSelectProps: {
-        data: ['Idle', 'Sent'] as any,
+        data: ['Idle', 'Sent', 'Bounced'] as any,
       },
       filterVariant: 'select',
     }

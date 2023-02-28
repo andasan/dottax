@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { render } from '@react-email/render';
-import nodemailer from 'nodemailer';
 import prisma from '@/lib/prisma';
 import async from 'async';
 import cron from 'node-cron';
@@ -9,9 +8,20 @@ import EmailTemplate from '@/email/emails/ciccc-t2202';
 import cloudinary from '@/utils/cloudinary';
 import { config } from '@/lib/config';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import apiInstance, { sendSmtpEmail } from '@/lib/sendinblue';
+
+const cronJobSchedule = {
+  oneMinute: '*/1 * * * * *',
+  twoMinutes: '*/2 * * * * *',
+  oneHour: '0 0 */1 * * *',
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try{
+  dayjs.extend(utc)
+  dayjs.extend(timezone)
+  try {
     const studentsEmailList = async (BATCH_NUMBER: number, BULK_LIMIT: number) => await prisma.student.findMany({
       where: {
         batch: Number(BATCH_NUMBER),
@@ -27,10 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       take: Number(BULK_LIMIT),
     });
 
-    //cron job every 2 minutes
-    // const cronJob = cron.schedule('*/2 * * * *', async () => {
-      //cron job per hour
-    const cronJob = cron.schedule('0 0 */1 * * *', async () => {
+    const cronJob = cron.schedule(cronJobSchedule.oneHour, async () => {
 
       const BULK_LIMIT = req.body?.take
       const BATCH_NUMBER = req.body?.batch
@@ -38,20 +45,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const getList = await studentsEmailList(BATCH_NUMBER, BULK_LIMIT)
 
       if (getList.length > 0) {
-        cronJob.start();
-        const result = await sendBulkEmail(getList);
-        // res.status(200).json({ message: `Bulk email is currently tasked to send ${req.body.take} emails every hours starting from ${dayjs().hour() + 1}:00`, status: 250, ...(result.data && { data: result?.data }) });
+        const result = await sendBulkEmail(getList, BULK_LIMIT);
       } else {
         cronJob.stop();
-        // res.status(200).json({ message: 'All students have received an email blast' });
       }
     }, {
       scheduled: true,
       timezone: 'America/Vancouver'
     });
+    cronJob.start();
 
-    res.status(250).json({ message: `Bulk email is currently tasked to send ${req.body.take} emails every hour starting from ${dayjs().hour() + 1}:00`, status: 250 });
-  }catch(err){
+    res.status(250).json({ message: `Bulk email is currently tasked to send ${req.body.take} emails every hour starting from ${dayjs().tz('America/Vancouver').hour() + 1}:00`, status: 250 });
+  } catch (err) {
     res.status(500).json(err)
   }
 }
@@ -74,49 +79,45 @@ type MailOptionsProps = {
   text?: string;
   attachments?: any[];
   html?: string;
+  firstName?: string;
+  lastName?: string;
 };
 
-async function sendBulkEmail(studentsEmailList: StudentEmailProps) {
+async function sendBulkEmail(studentsEmailList: StudentEmailProps, take: number) {
   //Retrieve a list of emails with attachments
   const batchEmailWithAttachments = await getAttachments(studentsEmailList);
 
   try {
-    const transporter = nodemailer.createTransport({
-      host: config.email.host,
-      port: 587,
-      auth: {
-        user: config.email.username,
-        pass: config.email.password,
-      },
-    });
 
-    // create a queue with a concurrency of 2
     const emailQueue = async.queue((mailOptions: MailOptionsProps, callback) => {
-      const { to, id } = mailOptions;
+      const { to, id, from, subject, attachments, html, firstName, lastName } = mailOptions;
 
-      // send the email
-      transporter.sendMail(mailOptions, async (error, info) => {
-        if (error) {
-          // handle any errors
-          throw new Error('LOG ERROR: ' + error);
-        } else {
-          // email was sent successfully
-          console.info(`Email sent: ${info.response}. Recipient: ${to}`);
+      sendSmtpEmail.subject = subject;
+      sendSmtpEmail.htmlContent = html;
+      sendSmtpEmail.sender = { "name": "Tax CICCC", "email": from };
+      sendSmtpEmail.to = [{ "email": to, "name": `${firstName} ${lastName}` }];
+      sendSmtpEmail.replyTo = { "email": "tax@ciccc.ca", "name": "Tax CICCC" };
+      sendSmtpEmail.attachment = attachments;
 
-          //update the status of the student
-          await prisma.student.update({
-            where: {
-              id: id,
-            },
-            data: {
-              status: 'sent',
-            },
-          });
-        }
-        // call the callback to indicate that the task is complete
-        callback();
+      apiInstance.sendTransacEmail(sendSmtpEmail).then(async function (data: any) {
+        // console.info('API called successfully. Returned data: ' + JSON.stringify(data));
+        console.log('API called successfully: ' + to);
+
+        //update the status of the student
+        await prisma.student.update({
+          where: {
+            id: id,
+          },
+          data: {
+            status: 'sent',
+          },
+        });
+
+      }, function (error: any) {
+        console.error(error);
+        throw new Error('LOG ERROR: ' + error);
       });
-    }, 2);
+    }, take);
 
     // send the emails with unique attachments
     batchEmailWithAttachments.forEach((recipient, i) => {
@@ -126,17 +127,18 @@ async function sendBulkEmail(studentsEmailList: StudentEmailProps) {
       // create the email options
       emailQueue.push({
         id: recipient.id,
-        from: `CICCC <${config.email.from || ''}>`,
+        from: config.email.from || 'tax@ciccc.ca',
         to: recipient.email,
-        subject: config.email.subject || '',
+        subject: config.email.subject || 'T2202 Form',
         attachments: [
           {
-            filename: 't2202-fill-21e.pdf',
-            path: recipient.attachmentPath,
-            contentType: 'application/pdf',
+            name: 't2202-fill-21e.pdf',
+            url: recipient.attachmentPath,
           },
         ],
         html: emailHtml,
+        firstName: recipient.firstName,
+        lastName: recipient.lastName,
       });
     });
 
@@ -183,7 +185,7 @@ async function getAttachments(data: StudentEmailProps) {
           if (error) {
             resolve(acc)
           } else {
-            resolve([...acc, { id, firstName, email, attachmentPath: result.secure_url }])
+            resolve([...acc, { id, firstName, lastName, email, attachmentPath: result.secure_url }])
           }
         });
       })
