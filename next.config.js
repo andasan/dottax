@@ -20,6 +20,7 @@ const nextConfig = {
     appDir: true,
     serverComponentsExternalPackages: ["prisma", "@prisma/client"],
     swcPlugins: [["next-superjson-plugin", {}]],
+    disableOptimizedLoading: true,
   },
   images: {
     domains: ["images.unsplash.com","img.freepik.com"]
