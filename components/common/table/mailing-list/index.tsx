@@ -162,7 +162,7 @@ export default function MailingListTable({ batchData, batch, pageSize }: Mailing
         const status = cell.getValue() as string;
         const reason = cell.row.original.bouncedReason || undefined;
         return (
-          <Tooltip label={reason || status} color="yellow" multiline width={reason ? 250 : 100} position="left" transition="skew-up" transitionDuration={300}>
+          <Tooltip sx={{ overflowWrap: "break-word" }} label={reason || status} color="yellow" multiline width={reason ? 250 : 100} position="left" transition="skew-up" transitionDuration={300}>
             <Badge color={status === 'idle' && 'yellow' || status === 'bounced' ? 'red' : 'blue'}>{status}</Badge>
           </Tooltip>
         )
@@ -190,11 +190,11 @@ export default function MailingListTable({ batchData, batch, pageSize }: Mailing
         sx: { borderBottom: 'unset', marginTop: '8px' },
         variant: 'filled',
       }}
-
+      enableStickyHeader
       enablePinning
       enableRowActions
       // enableRowSelection
-      initialState={{ showColumnFilters: false }}
+      initialState={{ showColumnFilters: true }}
       positionToolbarAlertBanner="bottom"
       renderRowActionMenuItems={({ row }) => (
         <RowActions student={row.original} toggleDrawer={toggleDrawer} />
