@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, createStyles, Group, Paper, Progress, SimpleGrid, Text } from '@mantine/core';
+import { createStyles, Group, Paper, Progress, Text } from '@mantine/core';
 import { IconArrowUpRight, IconDeviceAnalytics } from '@tabler/icons-react';
 
 import { useStoreSelector } from '@/lib/hooks';
@@ -49,7 +49,7 @@ export default function SentMailStats() {
     setEmailState({
       sent,
       total,
-      average: parseInt(((sent / total) * 100).toFixed(0))
+      average: parseInt(((sent / total) * 100).toFixed(2))
     });
   }, [populateStudents]);
 
@@ -58,28 +58,15 @@ export default function SentMailStats() {
   const segments = [{
     color: '#47D6AB',
     label: averageSent > 10 ? `${emailState.sent} Sent` : undefined,
-    value: averageSent
+    value: averageSent,
+    tooltip: `${emailState.sent} Sent`
   },
   {
     color: '#333',
     label: (100-averageSent) > 10 ? `${emailState.total-emailState.sent} Remaining` : undefined,
-    value: 100 - averageSent
+    value: 100 - averageSent,
+    tooltip: `${emailState.total-emailState.sent} Remaining`
   }]
-
-  // const descriptions = data.map((stat) => (
-  //   <Box key={stat.label} sx={{ borderBottomColor: stat.color }} className={classes.stat}>
-  //     <Text transform="uppercase" size="xs" color="dimmed" weight={700}>
-  //       {stat.label}
-  //     </Text>
-
-  //     <Group position="apart" align="flex-end" spacing={0}>
-  //       <Text weight={700}>{stat.count}</Text>
-  //       <Text color={stat.color} weight={700} size="sm" className={classes.statCount}>
-  //         {stat.part}%
-  //       </Text>
-  //     </Group>
-  //   </Box>
-  // ));
 
   return (
     <Paper withBorder p="md" radius="md">
@@ -89,7 +76,7 @@ export default function SentMailStats() {
             Emails Delivered
           </Text>
           <Text color="teal" className={classes.diff} size="sm" weight={700}>
-            <span>{emailState.average}%</span>
+            <span>{emailState.average.toFixed(2)}%</span>
             <IconArrowUpRight
               size={16}
               style={{ marginBottom: 4 }}

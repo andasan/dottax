@@ -36,7 +36,12 @@ export default async function StudentBatch({ params }: StudentBatchProps) {
   const data = batchData.map((student) => {
     const bounce = events.find((event: any) => event.email === student.email);
     if (bounce) {
-      return { ...student, status: "bounced", bouncedReason: bounce.reason as string, updatedAt: dayjs(student.updatedAt).format("DD/MM/YYYY") };
+      return {
+        ...student,
+        status: "bounced",
+        bouncedReason: bounce.reason as string,
+        updatedAt: dayjs(student.updatedAt).format("DD/MM/YYYY")
+      };
     }
     return {...student, updatedAt: dayjs(student.updatedAt).format("DD/MM/YYYY")}
   });

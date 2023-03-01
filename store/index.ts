@@ -11,7 +11,7 @@ const store = configureStore({
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({
     serializableCheck: false,
-  }).concat(process.env.NODE_ENV === 'production' ? [] : [logger]),
+  }),
 });
 
 export default store;

@@ -1,18 +1,16 @@
-const keys = process?.env
-
 export const config = {
-  port: keys.PORT,
-  databaseURL: keys.DATABASE_URL,
-  clientUrl: keys.CLIENT_URL,
-  assetsUrl: keys.ASSETS_URL,
+  port: process.env.PORT,
+  databaseURL: process.env.DATABASE_URL,
+  clientUrl: process.env.CLIENT_URL,
+  assetsUrl: process.env.ASSETS_URL,
   email: {
-    from: keys.EMAIL_FROM,
-    subject: keys.EMAIL_SUBJECT,
+    from: process.env.EMAIL_FROM,
+    subject: process.env.EMAIL_SUBJECT,
   },
-  sibApiKey: keys.SIB_API_KEY,
+  sibApiKey: process.env.SIB_API_KEY,
   cloudinary: {
-    cloud_name: keys.CLOUDINARY_NAME,
-    api_key: keys.CLOUDINARY_API_KEY,
-    api_secret: keys.CLOUDINARY_API_SECRET,
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
   },
 }
