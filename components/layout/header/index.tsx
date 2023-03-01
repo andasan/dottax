@@ -81,7 +81,6 @@ const HeaderBar: React.FC<HeaderBarType> = ({ opened, setOpened }) => {
               mx="md"
             />
           </MediaQuery>
-          {/* <Burger opened={opened} onClick={() => setOpened((o) => !o)} size="sm" /> */}
           <Image
             style={{
               mixBlendMode: colorScheme === 'light' ? 'darken' : 'exclusion',
@@ -94,36 +93,9 @@ const HeaderBar: React.FC<HeaderBarType> = ({ opened, setOpened }) => {
         </Group>
 
         <Group>
-          {/* <Group ml={50} spacing={5} className={classes.links}>
-            <NavAction />
-          </Group> */}
           <ColorSchemeToggle />
         </Group>
       </div>
-
-      {/* <img
-        style={{
-          mixBlendMode: colorScheme === 'light' ? 'darken' : 'exclusion',
-        }}
-        height={23}
-        src={CICCCLogo.src}
-      />
-      <MediaQuery largerThan="lg" styles={{ display: 'none' }}>
-        <Burger
-          opened={opened}
-          onClick={() => setOpened((o) => !o)}
-          size="sm"
-          color={theme.colors.gray[7]}
-          mx="xl"
-        />
-      </MediaQuery>
-      <div className="mr-6 hidden w-full justify-end md:flex">
-        <NavAction />
-      </div>
-
-      <div className="hidden md:block">
-        <ColorSchemeToggle />
-      </div> */}
     </Header>
   );
 };

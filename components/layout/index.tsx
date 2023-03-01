@@ -7,9 +7,9 @@ import { useState, useEffect } from 'react'
 import { useStoreDispatch } from '@/lib/hooks';
 import { studentAction } from '@/store/index';
 
-import FooterBar from './footer/Footer'
-import HeaderBar from './header/Header'
-import NavigationBar from './navbar/navigation-bar';
+import FooterBar from '@/components/layout/footer'
+import HeaderBar from '@/components/layout/header'
+import NavigationBar from '@/components/layout/navbar/navigation-bar';
 
 type LayoutType = {
   children: React.ReactNode,
