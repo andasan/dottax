@@ -3,27 +3,24 @@
 import React, { Dispatch, useEffect, useMemo, useState } from "react";
 
 import { MantineReactTable, MRT_ColumnDef } from "mantine-react-table";
-import { Badge, Box, Button, Divider, Drawer, Menu, Text, Title, Tooltip } from "@mantine/core";
+import { Badge, Chip, Divider, Drawer, Menu, Text, Title, Tooltip } from "@mantine/core";
 import { useModals } from '@mantine/modals';
-import { IconUserCircle, IconSend, IconDeviceFloppy, IconEdit, IconMailForward, IconBackspace, IconDotsVertical, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconSend, IconEdit, IconMailForward, IconBackspace, IconDotsVertical, IconPlus, IconTrash } from "@tabler/icons-react";
 import { cleanNotifications, showNotification } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
 
 import EditProfileForm from "@/components/common/forms/edit-user";
-import { useStoreSelector, useStoreDispatch } from '@/lib/hooks';
-import { studentState, studentAction } from '@/store/index';
-import { BatchData } from "@/types/component.types";
-import { fetchDataIfEmpty } from "@/store/thunk";
+import { useStudentStore } from "@/lib/zustand";
+import { Student, MailingListTableProps } from "@/types/component.types";
 
-interface MailingListTableProps {
-  batchData: BatchData[];
-  batch: number;
-  pageSize: number;
-}
+export default function MailingListTable({ data, batch, pageSize }: MailingListTableProps) {
+  const setStudents = useStudentStore((state) => state.setStudents);
+  const removeBatch = useStudentStore((state) => state.removeBatch);
+  const updateStudent = useStudentStore((state) => state.updateStudent);
+  const students = useStudentStore((state) => state.students);
 
-export default function MailingListTable({ batchData, batch, pageSize }: MailingListTableProps) {
-  const { studentsByBatch } = useStoreSelector(studentState);
-  const [data, setData] = useState<BatchData[]>([]);
+  const [emailMode, setEmailMode] = useState('all');
+  const [tableData, setTableData] = useState<Student[]>(students);
   const [drawerOpened, toggleDrawer] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -31,44 +28,23 @@ export default function MailingListTable({ batchData, batch, pageSize }: Mailing
   });
   const router = useRouter();
   const modals = useModals();
-  const dispatch = useStoreDispatch();
 
   useEffect(() => {
-
-    const fetchEvents = async () => {
-      const response = await fetch("/api/email/activity", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ event: "bounces" }),
-      });
-      const { body: { events } } = await response.json();
-
-      const updatedData = batchData.map((student) => {
-        const bounce = events.find((event: any) => event.email === student.email);
-        if (bounce) {
-          return { ...student, status: "bounced", bouncedReason: bounce.reason };
-        }
-        return student;
-      });
-
-      setData(updatedData);
-    }
-
-    fetchEvents();
-
-  }, [batchData]);
+    setStudents(data);
+  }, []);
 
   useEffect(() => {
-    setData(studentsByBatch);
-  }, [studentsByBatch]);
+    const emailModeMap = {
+      all: students,
+      sent: students.filter(student => student.status === 'sent'),
+      idle: students.filter(student => student.status === 'idle'),
+      bounced: students.filter(student => student.status === 'bounced')
+    } as Record<string, Student[]>;
 
-  useEffect(() => {
-    dispatch(studentAction.loadStudentsByBatch(batch));
-  }, [batch]);
+    setTableData(emailModeMap[emailMode]);
+  }, [students]);
 
-  const onSubmitEditForm = async (student: any) => {
+  const onSubmitEditForm = async (student: Student) => {
     toggleDrawer(false);
 
     // Edit data in db
@@ -79,6 +55,22 @@ export default function MailingListTable({ batchData, batch, pageSize }: Mailing
       },
       body: JSON.stringify({ student }),
     });
+
+    if (!res.ok) {
+      showNotification({
+        title: 'Something went wrong!',
+        message: `Unable to update student ${student.studentId}`,
+        color: 'red',
+      });
+    } else {
+      showNotification({
+        title: 'Update Student',
+        message: `You have successfully updated student ${student.studentId}`,
+        color: 'teal',
+      });
+
+      updateStudent(student);
+    }
   }
 
   const handleSendBulkEmail = async () => {
@@ -128,28 +120,43 @@ export default function MailingListTable({ batchData, batch, pageSize }: Mailing
         message: `You have successfully deleted batch ${batch}`,
         color: 'teal',
       });
+      removeBatch(batch);
       router.push('/dashboard');
-
-      //update redux to remove batch
-      dispatch(studentAction.deleteBatch(batch));
     }
   };
 
-  const columns = useMemo<MRT_ColumnDef<BatchData>[]>(() => [
+  const handleEmailMode = (value: any) => {
+    switch (value) {
+      case 'sent':
+      case 'idle':
+      case 'bounced':
+        setTableData(
+          students.filter(
+            (item: Student) => item.status.toLowerCase() === value.toLowerCase()
+          )
+        );
+        break;
+      default:
+        setTableData(students);
+        break;
+    }
+
+    setEmailMode(value);
+  };
+
+  const columns = useMemo<MRT_ColumnDef<Student>[]>(() => [
     {
-      accessorKey: "firstName", //accessorKey used to define `data` column. `id` gets set to accessorKey automatically
-      enableClickToCopy: true,
+      accessorKey: "firstName",
       header: "First Name",
       size: 200
     },
     {
-      accessorKey: "lastName", //accessorKey used to define `data` column. `id` gets set to accessorKey automatically
-      enableClickToCopy: true,
+      accessorKey: "lastName",
       header: "Last Name",
       size: 200
     },
     {
-      accessorKey: "email", //accessorKey used to define `data` column. `id` gets set to accessorKey automatically
+      accessorKey: "email",
       enableClickToCopy: true,
       header: "Email",
       size: 200
@@ -178,7 +185,7 @@ export default function MailingListTable({ batchData, batch, pageSize }: Mailing
   return (
     <MantineReactTable
       columns={columns}
-      data={data}
+      data={tableData}
       enableColumnOrdering
       onPaginationChange={setPagination} //hoist pagination state to your state when it changes internally
       state={{ pagination }} //pass the pagination state to the table
@@ -190,6 +197,9 @@ export default function MailingListTable({ batchData, batch, pageSize }: Mailing
         sx: { borderBottom: 'unset', marginTop: '8px' },
         variant: 'filled',
       }}
+      mantineTopToolbarProps={{
+        sx: { zIndex: 5 },
+      }}
       enableStickyHeader
       enablePinning
       enableRowActions
@@ -199,109 +209,73 @@ export default function MailingListTable({ batchData, batch, pageSize }: Mailing
       renderRowActionMenuItems={({ row }) => (
         <RowActions student={row.original} toggleDrawer={toggleDrawer} />
       )}
-      renderTopToolbarCustomActions={({ table }) => {
-        // const handleDeactivate = () => {
-        //   table.getSelectedRowModel().flatRows.map((row) => {
-        //     alert("deactivating " + row.getValue("name"));
-        //   });
-        // };
+      renderTopToolbarCustomActions={({ table }) => (
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <Drawer
+            opened={drawerOpened}
+            onClose={() => toggleDrawer(false)}
+            title="Modify Student Profile"
+            padding="xl"
+            size="xl"
+          >
+            <EditProfileForm submitForm={onSubmitEditForm} />
+          </Drawer>
 
-        // const handleActivate = () => {
-        //   table.getSelectedRowModel().flatRows.map((row) => {
-        //     alert("activating " + row.getValue("name"));
-        //   });
-        // };
+          <Title order={2}>Batch {batch}</Title>
 
-        // const handleContact = () => {
-        //   const allStudents = table.getSelectedRowModel().flatRows.map((row) => ({
-        //     firstName: row.getValue("firstName"),
-        //     lastName: row.getValue("lastName"),
-        //     email: row.getValue("email"),
-        //   }));
-        // };
+          <Menu>
+            <Menu.Target>
+              <IconDotsVertical size={18} style={{ cursor: 'pointer' }} />
+            </Menu.Target>
 
-        return (
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            <Drawer
-              opened={drawerOpened}
-              onClose={() => toggleDrawer(false)}
-              title="Modify Student Profile"
-              padding="xl"
-              size="xl"
-            >
-              <EditProfileForm submitForm={onSubmitEditForm} />
-            </Drawer>
+            <Menu.Dropdown>
+              <Menu.Label>Batch Menu</Menu.Label>
+              <Menu.Item
+                icon={<IconSend size={18} />}
+                onClick={handleSendBulkEmail}
+                color="cyan"
+              >
+                Send Bulk Email
+              </Menu.Item>
+              <Menu.Item
+                icon={<IconPlus size={14} />}
+                onClick={handleAddStudent}
+              >
+                Add Student(s)
+              </Menu.Item>
+              <Divider />
+              <Menu.Item
+                icon={<IconTrash size={14} />}
+                onClick={handleRemoveBatch}
+                color="red"
+              >
+                Delete Batch
+              </Menu.Item>
 
-            <Title order={2}>Batch {batch}</Title>
+            </Menu.Dropdown>
+          </Menu>
 
-            <Menu>
-              <Menu.Target>
-                <IconDotsVertical size={18} style={{ cursor: 'pointer' }} />
-              </Menu.Target>
-
-              <Menu.Dropdown>
-                <Menu.Label>Batch Menu</Menu.Label>
-                <Menu.Item
-                  icon={<IconSend size={18} />}
-                  onClick={handleSendBulkEmail}
-                  color="cyan"
-                >
-                  Send Bulk Email
-                </Menu.Item>
-                <Menu.Item
-                  icon={<IconPlus size={14} />}
-                  onClick={handleAddStudent}
-                >
-                  Add Student(s)
-                </Menu.Item>
-                <Divider />
-                <Menu.Item
-                  icon={<IconTrash size={14} />}
-                  onClick={handleRemoveBatch}
-                  color="red"
-                >
-                  Delete Batch
-                </Menu.Item>
-
-              </Menu.Dropdown>
-            </Menu>
-            {/* <Button
-              color="red"
-              disabled={!table.getIsSomeRowsSelected()}
-              onClick={handleDeactivate}
-              variant="filled"
-            >
-              Deactivate
-            </Button>
-            <Button
-              color="green"
-              disabled={!table.getIsSomeRowsSelected()}
-              onClick={handleActivate}
-              variant="filled"
-            >
-              Activate
-            </Button>
-            <Button
-              color="blue"
-              disabled={!table.getIsAllRowsSelected()}
-              onClick={handleContact}
-              variant="filled"
-            >
-              Contact
-            </Button> */}
-          </div>
-        );
-      }}
+          <Chip.Group value={emailMode} onChange={handleEmailMode} spacing="sm" style={{ justifyContent: "flex-end", alignItems: "center" }}>
+            <Chip value="idle">Idle</Chip>
+            <Chip value="sent">Sent</Chip>
+            <Chip value="bounced">Bounced</Chip>
+            <Chip value="all">All</Chip>
+          </Chip.Group>
+        </div>
+      )
+      }
     />
   );
 }
 
 
-const RowActions = ({ student, toggleDrawer }: { student: BatchData, toggleDrawer: Dispatch<React.SetStateAction<boolean>>; }) => {
+const RowActions = ({ student, toggleDrawer }: { student: Student, toggleDrawer: Dispatch<React.SetStateAction<boolean>>; }) => {
   const modals = useModals();
-  const dispatch = useStoreDispatch();
+  const setSelectedStudent = useStudentStore(state => state.setSelectedStudent);
+  const updateStudentState = useStudentStore(state => state.updateStudentState);
+  const removeStudent = useStudentStore(state => state.removeStudent);
 
-  const handleSendEmail = async (student: BatchData) => {
+  const handleSendEmail = async (student: Student) => {
     showNotification({
       title: 'Sending mail',
       message: "Please wait...",
@@ -329,7 +303,9 @@ const RowActions = ({ student, toggleDrawer }: { student: BatchData, toggleDrawe
         message: message,
         color: 'teal',
       });
-      dispatch(studentAction.updateStudentStatus({ id: student.id, status: "sent" }));
+
+      updateStudentState({ ...student, status: "sent" })
+
     } else {
       showNotification({
         title: 'Error',
@@ -340,7 +316,7 @@ const RowActions = ({ student, toggleDrawer }: { student: BatchData, toggleDrawe
     }
   }
 
-  const deleteProfile = async (student: BatchData) => {
+  const deleteProfile = async (student: Student) => {
     modals.openConfirmModal({
       title: 'Delete profile',
       children: (
@@ -357,7 +333,7 @@ const RowActions = ({ student, toggleDrawer }: { student: BatchData, toggleDrawe
     });
   };
 
-  const onDeleteProfile = async (student: BatchData) => {
+  const onDeleteProfile = async (student: Student) => {
     // remove data in db
     const res = await fetch('/api/delete-student', {
       method: 'POST',
@@ -367,7 +343,7 @@ const RowActions = ({ student, toggleDrawer }: { student: BatchData, toggleDrawe
       body: JSON.stringify({ id: student.id }),
     });
 
-    dispatch(studentAction.deleteStudent(student.id));
+    removeStudent(student.id);
 
     if (!res.ok) {
       showNotification({
@@ -396,7 +372,7 @@ const RowActions = ({ student, toggleDrawer }: { student: BatchData, toggleDrawe
       <Menu.Item
         icon={<IconEdit size={14} />}
         onClick={() => {
-          dispatch(studentAction.selectedProfileData(student));
+          setSelectedStudent(student);
           toggleDrawer(true);
         }}
       >

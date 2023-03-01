@@ -1,11 +1,11 @@
-import { createStyles, Navbar, ScrollArea, Skeleton } from '@mantine/core';
+import { createStyles, Navbar, ScrollArea } from '@mantine/core';
 
 import { navData } from '@/data/navData';
-import { useStoreSelector } from '@/lib/hooks';
-import { studentState } from '@/store/index';
+import { useStudentStore } from '@/lib/zustand';
 
 import LinksGroup from './nav-link-group';
 import { UserButton } from './user-button';
+import { useEffect } from 'react';
 
 const useStyles = createStyles((theme) => ({
   navbar: {
@@ -19,9 +19,8 @@ const useStyles = createStyles((theme) => ({
     marginLeft: -theme.spacing.md,
     marginRight: -theme.spacing.md,
     color: theme.colorScheme === 'dark' ? theme.white : theme.black,
-    borderBottom: `1px solid ${
-      theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]
-    }`,
+    borderBottom: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]
+      }`,
   },
 
   links: {
@@ -37,9 +36,8 @@ const useStyles = createStyles((theme) => ({
   footer: {
     marginLeft: -theme.spacing.md,
     marginRight: -theme.spacing.md,
-    borderTop: `1px solid ${
-      theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]
-    }`,
+    borderTop: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]
+      }`,
   },
 }));
 
@@ -48,19 +46,20 @@ interface NavigationBarProps {
 }
 
 export default function NavigationBar({ opened }: NavigationBarProps) {
-  const { loading, batches } = useStoreSelector(studentState);
+  const fetchBatches = useStudentStore((state) => state.fetchBatches);
+  const batches = useStudentStore((state) => state.batches);
   const { classes } = useStyles();
+
+  useEffect(() => {
+    fetchBatches();
+  }, [])
 
   const links = navData(batches).map((item) => <LinksGroup {...item} key={item.label} />);
 
   return (
     <Navbar width={{ sm: 300 }} hidden={opened} p="md" className={classes.navbar}>
       <Navbar.Section grow className={classes.links} component={ScrollArea}>
-        {loading ? (
-          <Skeleton height={40} radius="sm" />
-        ) : (
-          <div className={classes.linksInner}>{links}</div>
-        )}
+        <div className={classes.linksInner}>{links}</div>
       </Navbar.Section>
 
       <Navbar.Section className={classes.footer}>

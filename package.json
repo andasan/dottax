@@ -100,7 +100,8 @@
     "sib-api-v3-typescript": "^2.2.2",
     "superjson": "^1.12.2",
     "uuid": "^9.0.0",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.2/xlsx-0.19.2.tgz"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.2/xlsx-0.19.2.tgz",
+    "zustand": "^4.3.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",

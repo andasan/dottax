@@ -1,37 +1,30 @@
-import { Student } from '@/types/schema.types';
-import { Button, TextInput, Switch } from '@mantine/core';
+import { Button, TextInput, Switch, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
-import { useStoreDispatch, useStoreSelector } from '@/lib/hooks';
-import { studentAction, studentState } from '@/store/index';
+import { useStudentStore } from '@/lib/zustand';
+import { Student } from '@/types/component.types';
 
 interface EditProfileFormProps {
-  submitForm: (newUser: Student) => void;
+  submitForm: (student: Student) => Promise<void>
 }
 
 export default function EditProfileForm({ submitForm }: EditProfileFormProps) {
-  const { studentSelected: data } = useStoreSelector(studentState);
-  const dispatch = useStoreDispatch();
+  const selectedStudent = useStudentStore((state) => state.selectedStudent);
 
   const form = useForm({
-    initialValues: data,
+    initialValues: selectedStudent,
 
     validate: {
       firstName: (value) => (value.length > 0 ? null : 'First name is required'),
       lastName: (value) => (value.length > 0 ? null : 'Last name is required'),
       email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
       studentId: (value) => (value.length > 0 ? null : 'Student ID is required'),
-      status: (value) => (value.length > 0 ? null : 'Status is required'),
     },
   });
 
   return (
-    // <form onSubmit={form.onSubmit((values) => submitForm(data, values))}>
     <form
-      onSubmit={form.onSubmit((values) => {
-        submitForm(values)
-        dispatch(studentAction.updateStudent(values));
-      })}
+      onSubmit={form.onSubmit(submitForm)}
     >
       <TextInput label="First Name" placeholder="First Name" {...form.getInputProps('firstName')} />
       <TextInput
@@ -47,7 +40,14 @@ export default function EditProfileForm({ submitForm }: EditProfileFormProps) {
         placeholder="Student ID"
         {...form.getInputProps('studentId')}
       />
-      <Switch
+      <Select
+        data={['idle', 'sent', 'bounced']}
+        mt={20}
+        label="Status"
+        placeholder="Status"
+        {...form.getInputProps('status')}
+      />
+      {/* <Switch
         mt={20}
         size="lg"
         onLabel="Sent"
@@ -57,7 +57,7 @@ export default function EditProfileForm({ submitForm }: EditProfileFormProps) {
         onChange={(event) =>
           form.setFieldValue('status', event.currentTarget.checked ? 'sent' : 'idle')
         }
-      />
+      /> */}
 
       <Button mt={20} type="submit">
         Edit

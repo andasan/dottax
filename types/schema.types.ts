@@ -12,7 +12,3 @@ export type Student = Prisma.StudentGetPayload<{
     updatedAt: true;
   };
 }>;
-
-export type StudentProps = {
-  students: Student[];
-};

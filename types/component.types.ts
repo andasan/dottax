@@ -49,15 +49,24 @@ export type LoginCredentialsType = {
   confirmPassword?: string;
 }
 
-export type BatchData = {
+export interface Student {
   id: number;
-  email: string;
   firstName: string;
   lastName: string;
+  email: string;
   studentId: string;
-  status?: string;
+  batch: number;
+  status: string;
+  updatedAt: string;
   bouncedReason?: string;
 }
+
+export interface MailingListTableProps {
+  data: Student[]
+  batch: number;
+  pageSize: number;
+}
+
 
 /**
   * Transactional email status

@@ -6,10 +6,6 @@ export const config = {
   clientUrl: keys.CLIENT_URL,
   assetsUrl: keys.ASSETS_URL,
   email: {
-    host: keys.NODEMAILER_HOST,
-    port: Number(keys.NODEMAILER_PORT),
-    username: keys.NODEMAILER_USER,
-    password: keys.NODEMAILER_PASS,
     from: keys.EMAIL_FROM,
     subject: keys.EMAIL_SUBJECT,
   },

@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { createLogger} from "redux-logger";
+import { createLogger } from "redux-logger";
 
 import { studentSlice } from "./student-slice";
 
@@ -11,7 +11,7 @@ const store = configureStore({
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({
     serializableCheck: false,
-  }).concat(process.env.NODE_ENV === 'production' ? [] : [logger]) ,
+  }).concat(process.env.NODE_ENV === 'production' ? [] : [logger]),
 });
 
 export default store;
