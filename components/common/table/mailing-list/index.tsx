@@ -20,7 +20,7 @@ export default function MailingListTable({ data, batch, pageSize }: MailingListT
   const students = useStudentStore((state) => state.students);
 
   const [emailMode, setEmailMode] = useState('all');
-  const [tableData, setTableData] = useState<Student[]>(students);
+  const [tableData, setTableData] = useState<Student[] | null>(null);
   const [drawerOpened, toggleDrawer] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -182,7 +182,7 @@ export default function MailingListTable({ data, batch, pageSize }: MailingListT
     }
   ], []);
 
-  if (!students) return (
+  if (!tableData) return (
     <>
       <Skeleton height={28} mt={20} radius="sm" />
       <Skeleton height={18} mt={8} radius="sm" />

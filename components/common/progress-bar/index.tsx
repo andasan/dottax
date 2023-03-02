@@ -57,8 +57,9 @@ export default function ProgressBar() {
 
     const handleMutation: MutationCallback = () => {
       const anchorElements = document.querySelectorAll("a");
+
       anchorElements.forEach((anchor) =>
-        anchor.addEventListener("click", handleAnchorClick)
+        !!anchor.href && anchor.addEventListener("click", handleAnchorClick)
       );
     };
 

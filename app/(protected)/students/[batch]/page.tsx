@@ -55,5 +55,5 @@ async function getData() {
     throw new Error('Failed to fetch data');
   }
 
-  return response.json().then(({ body: { events } }) => events.filter((event: any) => event.from === config.email.from));
+  return await response.json().then(({ body: { events } }) => events.filter((event: any) => event.from === config.email.from));
 }

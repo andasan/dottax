@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const data = await prisma.emailTemplate.update({
         where: {
-          id,
+          id: +id,
         },
         data: {
           header,

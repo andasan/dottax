@@ -21,8 +21,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   //create once
   // await createEmailTemplate();
 
-  console.log(students.length)
-
   const data = students.length > 0 ? students.map((student) => {
     const bounce = events.find((event: any) => event.email === student.email);
     if (bounce) {
@@ -65,7 +63,7 @@ async function createEmailTemplate(){
     throw new Error('Failed to fetch data');
   }
 
-  return response.json()
+  return await response.json()
 }
 
 async function getData() {
@@ -90,6 +88,6 @@ async function getData() {
     throw new Error('Failed to fetch data');
   }
 
-  return response.json().then(({ body: { events } }) => events.filter((event: any) => event.from === config.email.from));
+  return await response.json().then(({ body: { events } }) => events.filter((event: any) => event.from === config.email.from));
 }
 

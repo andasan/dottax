@@ -14,11 +14,11 @@ async function getData() {
 
   if (!response.ok) {
     console.error('Failed to fetch data')
-    return []
+    return [{ id: 0, header: '', body: '', footer: '' }]
     // This will activate the closest `error.js` Error Boundary
     throw new Error('Failed to fetch data');
   }
 
-  return response.json();
+  return await response.json();
 }
 
