@@ -8,11 +8,16 @@ import Link from '@tiptap/extension-link';
 import { EditorContent, useEditor, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 
-import { Box, Button, Text, Divider, Group, Modal, TextInput } from '@mantine/core';
-import { IconList, IconStrikethrough, IconBold, IconItalic, IconIndentIncrease, IconH1, IconH2, IconH3, IconH4, IconH5, IconH6, IconListNumbers, IconSeparatorHorizontal, IconBlockquote, IconCornerDownLeft, IconArrowBackUp, IconArrowForwardUp, IconClearFormatting, IconLink } from '@tabler/icons-react';
+import { Box, Button, Text, Divider, Group, Modal, TextInput, Skeleton } from '@mantine/core';
+import { IconList, IconStrikethrough, IconBold, IconItalic, IconIndentIncrease, IconH1, IconH2, IconH3, IconH4, IconH5, IconH6, IconListNumbers, IconSeparatorHorizontal, IconBlockquote, IconCornerDownLeft, IconArrowBackUp, IconArrowForwardUp, IconClearFormatting, IconLink, IconBrandHtml5 } from '@tabler/icons-react';
 import { FormValues } from '@/screens/email-template';
 
-const MenuBar = ({ editor }: { editor: Editor }) => {
+interface MenuBarProps {
+  editor: Editor;
+  setToggleHtml: Dispatch<SetStateAction<boolean>>;
+}
+
+const MenuBar = ({ editor, setToggleHtml }: MenuBarProps) => {
   const [url, setUrl] = useState<string>("");
   const [modalIsOpen, setIsOpen] = useState(false);
 
@@ -175,6 +180,9 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
         >
           <IconArrowForwardUp size={12} />
         </Button>
+        <Button onClick={() => setToggleHtml(t => !t)}>
+          <IconBrandHtml5 size={12} />
+        </Button>
       </Group>
     </>
   );
@@ -191,7 +199,7 @@ interface CustomTextStyleOptions extends TextStyleOptions {
 }
 
 export default function CustomTextArea({ label, templateState, setTemplateState }: CustomTextAreaProps) {
-
+  const [toggleHtml, setToggleHtml] = useState(false);
   const customTextStyleOptions: CustomTextStyleOptions = {
     types: [ListItem.name],
     HTMLAttributes: {}
@@ -213,7 +221,7 @@ export default function CustomTextArea({ label, templateState, setTemplateState 
     content: templateState.body,
   }) as Editor;
 
-  // console.log(editor.getHTML());
+  // console.log(editor?.getHTML());
 
   return (
     <>
@@ -227,9 +235,15 @@ export default function CustomTextArea({ label, templateState, setTemplateState 
         textAlign: 'left',
         minHeight: '42px',
       }}>
-        <MenuBar editor={editor} />
+        <MenuBar editor={editor} setToggleHtml={setToggleHtml} />
         <Divider mt={5} mb={20} />
-        <EditorContent editor={editor} />
+        {editor && toggleHtml ? (
+          <Box>
+            {editor.getHTML()}
+          </Box>
+        ) : (
+          <EditorContent editor={editor} />
+        )}
       </Box>
     </>
   );

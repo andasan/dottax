@@ -16,7 +16,6 @@ import { config } from '@/lib/config';
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
 
   const events = await getData();
-  console.log("EVENTS: ", events.length)
   const students = await getStudents();
 
   const data = students.length > 0 ? students.map((student) => {

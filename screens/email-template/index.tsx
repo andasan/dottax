@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   Paper,
@@ -22,10 +22,6 @@ import { CustomTextArea } from '@/components/common';
 
 const fontFamily =
   '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif';
-
-const main = {
-  backgroundColor: '#dbddde',
-};
 
 const sectionLogo = {
   marginLeft: 0,
@@ -65,28 +61,11 @@ const paragraph = {
   color: '#3c4043',
 };
 
-const link = {
-  ...paragraph,
-  color: '#004dcf',
-};
-
-const hr = {
-  borderColor: '#e8eaed',
-  margin: '20px 0',
-};
-
 export type FormValues = {
   header: string;
   body: string;
   footer: string;
 };
-
-// `<p>A digital Tuition Enrolment Certificate (T2202) has been issued to you and is ready for viewing.
-//     Please see the attached file for your T2202.</p>
-//     <p>If you have any queries, please contact <a href="mailto:info@ciccc.ca">here</a></p>
-
-//     Thank you,<br>
-//     Cornerstone International Community College Admin`,
 
 export default function EmailTemplatePage() {
 
