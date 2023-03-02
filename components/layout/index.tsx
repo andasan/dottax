@@ -9,6 +9,7 @@ import FooterBar from '@/components/layout/footer'
 import HeaderBar from '@/components/layout/header'
 import NavigationBar from '@/components/layout/navbar/navigation-bar';
 import { useStudentStore } from '@/lib/zustand';
+import ProgressBar from '@/components/common/progress-bar';
 
 type LayoutType = {
   children: React.ReactNode,
@@ -28,6 +29,8 @@ export default function Layout({ children, students }: LayoutType) {
   }, [])
 
   return (
+    <>
+    <ProgressBar />
     <AppShell
       styles={{
         main: {
@@ -46,5 +49,6 @@ export default function Layout({ children, students }: LayoutType) {
     >
       {children}
     </AppShell>
+    </>
   )
 }

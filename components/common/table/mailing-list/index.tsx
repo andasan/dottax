@@ -73,15 +73,15 @@ export default function MailingListTable({ data, batch, pageSize }: MailingListT
     }
   }
 
-  const handleSendBulkEmail = async () => {
+  const handleSendBulkEmail = () => {
     router.push(`/batch-email/${batch}`);
   };
 
-  const handleAddStudent = async () => {
+  const handleAddStudent = () => {
     router.push(`/add-student/${batch}`);
   };
 
-  const handleRemoveBatch = async () => {
+  const handleRemoveBatch = () => {
     modals.openConfirmModal({
       title: 'Delete batch',
       children: (
@@ -182,7 +182,7 @@ export default function MailingListTable({ data, batch, pageSize }: MailingListT
     }
   ], []);
 
-  if (tableData.length === 0) return (
+  if (!students) return (
     <>
       <Skeleton height={28} mt={20} radius="sm" />
       <Skeleton height={18} mt={8} radius="sm" />
@@ -224,7 +224,7 @@ export default function MailingListTable({ data, batch, pageSize }: MailingListT
         <RowActions student={row.original} toggleDrawer={toggleDrawer} />
       )}
       renderTopToolbarCustomActions={({ table }) => (
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center", marginTop: "10px" }}>
           <Drawer
             opened={drawerOpened}
             onClose={() => toggleDrawer(false)}
@@ -235,7 +235,7 @@ export default function MailingListTable({ data, batch, pageSize }: MailingListT
             <EditProfileForm submitForm={onSubmitEditForm} />
           </Drawer>
 
-          <Title order={2}>Batch {batch}</Title>
+          <Title ml={5} order={2}>Batch {batch}</Title>
 
           <Menu position="right-start" withArrow>
             <Menu.Target>

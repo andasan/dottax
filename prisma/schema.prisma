@@ -30,3 +30,12 @@ model Student {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
+
+model EmailTemplate {
+  id        Int       @id @default(autoincrement())
+  header    String
+  body      String
+  footer    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}

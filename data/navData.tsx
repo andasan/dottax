@@ -14,7 +14,7 @@ export const navData = (batchLinks: number[]): NavLinkType[] => [
   {
     label: 'Students',
     icon: IconNotes,
-    initiallyOpened: true,
+    initiallyOpened: false,
     links: batchLinks.map((batch) => ({ label: `Batch ${batch}`, link: `/students/${+batch}` })),
   },
   { label: 'Settings',
