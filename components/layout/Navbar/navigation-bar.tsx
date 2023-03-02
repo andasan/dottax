@@ -46,13 +46,8 @@ interface NavigationBarProps {
 }
 
 export default function NavigationBar({ opened }: NavigationBarProps) {
-  const fetchBatches = useStudentStore((state) => state.fetchBatches);
   const batches = useStudentStore((state) => state.batches);
   const { classes } = useStyles();
-
-  useEffect(() => {
-    fetchBatches();
-  }, [])
 
   const links = navData(batches).map((item) => <LinksGroup {...item} key={item.label} />);
 

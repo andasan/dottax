@@ -6,6 +6,7 @@ export interface StudentStore {
     selectedStudent: Student;
     students: Student[];
     batches: number[];
+    loading: boolean;
     setSelectedStudent: (student: Student) => void;
     updateStudent: (student: Student) => void;
     fetchStudents: () => void;
@@ -20,6 +21,7 @@ export const useStudentStore = create<StudentStore>((set, get) => ({
     selectedStudent: {} as Student,
     students: [],
     batches: [],
+    loading: false,
     setSelectedStudent: (student: Student) => {
         set({ selectedStudent: student })
     },
@@ -28,11 +30,13 @@ export const useStudentStore = create<StudentStore>((set, get) => ({
         set({ students })
     },
     fetchStudents: async () => {
+        set({ loading: true })
         const res = await fetch(`/api/fetch-data`)
-        set({ students: await res.json() })
+        set({ students: await res.json(), loading: false })
     },
     setStudents: (students) => {
-        set({ students })
+        set({ loading: true })
+        set({ students, loading: false })
     },
     updateStudentState: (student: Student) => {
         const students = get().students.map(s => s.id === student.id ? student : s)

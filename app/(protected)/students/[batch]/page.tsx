@@ -1,6 +1,6 @@
 import MailingListTable from "@/components/common/table/mailing-list"
 import { config } from "@/lib/config";
-import prisma from "@/lib/prisma";
+import { getStudents } from "@/lib/prisma";
 import dayjs from "dayjs";
 
 interface StudentBatchProps {
@@ -12,28 +12,12 @@ interface StudentBatchProps {
 export default async function StudentBatch({ params }: StudentBatchProps) {
   const { batch } = params
 
-  const events = await getData();
+  const events = await getData() || [];
   const PAGE_SIZE = 20;
 
-  //implement a prisma query to get the batch data
-  const batchData = Number.isInteger(+batch) ? await prisma.student.findMany({
-    where: {
-      batch: +batch,
-    },
-    select: {
-      id: true,
-      email: true,
-      firstName: true,
-      lastName: true,
-      studentId: true,
-      status: true,
-      batch: true,
-      updatedAt: true,
-    },
-    // take: 10,
-  }) : []
+  const batchData = Number.isInteger(+batch) ? await getStudents(+batch) : []
 
-  const data = batchData.map((student) => {
+  const data = batchData.length > 0 ? batchData.map((student) => {
     const bounce = events.find((event: any) => event.email === student.email);
     if (bounce) {
       return {
@@ -43,14 +27,16 @@ export default async function StudentBatch({ params }: StudentBatchProps) {
         updatedAt: dayjs(student.updatedAt).format("DD/MM/YYYY")
       };
     }
-    return {...student, updatedAt: dayjs(student.updatedAt).format("DD/MM/YYYY")}
-  });
+    return { ...student, updatedAt: dayjs(student.updatedAt).format("DD/MM/YYYY") }
+  }) : []
 
   return <MailingListTable data={data} batch={batch} pageSize={PAGE_SIZE} />
 }
 
 async function getData() {
-  const response = await fetch(`${config.clientUrl}/api/email/activity`, {
+  const tempClientUrl = process.env.VERCEL_URL;
+  const apiUrl = config.clientUrl || `https://${tempClientUrl}`;
+  const response = await fetch(apiUrl + '/api/email/activity', {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -63,9 +49,11 @@ async function getData() {
 
   // Recommendation: handle errors
   if (!response.ok) {
+    console.error('Failed to fetch data')
+    return []
     // This will activate the closest `error.js` Error Boundary
     throw new Error('Failed to fetch data');
   }
 
-  return response.json().then(({ body: { events }} ) => events.filter((event: any) => event.from === config.email.from));
+  return response.json().then(({ body: { events } }) => events.filter((event: any) => event.from === config.email.from));
 }

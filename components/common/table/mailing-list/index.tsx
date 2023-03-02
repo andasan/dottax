@@ -361,7 +361,7 @@ const RowActions = ({ student, toggleDrawer }: { student: Student, toggleDrawer:
   };
 
   return (
-    <>
+    <div style={{ zIndex: 500 }}>
       <Menu.Label>{`${student.firstName} ${student.lastName}`}</Menu.Label>
       <Menu.Item
         icon={<IconMailForward size={14} />}
@@ -386,6 +386,6 @@ const RowActions = ({ student, toggleDrawer }: { student: Student, toggleDrawer:
       >
         Delete Profile
       </Menu.Item>
-    </>
+    </div>
   )
 }

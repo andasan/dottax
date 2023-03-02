@@ -1,30 +1,37 @@
 import { Table, Text, Skeleton } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat)
 
 import { useStoreSelector } from '@/lib/hooks';
 import { studentState } from '@/store/index';
 import TableRow from './table-row';
+import { useStudentStore } from '@/lib/zustand';
 
 export default function RecentActivityTable(/*props*/) {
-  const { populateStudents, loading } = useStoreSelector(studentState);
+  // const { populateStudents, loading } = useStoreSelector(studentState);
+  const students = useStudentStore(state => state.students);
+  const loading = useStudentStore(state => state.loading);
 
   const [sortedStudents, setSortedStudents] = useState<any>(null);
 
   useEffect(() => {
-    const sortedStudents2 = [...populateStudents]
-    setSortedStudents(sortedStudents2.sort(
+    // const sortedStudents2 = [...populateStudents]
+    setSortedStudents(students.sort(
       (a, b) => {
-        if (dayjs(a.updatedAt).isAfter(b.updatedAt)) {
+        const aDate = dayjs(a.updatedAt, "DD/MM/YYYY HH:mm");
+        const bDate = dayjs(b.updatedAt, "DD/MM/YYYY HH:mm");
+        if (aDate.isAfter(bDate)) {
           return -1;
-        } else if (dayjs(a.updatedAt).isBefore(b.updatedAt)) {
+        } else if (aDate.isBefore(bDate)) {
           return 1;
         } else {
           return 0;
         }
       }
     ).slice(0, 5));
-  }, [populateStudents]);
+  }, [students]);
 
 
   if(loading) {
