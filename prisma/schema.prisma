@@ -21,9 +21,7 @@ model Student {
   id        Int       @id @default(autoincrement())
   firstName String
   lastName  String
-  // email     String
   email     String    @unique
-  // studentId String
   studentId String    @unique
   batch     Int
   status    String    @default("idle")
@@ -34,7 +32,7 @@ model Student {
 model EmailTemplate {
   id        Int       @id @default(autoincrement())
   header    String
-  body      String
+  body      String    @db.Text
   footer    String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

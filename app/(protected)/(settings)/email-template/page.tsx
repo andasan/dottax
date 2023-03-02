@@ -2,7 +2,9 @@ import EmailTemplatePage from '@/screens/email-template';
 import { config } from '@/lib/config';
 
 export default async function EmailTemplate() {
-  return <EmailTemplatePage />
+  const [template] = await getData();
+
+  return <EmailTemplatePage template={template} />
 }
 
 async function getData() {

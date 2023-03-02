@@ -14,11 +14,13 @@ import {
   Divider,
   Image,
   TypographyStylesProvider,
+  Button,
 } from '@mantine/core';
 
 import { useForm } from '@mantine/form';
 
 import { CustomTextArea } from '@/components/common';
+import { showNotification } from '@mantine/notifications';
 
 const fontFamily =
   '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif';
@@ -62,30 +64,24 @@ const paragraph = {
 };
 
 export type FormValues = {
+  id: number;
   header: string;
   body: string;
   footer: string;
 };
 
-export default function EmailTemplatePage() {
+export default function EmailTemplatePage({ template }: { template: FormValues }) {
 
   const [templateState, setTemplateState] = useState<FormValues>({
-    header: 'Tuition Enrolment Certificate (T2202)',
-    body: `
-    <p><i>Do Not Reply. This is an automated email using a third-party secure portal. </i></p>
-    <p>Hello Student,</p>
-    <p>Please find attached your confidential tax form.</p>
-    <p>Your tax form contains sensitive personal information. Download it using a trusted, secure connection instead of over free, public wi-fi, such as at airports or coffee shops, etc.</p>
-    <p>If you need assistance to file your tax, please contact our preferred partner, Phoenix Accounting Services: <a href="https://phoenixcanada.ca/file-your-taxes">https://phoenixcanada.ca/file-your-taxes</a></p>
-    <p>Thank you</p>
-      `,
-    footer:
-      '© 2023 Cornerstone International College of Canada 609 West Hastings St, Vancouver, BC, Canada V6B 4W4',
+    id: +template.id,
+    header: template?.header,
+    body: template?.body,
+    footer: template?.footer,
   });
-
 
   const form = useForm({
     initialValues: {
+      id: +templateState.id,
       header: templateState.header,
       body: templateState.body,
       footer: templateState.footer,
@@ -97,6 +93,31 @@ export default function EmailTemplatePage() {
       footer: (value: string) => (value.length > 0 ? null : 'Footer is required'),
     },
   });
+
+  const handleSubmit = async (values: FormValues) => {
+
+    const response = await fetch('/api/email/template', {
+      method: 'PUT',
+      body: JSON.stringify({
+        id: values.id,
+        header: values.header,
+        body: values.body,
+        footer: values.footer,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Failed to fetch data')
+      return []
+    }
+
+    // console.log(await response.json())
+    showNotification({
+      title: 'Email template updated',
+      message: 'Email template has been updated successfully',
+      color: 'teal',
+    })
+  };
 
   const baseUrl = '/static';
 
@@ -114,7 +135,7 @@ export default function EmailTemplatePage() {
             ]}
           >
             <Stack align="stretch" spacing="xs" mt={25}>
-              <form onSubmit={form.onSubmit((values) => console.log(values))}>
+              <form onSubmit={form.onSubmit(handleSubmit)}>
                 <TextInput
                   mt={20}
                   placeholder="Header Title here"
@@ -134,6 +155,10 @@ export default function EmailTemplatePage() {
                   size="md"
                   {...form.getInputProps('footer')}
                 />
+
+                <Button type="submit" mt={20} variant="outline" color="blue">
+                  Save
+                </Button>
               </form>
             </Stack>
 

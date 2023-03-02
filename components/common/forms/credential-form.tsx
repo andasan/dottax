@@ -101,6 +101,7 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
   });
 
   const handleForm = (values: LoginCredentialsType) => {
+
     if (type === 'login') {
       signIn('credentials', {
         redirect: false,
@@ -108,6 +109,7 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
         password: values.password,
         // @ts-ignore
       }).then(({ ok, error }) => {
+        console.log(ok, error)
         setLoading(false);
         if (ok) {
           router.push('/dashboard');
@@ -126,6 +128,13 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
             color: 'red',
           });
         }
+      }).catch((err) => {
+        setLoading(false);
+        showNotification({
+          title: 'Opps!',
+          message: err,
+          color: 'red',
+        });
       });
     } else {
       fetch('/api/auth/register', {

@@ -1,13 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-import { students } from "./seeds/students";
+import { students, emailTemplates } from "./seeds/students";
 
 async function main() {
-  await prisma.student.deleteMany();
+  // await prisma.student.deleteMany();
 
-  await prisma.student.createMany({
-    data: await students()
+  await prisma.emailTemplate.create({
+    data: emailTemplates
   });
 }
 
