@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const days = undefined;
   const email = undefined;
 
-  apiInstance.getEmailEventReport(limit, offset, startDate, endDate, days, email, event).then(function (data: any) {
+  return apiInstance.getEmailEventReport(limit, offset, startDate, endDate, days, email, event).then(function (data: any) {
     // console.log('API called successfully. Returned data: ' + JSON.stringify(data));
     return res.status(200).json(data);
   }, function (error: any) {

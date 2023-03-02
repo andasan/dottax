@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { createStyles, Group, Paper, Progress, Text } from '@mantine/core';
 import { IconArrowUpRight, IconDeviceAnalytics } from '@tabler/icons-react';
 
-import { useStoreSelector } from '@/lib/hooks';
-import { studentState } from '@/store/index';
+import { useStudentStore } from '@/lib/zustand';
 
 const useStyles = createStyles((theme) => ({
   progressLabel: {
@@ -39,19 +38,19 @@ export default function SentMailStats() {
     total: 0,
     average: 0,
   });
-  const { populateStudents } = useStoreSelector(studentState);
+  const students = useStudentStore((state) => state.students);
 
   const { classes } = useStyles();
 
   useEffect(() => {
-    const sent = populateStudents.filter((student) => student.status === 'sent').length;
-    const total = populateStudents.length;
+    const sent = students.filter((student) => student.status === 'sent').length;
+    const total = students.length;
     setEmailState({
       sent,
       total,
       average: parseInt(((sent / total) * 100).toFixed(2))
     });
-  }, [populateStudents]);
+  }, [students]);
 
   const averageSent = parseInt((emailState.sent/emailState.total * 100).toFixed(2))
 

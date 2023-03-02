@@ -17,11 +17,14 @@ type LayoutType = {
 
 export default function Layout({ children, students }: LayoutType) {
   const setStudents = useStudentStore((state) => state.setStudents);
+  const fetchBatches = useStudentStore((state) => state.fetchBatches);
+
   const theme = useMantineTheme()
   const [opened, setOpened] = useState(false)
 
   useEffect(() => {
     setStudents(students);
+    fetchBatches();
   }, [])
 
   return (
