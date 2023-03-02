@@ -32,7 +32,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "pages/api/file-upload/index.js",
-    "components/common/elements/text-area.jsx"
+    "components/common/elements/text-area.tsx"
   ],
   "exclude": ["node_modules"]
 }

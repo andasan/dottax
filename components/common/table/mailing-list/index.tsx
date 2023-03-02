@@ -3,7 +3,7 @@
 import React, { Dispatch, useEffect, useMemo, useState } from "react";
 
 import { MantineReactTable, MRT_ColumnDef } from "mantine-react-table";
-import { Badge, Chip, Divider, Drawer, Menu, Text, Title, Tooltip } from "@mantine/core";
+import { Badge, Chip, Divider, Drawer, Menu, Skeleton, Text, Title, Tooltip } from "@mantine/core";
 import { useModals } from '@mantine/modals';
 import { IconSend, IconEdit, IconMailForward, IconBackspace, IconDotsVertical, IconPlus, IconTrash } from "@tabler/icons-react";
 import { cleanNotifications, showNotification } from "@mantine/notifications";
@@ -182,6 +182,18 @@ export default function MailingListTable({ data, batch, pageSize }: MailingListT
     }
   ], []);
 
+  if (tableData.length === 0) return (
+    <>
+      <Skeleton height={28} mt={20} radius="sm" />
+      <Skeleton height={18} mt={8} radius="sm" />
+      <Skeleton height={18} mt={8} radius="sm" />
+      <Skeleton height={18} mt={8} radius="sm" />
+      <Skeleton height={18} mt={8} radius="sm" />
+      <Skeleton height={18} mt={8} radius="sm" />
+      <Skeleton height={18} mt={8} radius="sm" />
+    </>
+  );
+
   return (
     <MantineReactTable
       columns={columns}
@@ -204,6 +216,8 @@ export default function MailingListTable({ data, batch, pageSize }: MailingListT
       enablePinning
       enableRowActions
       // enableRowSelection
+      enableRowNumbers
+      rowNumberMode="original" //default
       initialState={{ showColumnFilters: true }}
       positionToolbarAlertBanner="bottom"
       renderRowActionMenuItems={({ row }) => (
@@ -223,7 +237,7 @@ export default function MailingListTable({ data, batch, pageSize }: MailingListT
 
           <Title order={2}>Batch {batch}</Title>
 
-          <Menu>
+          <Menu position="right-start" withArrow>
             <Menu.Target>
               <IconDotsVertical size={18} style={{ cursor: 'pointer' }} />
             </Menu.Target>
@@ -267,7 +281,6 @@ export default function MailingListTable({ data, batch, pageSize }: MailingListT
     />
   );
 }
-
 
 const RowActions = ({ student, toggleDrawer }: { student: Student, toggleDrawer: Dispatch<React.SetStateAction<boolean>>; }) => {
   const modals = useModals();

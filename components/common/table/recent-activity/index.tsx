@@ -4,20 +4,16 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 dayjs.extend(customParseFormat)
 
-import { useStoreSelector } from '@/lib/hooks';
-import { studentState } from '@/store/index';
 import TableRow from './table-row';
 import { useStudentStore } from '@/lib/zustand';
 
 export default function RecentActivityTable(/*props*/) {
-  // const { populateStudents, loading } = useStoreSelector(studentState);
   const students = useStudentStore(state => state.students);
   const loading = useStudentStore(state => state.loading);
 
   const [sortedStudents, setSortedStudents] = useState<any>(null);
 
   useEffect(() => {
-    // const sortedStudents2 = [...populateStudents]
     setSortedStudents(students.sort(
       (a, b) => {
         const aDate = dayjs(a.updatedAt, "DD/MM/YYYY HH:mm");

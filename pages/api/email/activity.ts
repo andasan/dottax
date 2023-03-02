@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const limit = 2500;
   const offset = 0;
-  const startDate = dayjs().subtract(30, 'day').format('YYYY-MM-DD');
+  const startDate = dayjs().subtract(90, 'day').format('YYYY-MM-DD');
   const endDate = dayjs().format('YYYY-MM-DD');
   const days = undefined;
   const email = undefined;

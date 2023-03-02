@@ -3,13 +3,10 @@
 import { useEffect, useState } from 'react';
 import { Paper, Container, Box, Title, Text, Center, Button, Select, Stack } from '@mantine/core';
 import { cleanNotifications, showNotification } from '@mantine/notifications';
-import { useRouter } from 'next/navigation';
-
-import { useStoreDispatch, useStoreSelector } from '@/lib/hooks';
-import { studentAction, studentState } from '@/store/index';
+import Link from 'next/link';
 
 import BatchTable from '@/components/common/table/batch-table/email';
-import Link from 'next/link';
+import { useStudentStore } from '@/lib/zustand';
 
 export default function BatchEmailPage({ batch }: { batch: number }) {
   const [batchData, setBatchData] = useState<any>(null);
@@ -17,21 +14,15 @@ export default function BatchEmailPage({ batch }: { batch: number }) {
   const [messageSent, setMessageSent] = useState<boolean>(false);
   const [sliceValue, setSliceValue] = useState<string>('50');
 
-  const { studentsByBatch } = useStoreSelector(studentState)
-  const dispatch = useStoreDispatch();
-  const router = useRouter();
+  const students = useStudentStore(state => state.students.filter(student => student.batch === +batch && student.status === 'idle'));
 
   useEffect(() => {
-    dispatch(studentAction.loadStudentsByBatch(batch));
-  }, []);
-
-  useEffect(() => {
-    setFilteredBatchData(studentsByBatch.filter(student => student.status === 'idle').slice(0, +sliceValue));
+    setFilteredBatchData(students.slice(0, +sliceValue));
   }, [sliceValue]);
 
   useEffect(() => {
-    setBatchData(studentsByBatch);
-  }, [studentsByBatch]);
+    setBatchData(students);
+  }, [students]);
 
   const handleBatchSubmit = async () => {
 

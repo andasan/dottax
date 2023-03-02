@@ -16,6 +16,7 @@ import { config } from '@/lib/config';
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
 
   const events = await getData();
+  console.log("EVENTS: ", events.length)
   const students = await getStudents();
 
   const data = students.length > 0 ? students.map((student) => {
@@ -33,13 +34,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <NotificationRegistry>
-      <ReduxRegistry>
-        <QueryClientRegistry>
-          <ModalRegistry>
-            <Layout students={data} >{children}</Layout>
-            </ModalRegistry>
-        </QueryClientRegistry>
-      </ReduxRegistry>
+      <QueryClientRegistry>
+        <ModalRegistry>
+          <Layout students={data} >{children}</Layout>
+        </ModalRegistry>
+      </QueryClientRegistry>
     </NotificationRegistry>
   );
 }

@@ -21,7 +21,6 @@ import { Dropzone, MS_EXCEL_MIME_TYPE } from '@mantine/dropzone';
 import { showNotification } from '@mantine/notifications';
 import { v4 as uuidv4 } from 'uuid';
 
-import { useStoreDispatch } from '@/lib/hooks';
 import { formatBytes } from '@/utils/formatBytes';
 import { readFile } from '@/utils/readFile';
 
