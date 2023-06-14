@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === "development") global.prisma = prisma;
 export default prisma;
 
 export const getStudents = async (batch?: number) =>
-  await prisma.student.findMany({
+  await prisma.studentproto.findMany({
     ...(batch && { where: { batch } }),
     select: {
       id: true,

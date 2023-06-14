@@ -1,8 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
-import path from "path";
-import fs from "fs";
-
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,7 +7,7 @@ export default async function handler(
 ) {
   const { student : { id, firstName, lastName, email, studentId, status }  } = req.body;
 
-  const data = await prisma.student.update({
+  const data = await prisma.studentproto.update({
     where: {
       id
     },

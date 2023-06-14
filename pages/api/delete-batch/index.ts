@@ -8,7 +8,7 @@ export default async function handler(
 ) {
     const { batch }: { batch: number } = req.body;
 
-    await prisma.student.deleteMany({
+    await prisma.studentproto.deleteMany({
         where: {
             batch: Number(batch)
         }

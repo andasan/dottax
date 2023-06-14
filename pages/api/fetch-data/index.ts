@@ -16,9 +16,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       let data = []
       if(!batch) {
-        data = await prisma.student.findMany();
+        data = await prisma.studentproto.findMany();
       }else{
-        data = await prisma.student.findMany({
+        data = await prisma.studentproto.findMany({
           where: {
             batch: Number(batch),
           }

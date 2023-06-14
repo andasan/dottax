@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   dayjs.extend(utc)
   dayjs.extend(timezone)
   try {
-    const studentsEmailList = async (BATCH_NUMBER: number, BULK_LIMIT: number) => await prisma.student.findMany({
+    const studentsEmailList = async (BATCH_NUMBER: number, BULK_LIMIT: number) => await prisma.studentproto.findMany({
       where: {
         batch: Number(BATCH_NUMBER),
         status: 'idle',
@@ -104,7 +104,7 @@ async function sendBulkEmail(studentsEmailList: StudentEmailProps, take: number)
         console.log('API called successfully: ' + to);
 
         //update the status of the student
-        await prisma.student.update({
+        await prisma.studentproto.update({
           where: {
             id: id,
           },

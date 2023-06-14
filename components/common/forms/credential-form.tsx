@@ -63,8 +63,8 @@ export default function Form({ type }: { type: 'login' | 'register' }) {
 
   const form = useForm({
     initialValues: {
-      email: '',
-      password: '',
+      email: 'hoge@hoge.com',
+      password: 'Hoge@123',
       confirmPassword: '',
       name: '',
     },

@@ -11,13 +11,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { email, id } = req.body;
 
   //commented out for now until all emails are unique in production
-  // const exists = await prisma.student.findUnique({
+  // const exists = await prisma.studentproto.findUnique({
   //   where: {
   //     email
   //   }
   // });
 
-  const exists = await prisma.student.findUnique({
+  const exists = await prisma.studentproto.findUnique({
     where: {
       id,
     },
@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (status === 250) {
         //update the status of the student
-        await prisma.student.update({
+        await prisma.studentproto.update({
           where: {
             id,
           },

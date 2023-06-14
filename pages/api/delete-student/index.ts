@@ -8,7 +8,7 @@ export default async function handler(
 ) {
   const { id } = req.body;
 
-  await prisma.student.delete({
+  await prisma.studentproto.delete({
     where: {
       id
     }

@@ -5,10 +5,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'GET') {
     try {
-      const data = await prisma.student.findMany({ select: { batch: true }})
+      const data = await prisma.studentproto.findMany({ select: { batch: true }})
 
       //create unique array of batches
-      const batches = [...new Set(data.map((item) => item.batch))]
+      const batches = [...new Set(data.map((item: any) => item.batch))]
 
       res.status(200).json(batches);
     } catch (error) {

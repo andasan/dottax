@@ -9,7 +9,7 @@ export default async function handler(
 
   const { remapRecords } = req.body;
 
-  const data = await prisma.student.createMany({
+  const data = await prisma.studentproto.createMany({
     data: remapRecords,
     skipDuplicates: true,
   });

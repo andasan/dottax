@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const data = await prisma.emailTemplate.create({
         data: {
-          header: "Tuition Enrolment Certificate (T2202)",
+          header: "Certificate",
           body: `<p><em>Do Not Reply. This is an automated email using a third-party secure portal.</em></p><p>Hello Student,</p><p>Please find attached your confidential tax form.</p><p>Your tax form contains sensitive personal information. Download it using a trusted, secure connection instead of over free, public wi-fi, such as at airports or coffee shops, etc.</p><p>If you need assistance to file your tax, please contact our preferred partner, Phoenix Accounting Services: <a target="_blank" rel="noopener noreferrer nofollow" href="https://phoenixcanada.ca/file-your-taxes">https://phoenixcanada.ca/file-your-taxes</a></p><p>Thank you</p>`,
           footer: "© 2023 Cornerstone International College of Canada 609 West Hastings St, Vancouver, BC, Canada V6B 4W4",
         },

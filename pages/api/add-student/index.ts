@@ -8,7 +8,7 @@ export default async function handler(
 
   const { student } = req.body;
 
-  const data = await prisma.student.create({
+  const data = await prisma.studentproto.create({
     data: student,
   });
   res.status(200).json({ message: "Students added", data });

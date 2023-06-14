@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma';
 
 export default async function AddBatch() {
 
-  const students = await prisma.student.findMany({
+  const students = await prisma.studentproto.findMany({
     select: {
       id: true,
       firstName: true,

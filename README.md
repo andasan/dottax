@@ -1,4 +1,4 @@
-# Dottax - Tax Form Emailer Web Application
+# Dottax - Emailer w/ PDF from Cloudinary as attachment | Web Application
 
 <p align="center">
 This is an application for simple email blasting with pdf attached.<br/>
