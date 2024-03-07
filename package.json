@@ -40,7 +40,7 @@
     "@next/bundle-analyzer": "^13.1.6",
     "@nivo/bar": "^0.80.0",
     "@nivo/core": "^0.80.0",
-    "@nivo/line": "^0.80.0",
+    "@nivo/line": "^0.85.0",
     "@prisma/client": "^4.10.1",
     "@react-email/button": "^0.0.6",
     "@react-email/container": "^0.0.7",
